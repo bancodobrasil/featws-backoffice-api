@@ -10,37 +10,37 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-// Rules ...
-type Rules struct {
+// Rulesheets ...
+type Rulesheets struct {
 	collection *mongo.Collection
 }
 
-var instance = Rules{}
+var instanceRulesheets = Rulesheets{}
 
-// GetRulesRepository ...
-func GetRulesRepository() Rules {
-	if instance.collection == nil {
-		instance.collection = database.GetCollection("rules")
+// GetRulesheetsRepository ...
+func GetRulesheetsRepository() Rulesheets {
+	if instanceRulesheets.collection == nil {
+		instanceRulesheets.collection = database.GetCollection("rulesheets")
 	}
 
-	return instance
+	return instanceRulesheets
 }
 
 // Create ...
-func (r Rules) Create(ctx context.Context, rule *models.Rule) error {
+func (r Rulesheets) Create(ctx context.Context, rulesheet *models.Rulesheet) error {
 
-	result, err := r.collection.InsertOne(ctx, rule)
+	result, err := r.collection.InsertOne(ctx, rulesheet)
 	if err != nil {
 		return err
 	}
 
-	rule.ID = result.InsertedID.(primitive.ObjectID)
+	rulesheet.ID = result.InsertedID.(primitive.ObjectID)
 
 	return nil
 }
 
 // Find ...
-func (r Rules) Find(ctx context.Context, filter interface{}) (list []models.Rule, err error) {
+func (r Rulesheets) Find(ctx context.Context, filter interface{}) (list []models.Rulesheet, err error) {
 
 	if filter == nil {
 		filter = bson.M{}
@@ -53,19 +53,19 @@ func (r Rules) Find(ctx context.Context, filter interface{}) (list []models.Rule
 
 	defer results.Close(ctx)
 	for results.Next(ctx) {
-		var rule models.Rule
-		if err = results.Decode(&rule); err != nil {
+		var rulesheet models.Rulesheet
+		if err = results.Decode(&rulesheet); err != nil {
 			return
 		}
 
-		list = append(list, rule)
+		list = append(list, rulesheet)
 	}
 
 	return
 }
 
 // Get ...
-func (r Rules) Get(ctx context.Context, id string) (rule *models.Rule, err error) {
+func (r Rulesheets) Get(ctx context.Context, id string) (rulesheet *models.Rulesheet, err error) {
 
 	oid, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
@@ -82,13 +82,13 @@ func (r Rules) Get(ctx context.Context, id string) (rule *models.Rule, err error
 		return
 	}
 
-	result.Decode(&rule)
+	result.Decode(&rulesheet)
 
 	return
 }
 
 // Update ...
-func (r Rules) Update(ctx context.Context, entity models.Rule) (updated *models.Rule, err error) {
+func (r Rulesheets) Update(ctx context.Context, entity models.Rulesheet) (updated *models.Rulesheet, err error) {
 
 	//update := bson.M{"name": entity.Name, "type": entity.Type, "opti": entity.Headers}
 	_, err = r.collection.UpdateOne(ctx, bson.M{"_id": entity.ID}, bson.M{"$set": entity})
@@ -106,7 +106,7 @@ func (r Rules) Update(ctx context.Context, entity models.Rule) (updated *models.
 }
 
 // Delete ...
-func (r Rules) Delete(ctx context.Context, id string) (deleted bool, err error) {
+func (r Rulesheets) Delete(ctx context.Context, id string) (deleted bool, err error) {
 
 	oid, err := primitive.ObjectIDFromHex(id)
 	if err != nil {

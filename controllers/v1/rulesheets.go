@@ -12,13 +12,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// CreateRule ...
-func CreateRule() gin.HandlerFunc {
+// CreateRulesheet ...
+func CreateRulesheet() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
 
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-		var payload payloads.Rule
+		var payload payloads.Rulesheet
 		defer cancel()
 
 		// validate the request body
@@ -37,7 +37,7 @@ func CreateRule() gin.HandlerFunc {
 			return
 		}
 
-		entity, err := models.NewRuleV1(payload)
+		entity, err := models.NewRulesheetV1(payload)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, responses.Error{
 				Error: err.Error(),
@@ -45,7 +45,7 @@ func CreateRule() gin.HandlerFunc {
 			return
 		}
 
-		err = services.CreateRule(ctx, &entity)
+		err = services.CreateRulesheet(ctx, &entity)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, responses.Error{
 				Error: err.Error(),
@@ -53,13 +53,13 @@ func CreateRule() gin.HandlerFunc {
 			return
 		}
 
-		var response = responses.NewRule(entity)
+		var response = responses.NewRulesheet(entity)
 		c.JSON(http.StatusCreated, response)
 	}
 }
 
-// GetRules ...
-func GetRules() gin.HandlerFunc {
+// GetRulesheets ...
+func GetRulesheets() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
 
@@ -76,7 +76,7 @@ func GetRules() gin.HandlerFunc {
 			filter[param] = value
 		}
 
-		entities, err := services.FetchRules(ctx, filter)
+		entities, err := services.FetchRulesheets(ctx, filter)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, responses.Error{
 				Error: err.Error(),
@@ -84,18 +84,18 @@ func GetRules() gin.HandlerFunc {
 			return
 		}
 
-		var response = make([]responses.Rule, len(entities))
+		var response = make([]responses.Rulesheet, len(entities))
 
 		for index, entity := range entities {
-			response[index] = responses.NewRule(entity)
+			response[index] = responses.NewRulesheet(entity)
 		}
 
 		c.JSON(http.StatusOK, response)
 	}
 }
 
-// GetRule ...
-func GetRule() gin.HandlerFunc {
+// GetRulesheet ...
+func GetRulesheet() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
 
@@ -110,7 +110,7 @@ func GetRule() gin.HandlerFunc {
 			return
 		}
 
-		entity, err := services.FetchRule(ctx, id)
+		entity, err := services.FetchRulesheet(ctx, id)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, responses.Error{
 				Error: err.Error(),
@@ -119,7 +119,7 @@ func GetRule() gin.HandlerFunc {
 		}
 
 		if entity != nil {
-			var response = responses.NewRule(*entity)
+			var response = responses.NewRulesheet(*entity)
 
 			c.JSON(http.StatusOK, response)
 			return
@@ -129,8 +129,8 @@ func GetRule() gin.HandlerFunc {
 	}
 }
 
-// UpdateRule ...
-func UpdateRule() gin.HandlerFunc {
+// UpdateRulesheet ...
+func UpdateRulesheet() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
 
@@ -146,7 +146,7 @@ func UpdateRule() gin.HandlerFunc {
 			return
 		}
 
-		var payload payloads.Rule
+		var payload payloads.Rulesheet
 		// validate the request body
 		if err := c.BindJSON(&payload); err != nil {
 			c.JSON(http.StatusBadRequest, responses.Error{
@@ -164,7 +164,7 @@ func UpdateRule() gin.HandlerFunc {
 
 		payload.ID = id
 
-		entity, err := models.NewRuleV1(payload)
+		entity, err := models.NewRulesheetV1(payload)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, responses.Error{
 				Error: err.Error(),
@@ -172,7 +172,7 @@ func UpdateRule() gin.HandlerFunc {
 			return
 		}
 
-		updatedEntity, err := services.UpdateRule(ctx, entity)
+		updatedEntity, err := services.UpdateRulesheet(ctx, entity)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, responses.Error{
 				Error: err.Error(),
@@ -181,7 +181,7 @@ func UpdateRule() gin.HandlerFunc {
 		}
 
 		if updatedEntity != nil {
-			var response = responses.NewRule(*updatedEntity)
+			var response = responses.NewRulesheet(*updatedEntity)
 
 			c.JSON(http.StatusOK, response)
 			return
@@ -191,8 +191,8 @@ func UpdateRule() gin.HandlerFunc {
 	}
 }
 
-// DeleteRule ...
-func DeleteRule() gin.HandlerFunc {
+// DeleteRulesheet ...
+func DeleteRulesheet() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
 
@@ -208,7 +208,7 @@ func DeleteRule() gin.HandlerFunc {
 			return
 		}
 
-		deleted, err := services.DeleteRule(ctx, id)
+		deleted, err := services.DeleteRulesheet(ctx, id)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, responses.Error{
 				Error: err.Error(),

@@ -1,11 +1,11 @@
 version: "3.6"
 services:
-  resolver:
+  api:
     build: .
     ports:
-      - 9000:9000
+      - 9007:9007
     expose:
-      - 9000
+      - 9007
     env_file:
       - .env
   mongo:
