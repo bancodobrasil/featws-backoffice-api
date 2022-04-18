@@ -9,7 +9,7 @@ import (
 type Rulesheet struct {
 	ID         primitive.ObjectID `bson:"_id,omitempty"`
 	Name       string             `bson:"name,omitempty"`
-	Version   string             `bson:"-"`
+	Version    string             `bson:"-"`
 	Features   *[]interface{}     `bson:"-"`
 	Parameters *[]interface{}     `bson:"-"`
 	Rules      *map[string]string `bson:"-"`
