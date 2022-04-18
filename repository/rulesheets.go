@@ -40,7 +40,7 @@ func (r Rulesheets) Create(ctx context.Context, rulesheet *models.Rulesheet) err
 }
 
 // Find ...
-func (r Rulesheets) Find(ctx context.Context, filter interface{}) (list []models.Rulesheet, err error) {
+func (r Rulesheets) Find(ctx context.Context, filter interface{}) (list []*models.Rulesheet, err error) {
 
 	if filter == nil {
 		filter = bson.M{}
@@ -53,7 +53,7 @@ func (r Rulesheets) Find(ctx context.Context, filter interface{}) (list []models
 
 	defer results.Close(ctx)
 	for results.Next(ctx) {
-		var rulesheet models.Rulesheet
+		var rulesheet *models.Rulesheet
 		if err = results.Decode(&rulesheet); err != nil {
 			return
 		}
@@ -64,15 +64,19 @@ func (r Rulesheets) Find(ctx context.Context, filter interface{}) (list []models
 	return
 }
 
+func buildFilter(id string) interface{} {
+	oid, err := primitive.ObjectIDFromHex(id)
+	if err == nil {
+		return bson.M{"_id": oid}
+	} else {
+		return bson.M{"name": id}
+	}
+}
+
 // Get ...
 func (r Rulesheets) Get(ctx context.Context, id string) (rulesheet *models.Rulesheet, err error) {
 
-	oid, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return
-	}
-
-	result := r.collection.FindOne(ctx, bson.M{"_id": oid})
+	result := r.collection.FindOne(ctx, buildFilter(id))
 
 	err = result.Err()
 	if err != nil {
@@ -90,7 +94,6 @@ func (r Rulesheets) Get(ctx context.Context, id string) (rulesheet *models.Rules
 // Update ...
 func (r Rulesheets) Update(ctx context.Context, entity models.Rulesheet) (updated *models.Rulesheet, err error) {
 
-	//update := bson.M{"name": entity.Name, "type": entity.Type, "opti": entity.Headers}
 	_, err = r.collection.UpdateOne(ctx, bson.M{"_id": entity.ID}, bson.M{"$set": entity})
 
 	if err != nil {

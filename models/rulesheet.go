@@ -7,8 +7,12 @@ import (
 
 // Rulesheet ...
 type Rulesheet struct {
-	ID   primitive.ObjectID `bson:"_id,omitempty"`
-	Name string             `bson:"name,omitempty"`
+	ID         primitive.ObjectID `bson:"_id,omitempty"`
+	Name       string             `bson:"name,omitempty"`
+	Version   string             `bson:"-"`
+	Features   *[]interface{}     `bson:"-"`
+	Parameters *[]interface{}     `bson:"-"`
+	Rules      *map[string]string `bson:"-"`
 }
 
 // NewRulesheetV1 ...
@@ -24,8 +28,12 @@ func NewRulesheetV1(payload v1.Rulesheet) (entity Rulesheet, err error) {
 	}
 
 	entity = Rulesheet{
-		ID:   id,
-		Name: payload.Name,
+		ID:         id,
+		Name:       payload.Name,
+		Version:    payload.Version,
+		Features:   payload.Features,
+		Parameters: payload.Parameters,
+		Rules:      payload.Rules,
 	}
 	return
 }

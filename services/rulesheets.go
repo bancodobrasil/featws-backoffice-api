@@ -17,16 +17,33 @@ func CreateRulesheet(ctx context.Context, rulesheet *models.Rulesheet) (err erro
 		return
 	}
 
+	err = saveInGitlab(rulesheet, "[FEATWS BOT] Create Repo")
+	if err != nil {
+		return
+	}
+
+	err = fillWithGitlab(rulesheet)
+	if err != nil {
+		return
+	}
+
 	return
 }
 
 // FetchRulesheets ...
-func FetchRulesheets(ctx context.Context, filter interface{}) (result []models.Rulesheet, err error) {
+func FetchRulesheets(ctx context.Context, filter interface{}) (result []*models.Rulesheet, err error) {
 
 	result, err = repository.GetRulesheetsRepository().Find(ctx, filter)
 	if err != nil {
 		return
 	}
+
+	// for _, rulesheet := range result {
+	// 	err = fillWithGitlab(rulesheet)
+	// 	if err != nil {
+	// 		return
+	// 	}
+	// }
 
 	return
 }
@@ -39,6 +56,13 @@ func FetchRulesheet(ctx context.Context, id string) (result *models.Rulesheet, e
 		return
 	}
 
+	if result != nil {
+		err = fillWithGitlab(result)
+		if err != nil {
+			return
+		}
+	}
+
 	return
 }
 
@@ -46,6 +70,16 @@ func FetchRulesheet(ctx context.Context, id string) (result *models.Rulesheet, e
 func UpdateRulesheet(ctx context.Context, entity models.Rulesheet) (result *models.Rulesheet, err error) {
 
 	result, err = repository.GetRulesheetsRepository().Update(ctx, entity)
+	if err != nil {
+		return
+	}
+
+	err = saveInGitlab(&entity, "[FEATWS BOT] Update Repo")
+	if err != nil {
+		return
+	}
+
+	err = fillWithGitlab(result)
 	if err != nil {
 		return
 	}

@@ -8,9 +8,14 @@ import (
 
 //Config ...
 type Config struct {
-	Port     string `mapstructure:"PORT"`
-	MongoURI string `mapstructure:"FEATWS_RESOLVER_BRIDGE_MONGO_URI"`
-	MongoDB  string `mapstructure:"FEATWS_RESOLVER_BRIDGE_MONGO_DB"`
+	Port                string `mapstructure:"PORT"`
+	MongoURI            string `mapstructure:"FEATWS_API_MONGO_URI"`
+	MongoDB             string `mapstructure:"FEATWS_API_MONGO_DB"`
+	GitlabToken         string `mapstructure:"FEATWS_API_GITLAB_TOKEN"`
+	GitlabUrl           string `mapstructure:"FEATWS_API_GITLAB_URL"`
+	GitlabNamespace     string `mapstructure:"FEATWS_API_GITLAB_NAMESPACE"`
+	GitlabPrefix        string `mapstructure:"FEATWS_API_GITLAB_PREFIX"`
+	GitlabDefaultBranch string `mapstructure:"FEATWS_API_GITLAB_DEFAULT_BRANCH"`
 }
 
 var config = &Config{}
@@ -24,8 +29,13 @@ func LoadConfig() (err error) {
 	viper.AutomaticEnv()
 
 	viper.SetDefault("PORT", "9007")
-	viper.SetDefault("FEATWS_RESOLVER_BRIDGE_MONGO_URI", "mongodb://localhost:27017/")
-	viper.SetDefault("FEATWS_RESOLVER_BRIDGE_MONGO_DB", "resolverBridge")
+	viper.SetDefault("FEATWS_API_MONGO_URI", "mongodb://localhost:27017/")
+	viper.SetDefault("FEATWS_API_MONGO_DB", "resolverBridge")
+	viper.SetDefault("FEATWS_API_GITLAB_TOKEN", "")
+	viper.SetDefault("FEATWS_API_GITLAB_URL", "")
+	viper.SetDefault("FEATWS_API_GITLAB_NAMESPACE", "")
+	viper.SetDefault("FEATWS_API_GITLAB_PREFIX", "")
+	viper.SetDefault("FEATWS_API_GITLAB_DEFAULT_BRANCH", "main")
 
 	err = viper.ReadInConfig()
 	if err != nil {

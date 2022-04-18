@@ -16,4 +16,5 @@
 api
 _data/
 .env
+.env.local
 .json

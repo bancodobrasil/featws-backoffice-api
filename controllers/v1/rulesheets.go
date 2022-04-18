@@ -53,7 +53,7 @@ func CreateRulesheet() gin.HandlerFunc {
 			return
 		}
 
-		var response = responses.NewRulesheet(entity)
+		var response = responses.NewRulesheet(&entity)
 		c.JSON(http.StatusCreated, response)
 	}
 }
@@ -119,7 +119,7 @@ func GetRulesheet() gin.HandlerFunc {
 		}
 
 		if entity != nil {
-			var response = responses.NewRulesheet(*entity)
+			var response = responses.NewRulesheet(entity)
 
 			c.JSON(http.StatusOK, response)
 			return
@@ -181,7 +181,7 @@ func UpdateRulesheet() gin.HandlerFunc {
 		}
 
 		if updatedEntity != nil {
-			var response = responses.NewRulesheet(*updatedEntity)
+			var response = responses.NewRulesheet(updatedEntity)
 
 			c.JSON(http.StatusOK, response)
 			return

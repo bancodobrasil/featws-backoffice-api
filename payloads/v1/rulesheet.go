@@ -6,6 +6,10 @@ package v1
 // 	Load    []string               `json:"load"`
 // }
 type Rulesheet struct {
-	ID   string `json:"id,omitempty" mapstructure:"id,omitempty"`
-	Name string `json:"name,omitempty" validate:"required" mapstructure:"name"`
+	ID         string             `json:"id,omitempty"`
+	Name       string             `json:"name,omitempty" validate:"required"`
+	Version    string             `json:"version,omitempty"`
+	Features   *[]interface{}     `json:"features,omitempty"`
+	Parameters *[]interface{}     `json:"parameters,omitempty"`
+	Rules      *map[string]string `json:"rules,omitempty"`
 }
