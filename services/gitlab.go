@@ -58,7 +58,7 @@ func saveInGitlab(rulesheet *models.Rulesheet, commitMessage string) error {
 			return err
 		}
 
-		rulesheet.Version = "1"
+		rulesheet.Version = "0"
 
 	} else {
 		bVersion, err := gitlabLoadString(git, proj, cfg.GitlabDefaultBranch, "VERSION")
