@@ -88,18 +88,20 @@ func saveInGitlab(rulesheet *models.Rulesheet, commitMessage string) error {
 	actions = append(actions, commitAction)
 
 	// FEATURES
-	sort.Slice(*rulesheet.Features, func(i, j int) bool {
-		a := reflect.ValueOf((*rulesheet.Features)[i])
-		b := reflect.ValueOf((*rulesheet.Features)[j])
-		aKind := a.Kind()
-		bKind := b.Kind()
-		if aKind == reflect.Map && bKind == reflect.Map {
-			aValue := a.MapIndex(reflect.ValueOf("name")).Interface().(string)
-			bValue := b.MapIndex(reflect.ValueOf("name")).Interface().(string)
-			return aValue < bValue
-		}
-		return false
-	})
+	if rulesheet.Features != nil {
+		sort.Slice(*rulesheet.Features, func(i, j int) bool {
+			a := reflect.ValueOf((*rulesheet.Features)[i])
+			b := reflect.ValueOf((*rulesheet.Features)[j])
+			aKind := a.Kind()
+			bKind := b.Kind()
+			if aKind == reflect.Map && bKind == reflect.Map {
+				aValue := a.MapIndex(reflect.ValueOf("name")).Interface().(string)
+				bValue := b.MapIndex(reflect.ValueOf("name")).Interface().(string)
+				return aValue < bValue
+			}
+			return false
+		})
+	}
 	content, err = json.MarshalIndent(rulesheet.Features, "", "  ")
 	if err != nil {
 		log.Errorf("Failed to marshal features: %v", err)
@@ -113,18 +115,20 @@ func saveInGitlab(rulesheet *models.Rulesheet, commitMessage string) error {
 	actions = append(actions, commitAction)
 
 	// PARAMETERS
-	sort.Slice(*rulesheet.Parameters, func(i, j int) bool {
-		a := reflect.ValueOf((*rulesheet.Parameters)[i])
-		b := reflect.ValueOf((*rulesheet.Parameters)[j])
-		aKind := a.Kind()
-		bKind := b.Kind()
-		if aKind == reflect.Map && bKind == reflect.Map {
-			aValue := a.MapIndex(reflect.ValueOf("name")).Interface().(string)
-			bValue := b.MapIndex(reflect.ValueOf("name")).Interface().(string)
-			return aValue < bValue
-		}
-		return false
-	})
+	if rulesheet.Parameters != nil {
+		sort.Slice(*rulesheet.Parameters, func(i, j int) bool {
+			a := reflect.ValueOf((*rulesheet.Parameters)[i])
+			b := reflect.ValueOf((*rulesheet.Parameters)[j])
+			aKind := a.Kind()
+			bKind := b.Kind()
+			if aKind == reflect.Map && bKind == reflect.Map {
+				aValue := a.MapIndex(reflect.ValueOf("name")).Interface().(string)
+				bValue := b.MapIndex(reflect.ValueOf("name")).Interface().(string)
+				return aValue < bValue
+			}
+			return false
+		})
+	}
 	content, err = json.MarshalIndent(rulesheet.Parameters, "", "  ")
 	if err != nil {
 		log.Errorf("Failed to marshal parameters: %v", err)
@@ -137,21 +141,21 @@ func saveInGitlab(rulesheet *models.Rulesheet, commitMessage string) error {
 	}
 	actions = append(actions, commitAction)
 
-	// RULES
-
-	rules := make([]string, len(*rulesheet.Rules))
-
-	for k := range *rulesheet.Rules {
-		rules = append(rules, k)
-	}
-
-	sort.Strings(rules)
-
 	rulesBuffer := bytes.NewBufferString("")
-	for _, ruleName := range rules {
-		fmt.Fprintf(rulesBuffer, "%s = %s\n", ruleName, (*rulesheet.Rules)[ruleName])
-	}
+	// RULES
+	if rulesheet.Rules != nil {
+		rules := make([]string, 0)
 
+		for k := range *rulesheet.Rules {
+			rules = append(rules, k)
+		}
+
+		sort.Strings(rules)
+
+		for _, ruleName := range rules {
+			fmt.Fprintf(rulesBuffer, "%s = %s\n", ruleName, (*rulesheet.Rules)[ruleName])
+		}
+	}
 	commitAction, err = createOrUpdateGitlabFileCommitAction(git, proj, cfg.GitlabDefaultBranch, "rules.featws", rulesBuffer.String())
 	if err != nil {
 		log.Errorf("Failed to commit rules: %v", err)
