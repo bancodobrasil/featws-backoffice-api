@@ -230,13 +230,13 @@ func fillWithGitlab(rulesheet *models.Rulesheet) (err error) {
 
 	rulesheet.Version = strings.Replace(string(bVersion), "\n", "", -1)
 
-	rulesheet.Features, err = gitlabLoadJson(git, proj, cfg.GitlabDefaultBranch, "features.json")
+	rulesheet.Features, err = gitlabLoadJSON(git, proj, cfg.GitlabDefaultBranch, "features.json")
 	if err != nil {
 		log.Errorf("Failed to fetch features: %v", err)
 		return
 	}
 
-	rulesheet.Parameters, err = gitlabLoadJson(git, proj, cfg.GitlabDefaultBranch, "parameters.json")
+	rulesheet.Parameters, err = gitlabLoadJSON(git, proj, cfg.GitlabDefaultBranch, "parameters.json")
 	if err != nil {
 		log.Errorf("Failed to fetch parameters: %v", err)
 		return
@@ -273,7 +273,7 @@ func connectGitlab(cfg *config.Config) (*gitlab.Client, error) {
 	return git, nil
 }
 
-func gitlabLoadJson(git *gitlab.Client, proj *gitlab.Project, ref string, fileName string) (*[]interface{}, error) {
+func gitlabLoadJSON(git *gitlab.Client, proj *gitlab.Project, ref string, fileName string) (*[]interface{}, error) {
 	rawDecodedText, err := gitlabLoadString(git, proj, ref, fileName)
 	if err != nil {
 		return nil, err
