@@ -45,5 +45,5 @@ func main() {
 
 	router.Run(":" + port)
 
-	log.Infof("Listen on http://0.0.0.0:%d\n", port)
+	log.Infof("Listen on http://0.0.0.0:%s\n", port)
 }
