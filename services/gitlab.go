@@ -87,6 +87,14 @@ func saveInGitlab(rulesheet *models.Rulesheet, commitMessage string) error {
 	}
 	actions = append(actions, commitAction)
 
+	ci := cfg.GitlabCIScript
+	commitAction, err = createOrUpdateGitlabFileCommitAction(git, proj, cfg.GitlabDefaultBranch, ".gitlab-ci.yml", ci)
+	if err != nil {
+		log.Errorf("Failed to commit ci: %v", err)
+		return err
+	}
+	actions = append(actions, commitAction)
+
 	// FEATURES
 	if rulesheet.Features == nil {
 		empty := make([]interface{}, 0)

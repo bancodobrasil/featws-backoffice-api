@@ -16,6 +16,7 @@ type Config struct {
 	GitlabNamespace     string `mapstructure:"FEATWS_API_GITLAB_NAMESPACE"`
 	GitlabPrefix        string `mapstructure:"FEATWS_API_GITLAB_PREFIX"`
 	GitlabDefaultBranch string `mapstructure:"FEATWS_API_GITLAB_DEFAULT_BRANCH"`
+	GitlabCIScript      string `mapstructure:"FEATWS_API_GITLAB_CI_SCRIPT"`
 }
 
 var config = &Config{}
@@ -36,6 +37,7 @@ func LoadConfig() (err error) {
 	viper.SetDefault("FEATWS_API_GITLAB_NAMESPACE", "")
 	viper.SetDefault("FEATWS_API_GITLAB_PREFIX", "")
 	viper.SetDefault("FEATWS_API_GITLAB_DEFAULT_BRANCH", "main")
+	viper.SetDefault("FEATWS_API_GITLAB_CI_SCRIPT", "")
 
 	err = viper.ReadInConfig()
 	if err != nil {
