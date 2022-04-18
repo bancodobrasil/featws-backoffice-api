@@ -12,7 +12,7 @@ type Config struct {
 	MongoURI            string `mapstructure:"FEATWS_API_MONGO_URI"`
 	MongoDB             string `mapstructure:"FEATWS_API_MONGO_DB"`
 	GitlabToken         string `mapstructure:"FEATWS_API_GITLAB_TOKEN"`
-	GitlabUrl           string `mapstructure:"FEATWS_API_GITLAB_URL"`
+	GitlabURL           string `mapstructure:"FEATWS_API_GITLAB_URL"`
 	GitlabNamespace     string `mapstructure:"FEATWS_API_GITLAB_NAMESPACE"`
 	GitlabPrefix        string `mapstructure:"FEATWS_API_GITLAB_PREFIX"`
 	GitlabDefaultBranch string `mapstructure:"FEATWS_API_GITLAB_DEFAULT_BRANCH"`

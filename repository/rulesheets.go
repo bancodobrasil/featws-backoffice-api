@@ -68,9 +68,8 @@ func buildFilter(id string) interface{} {
 	oid, err := primitive.ObjectIDFromHex(id)
 	if err == nil {
 		return bson.M{"_id": oid}
-	} else {
-		return bson.M{"name": id}
 	}
+	return bson.M{"name": id}
 }
 
 // Get ...

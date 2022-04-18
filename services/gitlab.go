@@ -265,7 +265,7 @@ func fillWithGitlab(rulesheet *models.Rulesheet) (err error) {
 }
 
 func connectGitlab(cfg *config.Config) (*gitlab.Client, error) {
-	git, err := gitlab.NewClient(cfg.GitlabToken, gitlab.WithBaseURL(cfg.GitlabUrl))
+	git, err := gitlab.NewClient(cfg.GitlabToken, gitlab.WithBaseURL(cfg.GitlabURL))
 	if err != nil {
 		log.Errorf("Failed to create client: %v", err)
 		return nil, err
