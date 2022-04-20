@@ -11,6 +11,8 @@ require (
 	github.com/prometheus/common v0.33.0 // indirect
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/viper v1.11.0
+	github.com/swaggo/gin-swagger v1.4.2
+	github.com/swaggo/swag v1.7.9
 	github.com/toorop/gin-logrus v0.0.0-20210225092905-2c785434f26f
 	github.com/ugorji/go v1.2.7 // indirect
 	github.com/xanzy/go-gitlab v0.63.0

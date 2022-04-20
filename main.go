@@ -5,6 +5,7 @@ import (
 
 	"github.com/bancodobrasil/featws-api/config"
 	"github.com/bancodobrasil/featws-api/database"
+	_ "github.com/bancodobrasil/featws-api/docs"
 	"github.com/bancodobrasil/featws-api/routes"
 	ginMonitor "github.com/bancodobrasil/gin-monitor"
 	telemetry "github.com/bancodobrasil/gin-telemetry"
@@ -21,6 +22,27 @@ func setupLog() {
 
 	log.SetLevel(log.DebugLevel)
 }
+
+// @title FeatWS API
+// @version 1.0
+// @description API Project to provide operations to manage FeatWS knowledge repositories rules
+// @termsOfService http://swagger.io/terms/
+
+// @contact.name API Support
+// @contact.url http://www.swagger.io/support
+// @contact.email support@swagger.io
+
+// @license.name Apache 2.0
+// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host localhost:9007
+// @BasePath /api/v1
+
+// @securityDefinitions.apikey ApiKeyAuth
+// @in header
+// @name Authorization
+
+// @x-extension-openapi {"example": "value on a json format"}
 
 // Run start the resolver server with resolverFunc
 func main() {
