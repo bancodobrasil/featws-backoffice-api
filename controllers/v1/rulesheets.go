@@ -71,7 +71,7 @@ func CreateRulesheet() gin.HandlerFunc {
 	}
 }
 
-// GetRulesheet godoc
+// GetRulesheets godoc
 // @Summary 		List Rulesheets
 // @Description List Rulesheet description
 // @Tags 				rulesheet
