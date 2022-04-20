@@ -23,6 +23,7 @@ func saveInGitlab(rulesheet *models.Rulesheet, commitMessage string) error {
 
 	git, err := connectGitlab(cfg)
 	if err != nil {
+		log.Errorf("Error on connect the gitlab client: %v", err)
 		return err
 	}
 
@@ -231,6 +232,7 @@ func fillWithGitlab(rulesheet *models.Rulesheet) (err error) {
 
 	git, err := connectGitlab(cfg)
 	if err != nil {
+		log.Errorf("Error on connect the gitlab client: %v", err)
 		return
 	}
 
@@ -300,6 +302,7 @@ func connectGitlab(cfg *config.Config) (*gitlab.Client, error) {
 func gitlabLoadJSON(git *gitlab.Client, proj *gitlab.Project, ref string, fileName string) (*[]interface{}, error) {
 	rawDecodedText, err := gitlabLoadString(git, proj, ref, fileName)
 	if err != nil {
+		log.Errorf("Error on load the JSON structure: %v", err)
 		return nil, err
 	}
 

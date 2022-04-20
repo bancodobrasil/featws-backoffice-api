@@ -2,6 +2,7 @@ package models
 
 import (
 	v1 "github.com/bancodobrasil/featws-api/payloads/v1"
+	log "github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -23,6 +24,7 @@ func NewRulesheetV1(payload v1.Rulesheet) (entity Rulesheet, err error) {
 	if payload.ID != "" {
 		id, err = primitive.ObjectIDFromHex(payload.ID)
 		if err != nil {
+			log.Errorf("Error on load the payload ID: %v", err)
 			return
 		}
 	}
