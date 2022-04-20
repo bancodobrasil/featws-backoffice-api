@@ -1,0 +1,269 @@
+basePath: /api/v1
+definitions:
+  v1.Error:
+    properties:
+      error: {}
+    type: object
+  v1.Rulesheet:
+    properties:
+      features:
+        items: {}
+        type: array
+      id:
+        type: string
+      name:
+        type: string
+      parameters:
+        items: {}
+        type: array
+      rules:
+        additionalProperties:
+          type: string
+        type: object
+      version:
+        type: string
+    required:
+    - name
+    type: object
+host: localhost:9007
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: API Project to provide operations to manage FeatWS knowledge repositories
+    rules
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: FeatWS API
+  version: "1.0"
+paths:
+  /rulesheets:
+    get:
+      consumes:
+      - application/json
+      description: List Rulesheet description
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            Authorization:
+              description: token access
+              type: string
+          schema:
+            items:
+              $ref: '#/definitions/v1.Rulesheet'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.Error'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/v1.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: List Rulesheets
+      tags:
+      - rulesheet
+    post:
+      consumes:
+      - application/json
+      description: Create Rulesheet description
+      parameters:
+      - description: Rulesheet body
+        in: body
+        name: rulesheet
+        required: true
+        schema:
+          $ref: '#/definitions/v1.Rulesheet'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            Authorization:
+              description: token access
+              type: string
+          schema:
+            $ref: '#/definitions/v1.Rulesheet'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.Error'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/v1.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Create Rulesheet
+      tags:
+      - rulesheet
+  /rulesheets/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete Rulesheet by ID description
+      parameters:
+      - description: Rulesheet ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            Authorization:
+              description: token access
+              type: string
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.Error'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/v1.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete Rulesheet by ID
+      tags:
+      - rulesheet
+    get:
+      consumes:
+      - application/json
+      description: Get Rulesheet by ID description
+      parameters:
+      - description: Rulesheet ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            Authorization:
+              description: token access
+              type: string
+          schema:
+            items:
+              $ref: '#/definitions/v1.Rulesheet'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.Error'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/v1.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Get Rulesheet by ID
+      tags:
+      - rulesheet
+    put:
+      consumes:
+      - application/json
+      description: Update Rulesheet by ID description
+      parameters:
+      - description: Rulesheet ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Rulesheet body
+        in: body
+        name: rulesheet
+        required: true
+        schema:
+          $ref: '#/definitions/v1.Rulesheet'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            Authorization:
+              description: token access
+              type: string
+          schema:
+            items:
+              $ref: '#/definitions/v1.Rulesheet'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/v1.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.Error'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/v1.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Update Rulesheet by ID
+      tags:
+      - rulesheet
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
+x-extension-openapi:
+  example: value on a json format
