@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"time"
 
+	log "github.com/sirupsen/logrus"
+
 	"github.com/bancodobrasil/featws-api/models"
 	payloads "github.com/bancodobrasil/featws-api/payloads/v1"
 	responses "github.com/bancodobrasil/featws-api/responses/v1"
@@ -26,6 +28,8 @@ func CreateRulesheet() gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, responses.Error{
 				Error: err.Error(),
 			})
+			log.Errorf("Error on validate request body: %v", err)
+
 			return
 		}
 
@@ -34,6 +38,7 @@ func CreateRulesheet() gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, responses.Error{
 				Error: validationErr.Error(),
 			})
+			log.Errorf("Error on validate required fields: %v", validationErr)
 			return
 		}
 
@@ -42,6 +47,7 @@ func CreateRulesheet() gin.HandlerFunc {
 			c.JSON(http.StatusInternalServerError, responses.Error{
 				Error: err.Error(),
 			})
+			log.Errorf("Error on define rulesheet entity: %v", err)
 			return
 		}
 
@@ -50,6 +56,7 @@ func CreateRulesheet() gin.HandlerFunc {
 			c.JSON(http.StatusInternalServerError, responses.Error{
 				Error: err.Error(),
 			})
+			log.Errorf("Error on create rulesheet: %v", err)
 			return
 		}
 
@@ -81,6 +88,7 @@ func GetRulesheets() gin.HandlerFunc {
 			c.JSON(http.StatusInternalServerError, responses.Error{
 				Error: err.Error(),
 			})
+			log.Errorf("Error on fetch more than one rulesheet: %v", err)
 			return
 		}
 
@@ -107,6 +115,7 @@ func GetRulesheet() gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, responses.Error{
 				Error: "Required param 'id'",
 			})
+			log.Error("Error on check if the rulesheet exist")
 			return
 		}
 
@@ -115,6 +124,7 @@ func GetRulesheet() gin.HandlerFunc {
 			c.JSON(http.StatusInternalServerError, responses.Error{
 				Error: err.Error(),
 			})
+			log.Errorf("Error on fetch unique rulesheet: %v", err)
 			return
 		}
 
@@ -143,6 +153,7 @@ func UpdateRulesheet() gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, responses.Error{
 				Error: "Required param 'id'",
 			})
+			log.Error("Error on check if the rulesheet exist")
 			return
 		}
 
@@ -152,6 +163,7 @@ func UpdateRulesheet() gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, responses.Error{
 				Error: err.Error(),
 			})
+			log.Errorf("Error on binding the payload: %v", err)
 		}
 
 		// use the validator libraty to validate required fields
@@ -159,6 +171,7 @@ func UpdateRulesheet() gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, responses.Error{
 				Error: validationErr.Error(),
 			})
+			log.Errorf("Error on validate required fields: %v", validationErr)
 			return
 		}
 
@@ -169,6 +182,7 @@ func UpdateRulesheet() gin.HandlerFunc {
 			c.JSON(http.StatusInternalServerError, responses.Error{
 				Error: err.Error(),
 			})
+			log.Errorf("Error on define entity: %v", err)
 			return
 		}
 
@@ -177,6 +191,7 @@ func UpdateRulesheet() gin.HandlerFunc {
 			c.JSON(http.StatusInternalServerError, responses.Error{
 				Error: err.Error(),
 			})
+			log.Errorf("Error on update entity: %v", err)
 			return
 		}
 
@@ -205,6 +220,7 @@ func DeleteRulesheet() gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, responses.Error{
 				Error: "Required param 'id'",
 			})
+			log.Error("Error on check if the rulesheet exist")
 			return
 		}
 
@@ -213,6 +229,7 @@ func DeleteRulesheet() gin.HandlerFunc {
 			c.JSON(http.StatusInternalServerError, responses.Error{
 				Error: err.Error(),
 			})
+			log.Errorf("Error on delete rulesheet: %v", err)
 			return
 		}
 
