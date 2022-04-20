@@ -6,8 +6,12 @@ import (
 	"github.com/bancodobrasil/featws-api/config"
 	"github.com/bancodobrasil/featws-api/database"
 	"github.com/bancodobrasil/featws-api/routes"
+	ginMonitor "github.com/bancodobrasil/gin-monitor"
+	telemetry "github.com/bancodobrasil/gin-telemetry"
 	"github.com/gin-gonic/gin"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
+	ginlogrus "github.com/toorop/gin-logrus"
 )
 
 func setupLog() {
@@ -37,9 +41,19 @@ func main() {
 
 	database.ConnectDB()
 
-	router := gin.New()
+	monitor, err := ginMonitor.New("v1.0.0", ginMonitor.DefaultErrorMessageKey, ginMonitor.DefaultBuckets)
+	if err != nil {
+		log.Panic(err)
+	}
+	gin.DefaultWriter = log.StandardLogger().WriterLevel(log.DebugLevel)
+	gin.DefaultErrorWriter = log.StandardLogger().WriterLevel(log.ErrorLevel)
 
+	router := gin.New()
+	router.Use(ginlogrus.Logger(log.StandardLogger()), gin.Recovery())
 	routes.SetupRoutes(router)
+	router.Use(monitor.Prometheus())
+	router.GET("metrics", gin.WrapH(promhttp.Handler()))
+	router.Use(telemetry.Middleware("featws-api"))
 
 	port := cfg.Port
 
