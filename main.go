@@ -72,10 +72,10 @@ func main() {
 
 	router := gin.New()
 	router.Use(ginlogrus.Logger(log.StandardLogger()), gin.Recovery())
-	routes.SetupRoutes(router)
 	router.Use(monitor.Prometheus())
 	router.GET("metrics", gin.WrapH(promhttp.Handler()))
 	router.Use(telemetry.Middleware("featws-api"))
+	routes.SetupRoutes(router)
 
 	port := cfg.Port
 
