@@ -8,7 +8,7 @@ import (
 // Rulesheet ...
 type Rulesheet struct {
 	gorm.Model
-	Name       string             
+	Name       string
 	Version    string             `gorm:"-"`
 	Features   *[]interface{}     `gorm:"-"`
 	Parameters *[]interface{}     `gorm:"-"`
