@@ -10,8 +10,7 @@ import (
 //Config ...
 type Config struct {
 	Port                string `mapstructure:"PORT"`
-	MongoURI            string `mapstructure:"FEATWS_API_MONGO_URI"`
-	MongoDB             string `mapstructure:"FEATWS_API_MONGO_DB"`
+	MysqlURI            string `mapstructure:"FEATWS_API_MYSQL_URI"`
 	GitlabToken         string `mapstructure:"FEATWS_API_GITLAB_TOKEN"`
 	GitlabURL           string `mapstructure:"FEATWS_API_GITLAB_URL"`
 	GitlabNamespace     string `mapstructure:"FEATWS_API_GITLAB_NAMESPACE"`
@@ -31,8 +30,7 @@ func LoadConfig() (err error) {
 	viper.AutomaticEnv()
 
 	viper.SetDefault("PORT", "9007")
-	viper.SetDefault("FEATWS_API_MONGO_URI", "mongodb://localhost:27017/")
-	viper.SetDefault("FEATWS_API_MONGO_DB", "resolverBridge")
+	viper.SetDefault("FEATWS_API_MYSQL_URI", "api:api@tcp(localhost:3306)/api")
 	viper.SetDefault("FEATWS_API_GITLAB_TOKEN", "")
 	viper.SetDefault("FEATWS_API_GITLAB_URL", "")
 	viper.SetDefault("FEATWS_API_GITLAB_NAMESPACE", "")

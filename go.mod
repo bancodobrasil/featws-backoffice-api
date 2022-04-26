@@ -7,6 +7,8 @@ require (
 	github.com/bancodobrasil/gin-telemetry v0.0.1-rc1
 	github.com/gin-gonic/gin v1.7.7
 	github.com/go-playground/validator/v10 v10.10.1
+	github.com/go-sql-driver/mysql v1.6.0 // indirect
+	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/prometheus/client_golang v1.12.1
 	github.com/prometheus/common v0.33.0 // indirect
 	github.com/sirupsen/logrus v1.8.1
@@ -18,4 +20,6 @@ require (
 	github.com/xanzy/go-gitlab v0.63.0
 	go.mongodb.org/mongo-driver v1.8.3
 	go.opentelemetry.io/otel/exporters/jaeger v1.6.3 // indirect
+	gorm.io/driver/mysql v1.3.3 // indirect
+	gorm.io/gorm v1.23.4 // indirect
 )

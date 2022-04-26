@@ -6,9 +6,19 @@ import (
 
 	"github.com/bancodobrasil/featws-api/config"
 	log "github.com/sirupsen/logrus"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 )
+
+var db *gorm.DB
+
+func GetConn() *gorm.DB {
+	return db
+}
+
+func GetModel(value interface{}) *gorm.DB {
+	return db.Model(value)
+}
 
 // ConnectDB ...
 func ConnectDB() {
@@ -19,36 +29,30 @@ func ConnectDB() {
 		return
 	}
 
-	cli, err := mongo.NewClient(options.Client().ApplyURI(cfg.MongoURI))
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	dbConn, err := gorm.Open(mysql.Open(cfg.MysqlURI+"?parseTime=true"), &gorm.Config{})
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	ctx, calcel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer calcel()
-	err = cli.Connect(ctx)
+	_, err = dbConn.ConnPool.QueryContext(ctx, "SELECT 1")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	//ping the database
-	err = cli.Ping(ctx, nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-	log.Debugln("Connected to MongoDB")
-	client = cli
+	log.Debugln("Connected to Mysql...")
+	db = dbConn
 }
-
-var client *mongo.Client
 
 // GetCollection getting database collections
-func GetCollection(collectionName string) *mongo.Collection {
-	cfg := config.GetConfig()
-	if cfg == nil {
-		log.Fatalf("Não foi carregada configuracão!\n")
-		return nil
-	}
-	collection := client.Database(cfg.MongoDB).Collection(collectionName)
-	return collection
-}
+// func GetCollection(collectionName string) *mongo.Collection {
+// 	cfg := config.GetConfig()
+// 	if cfg == nil {
+// 		log.Fatalf("Não foi carregada configuracão!\n")
+// 		return nil
+// 	}
+// 	collection := client.Database(cfg.MongoDB).Collection(collectionName)
+// 	return collection
+// }

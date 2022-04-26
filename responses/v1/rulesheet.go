@@ -4,7 +4,7 @@ import "github.com/bancodobrasil/featws-api/models"
 
 // Rulesheet ...
 type Rulesheet struct {
-	ID         string             `json:"id,omitempty"`
+	ID         uint               `json:"id,omitempty"`
 	Name       string             `json:"name,omitempty"`
 	Version    string             `json:"version,omitempty"`
 	Features   *[]interface{}     `json:"features,omitempty"`
@@ -15,7 +15,7 @@ type Rulesheet struct {
 // NewRulesheet ...
 func NewRulesheet(entity *models.Rulesheet) Rulesheet {
 	return Rulesheet{
-		ID:         entity.ID.Hex(),
+		ID:         entity.ID,
 		Name:       entity.Name,
 		Version:    entity.Version,
 		Features:   entity.Features,

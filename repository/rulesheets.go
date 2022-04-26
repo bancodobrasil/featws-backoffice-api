@@ -2,41 +2,48 @@ package repository
 
 import (
 	"context"
+	"errors"
 
 	"github.com/bancodobrasil/featws-api/database"
 	"github.com/bancodobrasil/featws-api/models"
+	_ "github.com/go-sql-driver/mysql"
 	log "github.com/sirupsen/logrus"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
+
+	"gorm.io/gorm"
 )
 
 // Rulesheets ...
 type Rulesheets struct {
-	collection *mongo.Collection
+	model *gorm.DB
 }
 
 var instanceRulesheets = Rulesheets{}
 
 // GetRulesheetsRepository ...
 func GetRulesheetsRepository() Rulesheets {
-	if instanceRulesheets.collection == nil {
-		instanceRulesheets.collection = database.GetCollection("rulesheets")
+	if instanceRulesheets.model == nil {
+		database.GetConn().AutoMigrate(&models.Rulesheet{})
+		instanceRulesheets.model = database.GetModel(&models.Rulesheet{})
 	}
-
 	return instanceRulesheets
 }
 
 // Create ...
 func (r Rulesheets) Create(ctx context.Context, rulesheet *models.Rulesheet) error {
 
-	result, err := r.collection.InsertOne(ctx, rulesheet)
-	if err != nil {
-		log.Errorf("Error on insert the result into collection: %v", err)
+	result := r.model.Create(&rulesheet)
+	if result.Error != nil {
+		log.Errorf("error on insert the result into model: %v", result.Error)
+		return result.Error
+	}
+
+	if result.RowsAffected != 1 {
+		err := errors.New("error on insert not inserted")
+		log.Error(err)
 		return err
 	}
 
-	rulesheet.ID = result.InsertedID.(primitive.ObjectID)
+	//rulesheet.ID = result. InsertedID.(primitive.ObjectID)
 
 	return nil
 }
@@ -44,55 +51,27 @@ func (r Rulesheets) Create(ctx context.Context, rulesheet *models.Rulesheet) err
 // Find ...
 func (r Rulesheets) Find(ctx context.Context, filter interface{}) (list []*models.Rulesheet, err error) {
 
-	if filter == nil {
-		filter = bson.M{}
-	}
+	result := r.model.Find(&list)
 
-	results, err := r.collection.Find(ctx, filter)
+	err = result.Error
 	if err != nil {
-		log.Errorf("Error on find the results from collection: %v", err)
+		log.Errorf("Error on find: %v", err)
 		return
-	}
-
-	defer results.Close(ctx)
-	for results.Next(ctx) {
-		var rulesheet *models.Rulesheet
-		if err = results.Decode(&rulesheet); err != nil {
-			log.Errorf("Error on decode the result into rulesheet: %v", err)
-			return
-		}
-
-		list = append(list, rulesheet)
 	}
 
 	return
 }
 
-//TODO PERGUNTAR PRO RAPHA
-func buildFilter(id string) interface{} {
-	oid, err := primitive.ObjectIDFromHex(id)
-	if err == nil {
-		return bson.M{"_id": oid}
-	}
-	return bson.M{"name": id}
-}
-
 // Get ...
 func (r Rulesheets) Get(ctx context.Context, id string) (rulesheet *models.Rulesheet, err error) {
 
-	result := r.collection.FindOne(ctx, buildFilter(id))
+	result := r.model.First(&rulesheet, "id = ? or name = ?", id, id)
 
-	err = result.Err()
+	err = result.Error
 	if err != nil {
 		log.Errorf("Error on find one result into collection: %v", err)
-		//TODO PERGUNTAR PRO RAPHA
-		if err == mongo.ErrNoDocuments {
-			return nil, nil
-		}
 		return
 	}
-
-	result.Decode(&rulesheet)
 
 	return
 }
@@ -100,18 +79,15 @@ func (r Rulesheets) Get(ctx context.Context, id string) (rulesheet *models.Rules
 // Update ...
 func (r Rulesheets) Update(ctx context.Context, entity models.Rulesheet) (updated *models.Rulesheet, err error) {
 
-	_, err = r.collection.UpdateOne(ctx, bson.M{"_id": entity.ID}, bson.M{"$set": entity})
+	result := r.model.Save(&entity)
 
+	err = result.Error
 	if err != nil {
-		log.Errorf("Error on update one into collection: %v", err)
+		log.Errorf("Error on update into collection: %v", err)
 		return
 	}
 
-	updated, err = r.Get(ctx, entity.ID.Hex())
-	if err != nil {
-		log.Errorf("Error on get the updated result into collection: %v", err)
-		return
-	}
+	updated = &entity
 
 	return
 }
@@ -119,20 +95,15 @@ func (r Rulesheets) Update(ctx context.Context, entity models.Rulesheet) (update
 // Delete ...
 func (r Rulesheets) Delete(ctx context.Context, id string) (deleted bool, err error) {
 
-	oid, err := primitive.ObjectIDFromHex(id)
+	result := r.model.Delete(id)
+
+	err = result.Error
 	if err != nil {
-		log.Errorf("Error on transform the oid in Object ID: %v", err)
+		log.Errorf("Error on delete from collection: %v", err)
 		return
 	}
 
-	result, err := r.collection.DeleteOne(ctx, bson.M{"_id": oid})
-
-	if err != nil {
-		log.Errorf("Error on delete one result from colletion: %v", err)
-		return
-	}
-
-	deleted = result.DeletedCount == 1
+	deleted = result.RowsAffected == 1
 
 	return
 }
