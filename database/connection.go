@@ -12,10 +12,12 @@ import (
 
 var db *gorm.DB
 
+// GetConn ...
 func GetConn() *gorm.DB {
 	return db
 }
 
+// GetModel ...
 func GetModel(value interface{}) *gorm.DB {
 	return db.Model(value)
 }

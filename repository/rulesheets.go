@@ -6,7 +6,6 @@ import (
 
 	"github.com/bancodobrasil/featws-api/database"
 	"github.com/bancodobrasil/featws-api/models"
-	_ "github.com/go-sql-driver/mysql"
 	log "github.com/sirupsen/logrus"
 
 	"gorm.io/gorm"
