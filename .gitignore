@@ -18,3 +18,5 @@ _data/
 .env
 .env.local
 .json
+
+data/

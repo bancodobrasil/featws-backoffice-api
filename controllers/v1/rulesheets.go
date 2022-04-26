@@ -3,6 +3,7 @@ package v1
 import (
 	"context"
 	"net/http"
+	"strconv"
 	"time"
 
 	log "github.com/sirupsen/logrus"
@@ -227,7 +228,8 @@ func UpdateRulesheet() gin.HandlerFunc {
 			return
 		}
 
-		payload.ID = id
+		iid, _ := strconv.ParseUint(id, 10, 32)
+		payload.ID = uint(iid)
 
 		entity, err := models.NewRulesheetV1(payload)
 		if err != nil {

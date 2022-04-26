@@ -1,5 +1,5 @@
 #!/bin/bash
 
-docker-compose up -d mongo-express
+docker-compose up -d adminer
 
 go build -o api && ./api

@@ -2,35 +2,26 @@ package models
 
 import (
 	v1 "github.com/bancodobrasil/featws-api/payloads/v1"
-	log "github.com/sirupsen/logrus"
-	"go.mongodb.org/mongo-driver/bson/primitive"
+	"gorm.io/gorm"
 )
 
 // Rulesheet ...
 type Rulesheet struct {
-	ID         primitive.ObjectID `bson:"_id,omitempty"`
-	Name       string             `bson:"name,omitempty"`
-	Version    string             `bson:"-"`
-	Features   *[]interface{}     `bson:"-"`
-	Parameters *[]interface{}     `bson:"-"`
-	Rules      *map[string]string `bson:"-"`
+	gorm.Model
+	Name       string
+	Version    string             `gorm:"-"`
+	Features   *[]interface{}     `gorm:"-"`
+	Parameters *[]interface{}     `gorm:"-"`
+	Rules      *map[string]string `gorm:"-"`
 }
 
 // NewRulesheetV1 ...
 func NewRulesheetV1(payload v1.Rulesheet) (entity Rulesheet, err error) {
 
-	id := primitive.NilObjectID
-
-	if payload.ID != "" {
-		id, err = primitive.ObjectIDFromHex(payload.ID)
-		if err != nil {
-			log.Errorf("Error on load the payload ID: %v", err)
-			return
-		}
-	}
-
 	entity = Rulesheet{
-		ID:         id,
+		Model: gorm.Model{
+			ID: payload.ID,
+		},
 		Name:       payload.Name,
 		Version:    payload.Version,
 		Features:   payload.Features,
