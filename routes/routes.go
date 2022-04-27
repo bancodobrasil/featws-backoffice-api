@@ -1,6 +1,8 @@
 package routes
 
 import (
+	"github.com/bancodobrasil/featws-api/config"
+	"github.com/bancodobrasil/featws-api/docs"
 	"github.com/bancodobrasil/featws-api/routes/api"
 	"github.com/gin-gonic/gin"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -9,6 +11,10 @@ import (
 
 // SetupRoutes define all routes
 func SetupRoutes(router *gin.Engine) {
+
+	cfg := config.GetConfig()
+
+	docs.SwaggerInfo.Host = cfg.ExternalHost
 
 	homeRouter(router.Group("/"))
 	api.Router(router.Group("/api"))
