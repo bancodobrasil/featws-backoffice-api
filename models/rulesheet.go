@@ -8,11 +8,12 @@ import (
 // Rulesheet ...
 type Rulesheet struct {
 	gorm.Model
-	Name       string
-	Version    string             `gorm:"-"`
-	Features   *[]interface{}     `gorm:"-"`
-	Parameters *[]interface{}     `gorm:"-"`
-	Rules      *map[string]string `gorm:"-"`
+	Name        string
+	Description string
+	Version     string             `gorm:"-"`
+	Features    *[]interface{}     `gorm:"-"`
+	Parameters  *[]interface{}     `gorm:"-"`
+	Rules       *map[string]string `gorm:"-"`
 }
 
 // NewRulesheetV1 ...
@@ -22,11 +23,12 @@ func NewRulesheetV1(payload v1.Rulesheet) (entity Rulesheet, err error) {
 		Model: gorm.Model{
 			ID: payload.ID,
 		},
-		Name:       payload.Name,
-		Version:    payload.Version,
-		Features:   payload.Features,
-		Parameters: payload.Parameters,
-		Rules:      payload.Rules,
+		Name:        payload.Name,
+		Description: payload.Description,
+		Version:     payload.Version,
+		Features:    payload.Features,
+		Parameters:  payload.Parameters,
+		Rules:       payload.Rules,
 	}
 	return
 }

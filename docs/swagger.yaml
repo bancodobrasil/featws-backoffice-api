@@ -6,11 +6,13 @@ definitions:
     type: object
   v1.Rulesheet:
     properties:
+      description:
+        type: string
       features:
         items: {}
         type: array
       id:
-        type: string
+        type: integer
       name:
         type: string
       parameters:
