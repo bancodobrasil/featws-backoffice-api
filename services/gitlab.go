@@ -201,10 +201,6 @@ func saveInGitlab(rulesheet *models.Rulesheet, commitMessage string) error {
 }
 
 func createOrUpdateGitlabFileCommitAction(git *gitlab.Client, proj *gitlab.Project, ref string, filename string, content string) (*gitlab.CommitActionOptions, error) {
-	cfg := config.GetConfig()
-	if cfg.GitlabToken == "" {
-		return &gitlab.CommitActionOptions{}, nil
-	}
 	action, err := defineCreateOrUpdateGitlabFileAction(git, proj, ref, filename)
 	if err != nil {
 		log.Errorf("Failed to define file action: %v", err)
@@ -218,11 +214,6 @@ func createOrUpdateGitlabFileCommitAction(git *gitlab.Client, proj *gitlab.Proje
 }
 
 func defineCreateOrUpdateGitlabFileAction(git *gitlab.Client, proj *gitlab.Project, ref string, fileName string) (*gitlab.FileActionValue, error) {
-	//TODO check if the token exists
-	// cfg := config.GetConfig()
-	// if cfg.GitlabToken == "" {
-	// 	return &gitlab.FileActionValue{nil,},nil
-	// }
 	_, resp, err := git.RepositoryFiles.GetFile(proj.ID, fileName, &gitlab.GetFileOptions{
 		Ref: gitlab.String(ref),
 	})
@@ -305,9 +296,6 @@ func fillWithGitlab(rulesheet *models.Rulesheet) (err error) {
 }
 
 func connectGitlab(cfg *config.Config) (*gitlab.Client, error) {
-	if cfg.GitlabToken == "" {
-		return &gitlab.Client{}, nil
-	}
 	git, err := gitlab.NewClient(cfg.GitlabToken, gitlab.WithBaseURL(cfg.GitlabURL))
 
 	if err != nil {
@@ -334,10 +322,6 @@ func gitlabLoadJSON(git *gitlab.Client, proj *gitlab.Project, ref string, fileNa
 }
 
 func gitlabLoadString(git *gitlab.Client, proj *gitlab.Project, ref string, fileName string) ([]byte, error) {
-	cfg := config.GetConfig()
-	if cfg.GitlabToken == "" {
-		return []byte{}, nil
-	}
 	file, resp, err := git.RepositoryFiles.GetFile(proj.ID, fileName, &gitlab.GetFileOptions{
 		Ref: gitlab.String(ref),
 	})
