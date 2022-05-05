@@ -7,6 +7,9 @@ import (
 )
 
 // HealthLiveHandler ...
-func HealthLiveHandler(c *gin.Context) {
-	c.String(http.StatusOK, "Application is live!!!")
+func HealthLiveHandler() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.String(http.StatusOK, "Application is live!!!")
+	}
+
 }
