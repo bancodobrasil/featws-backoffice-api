@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// HomeHandler ...
+// HealthLiveHandler ...
 func HealthLiveHandler(c *gin.Context) {
 	c.String(http.StatusOK, "Application is live!!!")
 }
