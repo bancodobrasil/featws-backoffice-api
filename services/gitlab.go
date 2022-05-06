@@ -20,6 +20,9 @@ import (
 
 func saveInGitlab(rulesheet *models.Rulesheet, commitMessage string) error {
 	cfg := config.GetConfig()
+	if cfg.GitlabToken == "" {
+		return nil
+	}
 
 	git, err := connectGitlab(cfg)
 	if err != nil {
@@ -211,7 +214,6 @@ func createOrUpdateGitlabFileCommitAction(git *gitlab.Client, proj *gitlab.Proje
 }
 
 func defineCreateOrUpdateGitlabFileAction(git *gitlab.Client, proj *gitlab.Project, ref string, fileName string) (*gitlab.FileActionValue, error) {
-
 	_, resp, err := git.RepositoryFiles.GetFile(proj.ID, fileName, &gitlab.GetFileOptions{
 		Ref: gitlab.String(ref),
 	})
@@ -229,6 +231,9 @@ func defineCreateOrUpdateGitlabFileAction(git *gitlab.Client, proj *gitlab.Proje
 
 func fillWithGitlab(rulesheet *models.Rulesheet) (err error) {
 	cfg := config.GetConfig()
+	if cfg.GitlabToken == "" {
+		return nil
+	}
 
 	git, err := connectGitlab(cfg)
 	if err != nil {
@@ -292,6 +297,7 @@ func fillWithGitlab(rulesheet *models.Rulesheet) (err error) {
 
 func connectGitlab(cfg *config.Config) (*gitlab.Client, error) {
 	git, err := gitlab.NewClient(cfg.GitlabToken, gitlab.WithBaseURL(cfg.GitlabURL))
+
 	if err != nil {
 		log.Errorf("Failed to create client: %v", err)
 		return nil, err
@@ -319,6 +325,7 @@ func gitlabLoadString(git *gitlab.Client, proj *gitlab.Project, ref string, file
 	file, resp, err := git.RepositoryFiles.GetFile(proj.ID, fileName, &gitlab.GetFileOptions{
 		Ref: gitlab.String(ref),
 	})
+
 	if err != nil {
 		if resp.StatusCode == http.StatusNotFound {
 			return []byte(""), nil

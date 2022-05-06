@@ -21,5 +21,5 @@ require (
 	go.mongodb.org/mongo-driver v1.8.3
 	go.opentelemetry.io/otel/exporters/jaeger v1.6.3 // indirect
 	gorm.io/driver/mysql v1.3.3 // indirect
-	gorm.io/gorm v1.23.4 // indirect
+	gorm.io/gorm v1.23.5 // indirect
 )
