@@ -45,6 +45,7 @@ func ConnectDB() {
 	}
 
 	log.Debugln("Connected to Mysql...")
+
 	db = dbConn
 }
 

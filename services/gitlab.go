@@ -342,3 +342,19 @@ func gitlabLoadString(git *gitlab.Client, proj *gitlab.Project, ref string, file
 	}
 	return rawDecodedText, nil
 }
+
+// func ConnectToGitlab() (string, error) {
+// 	cfg := config.GetConfig()
+// 	if cfg.GitlabToken == "" {
+// 		return nil
+// 	}
+
+// 	_, err := connectGitlab(cfg)
+// 	if err != nil {
+// 		log.Errorf("Error on connect the gitlab client: %v", err)
+// 		return err
+// 	}
+
+// 	return "Ok", nil
+
+// }
