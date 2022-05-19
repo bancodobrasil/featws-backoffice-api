@@ -13,10 +13,12 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// HealthController the health endpoints controller
 type HealthController struct {
 	health healthcheck.Handler
 }
 
+// NewHealthController ...
 func NewHealthController() *HealthController {
 	return &HealthController{
 		health: newHandler(),
