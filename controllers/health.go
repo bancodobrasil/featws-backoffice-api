@@ -28,20 +28,33 @@ func NewHealthController() *HealthController {
 	}
 }
 
+var health = healthcheck.NewHandler()
+
 func newHandler() healthcheck.Handler {
 	cfg := config.GetConfig()
-	rawGitlabURL := cfg.GitlabURL
-	gitlab, _ := url.Parse(rawGitlabURL)
-	gitlabUrl := gitlab.Scheme + "://" + gitlab.Host
-	health := healthcheck.NewHandler()
 	health.AddLivenessCheck("goroutine-threshold", goroutine.Count(100))
-	database, err := database.GetConn().DB()
-	if err != nil {
-		log.Fatal(err)
-	}
 
-	health.AddReadinessCheck("database", db.Ping(database, 1*time.Second))
-	health.AddReadinessCheck("gitlab", Get(gitlabUrl, 1*time.Second))
+	if cfg.GitlabURL != "" {
+		rawGitlabURL := cfg.GitlabURL
+		gitlab, _ := url.Parse(rawGitlabURL)
+
+		if gitlab.Scheme == "" {
+			log.Fatal("gitlab must have a scheme: http:// or https://")
+		}
+
+		if gitlab.Host == "" {
+			log.Fatal("gitlab must have a host: example.com")
+		}
+		gitlabURL := gitlab.Scheme + "://" + gitlab.Host
+		health.AddReadinessCheck("gitlab", Get(gitlabURL, 1*time.Second))
+
+		database, err := database.GetConn().DB()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		health.AddReadinessCheck("database", db.Ping(database, 1*time.Second))
+	}
 	return health
 }
 
