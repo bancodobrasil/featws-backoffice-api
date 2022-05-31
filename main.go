@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"strings"
 
 	"github.com/bancodobrasil/featws-api/config"
 	"github.com/bancodobrasil/featws-api/database"
@@ -9,6 +10,7 @@ import (
 	"github.com/bancodobrasil/featws-api/routes"
 	ginMonitor "github.com/bancodobrasil/gin-monitor"
 	telemetry "github.com/bancodobrasil/gin-telemetry"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
@@ -71,10 +73,16 @@ func main() {
 	gin.DefaultErrorWriter = log.StandardLogger().WriterLevel(log.ErrorLevel)
 
 	router := gin.New()
+
 	router.Use(ginlogrus.Logger(log.StandardLogger()), gin.Recovery())
 	router.Use(monitor.Prometheus())
 	router.GET("metrics", gin.WrapH(promhttp.Handler()))
 	router.Use(telemetry.Middleware("featws-api"))
+
+	configCors := cors.DefaultConfig()
+	configCors.AllowOrigins = strings.Split(cfg.AllowOrigins, ",")
+	router.Use(cors.New(configCors))
+
 	routes.SetupRoutes(router)
 
 	port := cfg.Port

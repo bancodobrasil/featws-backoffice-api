@@ -6,6 +6,7 @@ require (
 	github.com/bancodobrasil/gin-monitor v1.0.0-rc1
 	github.com/bancodobrasil/gin-telemetry v0.0.1-rc1
 	github.com/bancodobrasil/healthcheck v0.0.2-rc1
+	github.com/gin-contrib/cors v1.3.1
 	github.com/gin-gonic/gin v1.7.7
 	github.com/go-playground/validator/v10 v10.10.1
 	github.com/gsdenys/healthcheck v0.0.0-20220412001953-64e5089fa0bc

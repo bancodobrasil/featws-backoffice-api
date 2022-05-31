@@ -16,7 +16,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// HealthController ...
+// HealthController the health endpoints controller
 type HealthController struct {
 	health healthcheck.Handler
 }

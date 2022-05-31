@@ -9,6 +9,7 @@ import (
 
 //Config ...
 type Config struct {
+	AllowOrigins        string `mapstructure:"ALLOW_ORIGINS"`
 	Port                string `mapstructure:"PORT"`
 	MysqlURI            string `mapstructure:"FEATWS_API_MYSQL_URI"`
 	GitlabToken         string `mapstructure:"FEATWS_API_GITLAB_TOKEN"`
@@ -30,6 +31,7 @@ func LoadConfig() (err error) {
 
 	viper.AutomaticEnv()
 
+	viper.SetDefault("ALLOW_ORIGINS", "http://localhost")
 	viper.SetDefault("PORT", "9007")
 	viper.SetDefault("FEATWS_API_MYSQL_URI", "api:api@tcp(localhost:3306)/api")
 	viper.SetDefault("FEATWS_API_GITLAB_TOKEN", "")
