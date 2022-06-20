@@ -15,6 +15,24 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type Rulesheets interface {
+	CreateRulesheet() gin.HandlerFunc
+	GetRulesheets() gin.HandlerFunc
+	GetRulesheet() gin.HandlerFunc
+	UpdateRulesheet() gin.HandlerFunc
+	DeleteRulesheet() gin.HandlerFunc
+}
+
+type rulesheets struct {
+	service services.Rulesheets
+}
+
+func NewRulesheets(service services.Rulesheets) Rulesheets {
+	return &rulesheets{
+		service: service,
+	}
+}
+
 // CreateRulesheet godoc
 // @Summary 		Create Rulesheet
 // @Description Create Rulesheet description
@@ -29,7 +47,7 @@ import (
 // @Failure 		default {object} responses.Error
 // @Security 		ApiKeyAuth
 // @Router 			/rulesheets [post]
-func CreateRulesheet() gin.HandlerFunc {
+func (rc *rulesheets) CreateRulesheet() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
 
@@ -65,7 +83,7 @@ func CreateRulesheet() gin.HandlerFunc {
 			return
 		}
 
-		err = services.CreateRulesheet(ctx, &entity)
+		err = rc.service.Create(ctx, &entity)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, responses.Error{
 				Error: err.Error(),
@@ -92,7 +110,7 @@ func CreateRulesheet() gin.HandlerFunc {
 // @Failure 		default {object} responses.Error
 // @Security 		ApiKeyAuth
 // @Router 			/rulesheets [get]
-func GetRulesheets() gin.HandlerFunc {
+func (rc *rulesheets) GetRulesheets() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
 
@@ -109,7 +127,7 @@ func GetRulesheets() gin.HandlerFunc {
 			filter[param] = value
 		}
 
-		entities, err := services.FetchRulesheets(ctx, filter)
+		entities, err := rc.service.Find(ctx, filter)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, responses.Error{
 				Error: err.Error(),
@@ -142,7 +160,7 @@ func GetRulesheets() gin.HandlerFunc {
 // @Failure 		default {object} responses.Error
 // @Security 		ApiKeyAuth
 // @Router 			/rulesheets/{id} [get]
-func GetRulesheet() gin.HandlerFunc {
+func (rc *rulesheets) GetRulesheet() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
 
@@ -158,7 +176,7 @@ func GetRulesheet() gin.HandlerFunc {
 			return
 		}
 
-		entity, err := services.FetchRulesheet(ctx, id)
+		entity, err := rc.service.Get(ctx, id)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, responses.Error{
 				Error: err.Error(),
@@ -193,7 +211,7 @@ func GetRulesheet() gin.HandlerFunc {
 // @Failure 		default {object} responses.Error
 // @Security 		ApiKeyAuth
 // @Router 			/rulesheets/{id} [put]
-func UpdateRulesheet() gin.HandlerFunc {
+func (rc *rulesheets) UpdateRulesheet() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
 
@@ -240,7 +258,7 @@ func UpdateRulesheet() gin.HandlerFunc {
 			return
 		}
 
-		updatedEntity, err := services.UpdateRulesheet(ctx, entity)
+		updatedEntity, err := rc.service.Update(ctx, entity)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, responses.Error{
 				Error: err.Error(),
@@ -274,7 +292,7 @@ func UpdateRulesheet() gin.HandlerFunc {
 // @Failure 		default {object} responses.Error
 // @Security 		ApiKeyAuth
 // @Router 			/rulesheets/{id} [delete]
-func DeleteRulesheet() gin.HandlerFunc {
+func (rc *rulesheets) DeleteRulesheet() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
 
@@ -291,7 +309,7 @@ func DeleteRulesheet() gin.HandlerFunc {
 			return
 		}
 
-		deleted, err := services.DeleteRulesheet(ctx, id)
+		deleted, err := rc.service.Delete(ctx, id)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, responses.Error{
 				Error: err.Error(),

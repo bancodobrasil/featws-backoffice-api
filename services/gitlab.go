@@ -18,25 +18,42 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func saveInGitlab(rulesheet *models.Rulesheet, commitMessage string) error {
-	cfg := config.GetConfig()
-	if cfg.GitlabToken == "" {
+type Gitlab interface {
+	Save(rulesheet *models.Rulesheet, commitMessage string) error
+	Fill(rulesheet *models.Rulesheet) error
+}
+
+type gitlabService struct {
+	cfg *config.Config
+}
+
+func NewGitlab(cfg *config.Config) Gitlab {
+	return &gitlabService{
+		cfg: cfg,
+	}
+}
+
+func (gs *gitlabService) Save(rulesheet *models.Rulesheet, commitMessage string) error {
+
+	cfg := gs.cfg
+
+	if gs.cfg.GitlabToken == "" {
 		return nil
 	}
 
-	git, err := connectGitlab(cfg)
+	git, err := connectGitlab(gs.cfg)
 	if err != nil {
 		log.Errorf("Error on connect the gitlab client: %v", err)
 		return err
 	}
 
-	ns, _, err := git.Namespaces.GetNamespace(cfg.GitlabNamespace)
+	ns, _, err := git.Namespaces.GetNamespace(gs.cfg.GitlabNamespace)
 	if err != nil {
 		log.Errorf("Failed to fetch namespace: %v", err)
 		return err
 	}
 
-	proj, resp, err := git.Projects.GetProject(fmt.Sprintf("%s/%s%s", ns.Path, cfg.GitlabPrefix, rulesheet.Name), &gitlab.GetProjectOptions{})
+	proj, resp, err := git.Projects.GetProject(fmt.Sprintf("%s/%s%s", ns.Path, gs.cfg.GitlabPrefix, rulesheet.Name), &gitlab.GetProjectOptions{})
 	if err != nil {
 		if resp.StatusCode != http.StatusNotFound {
 			log.Errorf("Failed to fetch project: %v", err)
@@ -229,31 +246,30 @@ func defineCreateOrUpdateGitlabFileAction(git *gitlab.Client, proj *gitlab.Proje
 	return gitlab.FileAction(gitlab.FileUpdate), nil
 }
 
-func fillWithGitlab(rulesheet *models.Rulesheet) (err error) {
-	cfg := config.GetConfig()
-	if cfg.GitlabToken == "" {
+func (gs *gitlabService) Fill(rulesheet *models.Rulesheet) (err error) {
+	if gs.cfg.GitlabToken == "" {
 		return nil
 	}
 
-	git, err := connectGitlab(cfg)
+	git, err := connectGitlab(gs.cfg)
 	if err != nil {
 		log.Errorf("Error on connect the gitlab client: %v", err)
 		return
 	}
 
-	ns, _, err := git.Namespaces.GetNamespace(cfg.GitlabNamespace)
+	ns, _, err := git.Namespaces.GetNamespace(gs.cfg.GitlabNamespace)
 	if err != nil {
 		log.Errorf("Failed to fetch namespace: %v", err)
 		return
 	}
 
-	proj, _, err := git.Projects.GetProject(fmt.Sprintf("%s/%s%s", ns.Path, cfg.GitlabPrefix, rulesheet.Name), &gitlab.GetProjectOptions{})
+	proj, _, err := git.Projects.GetProject(fmt.Sprintf("%s/%s%s", ns.Path, gs.cfg.GitlabPrefix, rulesheet.Name), &gitlab.GetProjectOptions{})
 	if err != nil {
 		log.Errorf("Failed to fetch project: %v", err)
 		return
 	}
 
-	bVersion, err := gitlabLoadString(git, proj, cfg.GitlabDefaultBranch, "VERSION")
+	bVersion, err := gitlabLoadString(git, proj, gs.cfg.GitlabDefaultBranch, "VERSION")
 	if err != nil {
 		log.Errorf("Failed to fetch version: %v", err)
 		return
@@ -261,19 +277,19 @@ func fillWithGitlab(rulesheet *models.Rulesheet) (err error) {
 
 	rulesheet.Version = strings.Replace(string(bVersion), "\n", "", -1)
 
-	rulesheet.Features, err = gitlabLoadJSON(git, proj, cfg.GitlabDefaultBranch, "features.json")
+	rulesheet.Features, err = gitlabLoadJSON(git, proj, gs.cfg.GitlabDefaultBranch, "features.json")
 	if err != nil {
 		log.Errorf("Failed to fetch features: %v", err)
 		return
 	}
 
-	rulesheet.Parameters, err = gitlabLoadJSON(git, proj, cfg.GitlabDefaultBranch, "parameters.json")
+	rulesheet.Parameters, err = gitlabLoadJSON(git, proj, gs.cfg.GitlabDefaultBranch, "parameters.json")
 	if err != nil {
 		log.Errorf("Failed to fetch parameters: %v", err)
 		return
 	}
 
-	bRules, err := gitlabLoadString(git, proj, cfg.GitlabDefaultBranch, "rules.featws")
+	bRules, err := gitlabLoadString(git, proj, gs.cfg.GitlabDefaultBranch, "rules.featws")
 	if err != nil {
 		log.Errorf("Failed to fetch parameters: %v", err)
 		return

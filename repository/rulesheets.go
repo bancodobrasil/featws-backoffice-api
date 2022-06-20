@@ -11,15 +11,19 @@ import (
 	"gorm.io/gorm"
 )
 
+type Rulesheets interface {
+	Repository[models.Rulesheet]
+}
+
 // Rulesheets ...
-type Rulesheets struct {
+type rulesheets struct {
 	model *gorm.DB
 }
 
-var instanceRulesheets = Rulesheets{}
+var instanceRulesheets = &rulesheets{}
 
-// GetRulesheetsRepository ...
-func GetRulesheetsRepository() Rulesheets {
+// GetRulesheets ...
+func GetRulesheets() Rulesheets {
 	if instanceRulesheets.model == nil {
 		database.GetConn().AutoMigrate(&models.Rulesheet{})
 		instanceRulesheets.model = database.GetModel(&models.Rulesheet{})
@@ -28,7 +32,7 @@ func GetRulesheetsRepository() Rulesheets {
 }
 
 // Create ...
-func (r Rulesheets) Create(ctx context.Context, rulesheet *models.Rulesheet) error {
+func (r *rulesheets) Create(ctx context.Context, rulesheet *models.Rulesheet) error {
 
 	result := r.model.Create(&rulesheet)
 	if result.Error != nil {
@@ -48,7 +52,7 @@ func (r Rulesheets) Create(ctx context.Context, rulesheet *models.Rulesheet) err
 }
 
 // Find ...
-func (r Rulesheets) Find(ctx context.Context, filter interface{}) (list []*models.Rulesheet, err error) {
+func (r *rulesheets) Find(ctx context.Context, filter interface{}) (list []*models.Rulesheet, err error) {
 
 	result := r.model.Find(&list)
 
@@ -62,7 +66,7 @@ func (r Rulesheets) Find(ctx context.Context, filter interface{}) (list []*model
 }
 
 // Get ...
-func (r Rulesheets) Get(ctx context.Context, id string) (rulesheet *models.Rulesheet, err error) {
+func (r *rulesheets) Get(ctx context.Context, id string) (rulesheet *models.Rulesheet, err error) {
 
 	result := r.model.First(&rulesheet, "id = ? or name = ?", id, id)
 
@@ -76,7 +80,7 @@ func (r Rulesheets) Get(ctx context.Context, id string) (rulesheet *models.Rules
 }
 
 // Update ...
-func (r Rulesheets) Update(ctx context.Context, entity models.Rulesheet) (updated *models.Rulesheet, err error) {
+func (r *rulesheets) Update(ctx context.Context, entity models.Rulesheet) (updated *models.Rulesheet, err error) {
 
 	result := r.model.Save(&entity)
 
@@ -92,7 +96,7 @@ func (r Rulesheets) Update(ctx context.Context, entity models.Rulesheet) (update
 }
 
 // Delete ...
-func (r Rulesheets) Delete(ctx context.Context, id string) (deleted bool, err error) {
+func (r *rulesheets) Delete(ctx context.Context, id string) (deleted bool, err error) {
 
 	result := r.model.Delete(id)
 
