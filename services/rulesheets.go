@@ -8,6 +8,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// Rulesheets ...
 type Rulesheets interface {
 	Create(context.Context, *models.Rulesheet) error
 	Find(ctx context.Context, filter interface{}) ([]*models.Rulesheet, error)
@@ -21,6 +22,7 @@ type rulesheets struct {
 	repository    repository.Rulesheets
 }
 
+// NewRulesheets ...
 func NewRulesheets(repository repository.Rulesheets, gitlabService Gitlab) Rulesheets {
 	return rulesheets{
 		repository:    repository,

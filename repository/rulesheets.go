@@ -11,11 +11,11 @@ import (
 	"gorm.io/gorm"
 )
 
+// Rulesheets ...
 type Rulesheets interface {
 	Repository[models.Rulesheet]
 }
 
-// Rulesheets ...
 type rulesheets struct {
 	model *gorm.DB
 }

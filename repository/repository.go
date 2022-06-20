@@ -4,6 +4,7 @@ import (
 	"context"
 )
 
+// Repository ...
 type Repository[T any] interface {
 	Create(ctx context.Context, entity *T) error
 	Find(ctx context.Context, filter interface{}) (list []*T, err error)

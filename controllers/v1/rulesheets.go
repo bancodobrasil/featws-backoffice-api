@@ -15,6 +15,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Rulesheets ...
 type Rulesheets interface {
 	CreateRulesheet() gin.HandlerFunc
 	GetRulesheets() gin.HandlerFunc
@@ -27,6 +28,7 @@ type rulesheets struct {
 	service services.Rulesheets
 }
 
+// NewRulesheets ...
 func NewRulesheets(service services.Rulesheets) Rulesheets {
 	return &rulesheets{
 		service: service,

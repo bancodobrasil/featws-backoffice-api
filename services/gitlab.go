@@ -18,6 +18,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// Gitlab ...
 type Gitlab interface {
 	Save(rulesheet *models.Rulesheet, commitMessage string) error
 	Fill(rulesheet *models.Rulesheet) error
@@ -27,6 +28,7 @@ type gitlabService struct {
 	cfg *config.Config
 }
 
+// NewGitlab ...
 func NewGitlab(cfg *config.Config) Gitlab {
 	return &gitlabService{
 		cfg: cfg,

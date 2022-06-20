@@ -1,4 +1,8 @@
 
+lint:
+	go install golang.org/x/lint/golint@latest
+	golint ./...
+
 up-services:
 	docker-compose up -d adminer
 
