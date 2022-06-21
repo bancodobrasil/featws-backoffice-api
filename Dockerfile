@@ -10,6 +10,8 @@ RUN go mod download
 
 COPY . /app
 
+RUN swag init
+
 RUN go build -o api
 
 FROM alpine:3.15

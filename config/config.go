@@ -26,7 +26,7 @@ var config = &Config{}
 //LoadConfig ...
 func LoadConfig() (err error) {
 	viper.AddConfigPath("./")
-	viper.SetConfigFile(".env")
+	viper.SetConfigFile(".env.desenv")
 	viper.SetConfigType("env")
 
 	viper.AutomaticEnv()

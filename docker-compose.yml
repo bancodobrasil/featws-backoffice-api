@@ -7,24 +7,39 @@ services:
     expose:
       - 9007
     env_file:
-      - .env
-  db:
-    image: mysql:8-debian
+      - .env.desenv
+    extra_hosts:
+      - "silo8-master.mysql.bdh.desenv.bb.com.br:170.66.41.165"
+      - "canais.fontes.intranet.bb.com.br:170.66.49.75"
+  mongo:
+    image: mongo
     restart: always
     ports:
-      - 3306:3306
+      - 27017:27017
     volumes:
-      - ./data/mysql:/var/lib/mysql
+      - ./_data/db:/data/db
     environment:
-      MYSQL_ROOT_PASSWORD: "root"
-      MYSQL_DATABASE: "api"
-      MYSQL_USER: "api"
-      MYSQL_PASSWORD: "api"
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+  # db:
+  #   image: mysql:8-debian
+  #   restart: always
+  #   ports:
+  #     - 3306:3306
+  #   volumes:
+  #     - ./data/mysql:/var/lib/mysql
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: "root"
+  #     MYSQL_DATABASE: "api"
+  #     MYSQL_USER: "api"
+  #     MYSQL_PASSWORD: "api"
 
-  adminer:
-    image: adminer
-    depends_on:
-      - db
-    restart: always
-    ports:
-      - 8080:8080
+  # adminer:
+  #   image: adminer
+  #   depends_on:
+  #     - db
+  #   restart: always
+  #   ports:
+  #     - 8080:8080
+
+  
