@@ -32,4 +32,5 @@ generate-mocks:
 	mockery --disable-version-string --output ./mocks/repository --dir repository --all
 
 generate-swagger:
+#   Install swag on https://github.com/swaggo/swag
 	swag i
