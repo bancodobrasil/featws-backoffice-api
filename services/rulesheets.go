@@ -65,7 +65,7 @@ func (rs rulesheets) Create(ctx context.Context, rulesheetDTO *dtos.Rulesheet) (
 // FetchRulesheets ...
 func (rs rulesheets) Find(ctx context.Context, filter interface{}) (result []*dtos.Rulesheet, err error) {
 
-	entities, err := rs.repository.Find(ctx, filter)
+	entities, err := rs.repository.Find(ctx, filter, &repository.FindOptions{})
 	if err != nil {
 		log.Errorf("Error on fetch the rulesheets(find): %v", err)
 		return
