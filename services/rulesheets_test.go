@@ -8,6 +8,8 @@ import (
 	"github.com/bancodobrasil/featws-api/dtos"
 	mocks_repository "github.com/bancodobrasil/featws-api/mocks/repository"
 	mocks_services "github.com/bancodobrasil/featws-api/mocks/services"
+	"github.com/bancodobrasil/featws-api/models"
+	log "github.com/sirupsen/logrus"
 )
 
 func TestGetWithErrorOnFill(t *testing.T) {
@@ -38,10 +40,8 @@ func TestGet(t *testing.T) {
 
 	ctx := context.Background()
 
-	expectedEntity := &models.Rulesheet{
-		Model: gorm.Model{
-			ID: 2,
-		},
+	expectedEntity := &dtos.Rulesheet{
+		ID:   2,
 		Name: "test",
 	}
 
@@ -60,17 +60,35 @@ func TestGet(t *testing.T) {
 	}
 }
 
-// func TestCreateRulesheet(t *testing.T) {
+func TestCreateRulesheet(t *testing.T) {
 
-// 	ctx :=  context.Background()
+	ctx := context.Background()
 
-// 	expectedEntity := &models.Rulesheet{
-// 		Model: gorm.Model{
-// 			ID: 1,
-// 		}
-// 	}
+	dto := &dtos.Rulesheet{
+		ID: 1,
+	}
 
-// 	repository := new(mocks_repository.Rulesheets)
-// 	repository.
+	rulesheet, err := models.NewRulesheetV1(*dto)
+	if err != nil {
+		log.Errorf("Error on create rulesheet on create model: %v", err)
+		return
+	}
 
-// }
+	fakeCommitMessage := "test"
+
+	repository := new(mocks_repository.Rulesheets)
+	repository.On("Create", ctx, &rulesheet).Return(rulesheet, nil)
+
+	gitlabService := new(mocks_services.Gitlab)
+	// gitlabService.On("Fill", dto).Return(nil)
+	gitlabService.On("Save", dto, fakeCommitMessage).Return(nil)
+
+	service := NewRulesheets(repository, gitlabService)
+
+	result := service.Create(ctx, dto)
+
+	if result != nil {
+		t.Error("Error on create the rulesheet")
+	}
+
+}

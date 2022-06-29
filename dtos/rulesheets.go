@@ -73,7 +73,7 @@ func NewRulesheetV1(payload v1.Rulesheet) (dto Rulesheet, err error) {
 func buildRule(v interface{}) (interface{}, error) {
 	switch value := v.(type) {
 	case []interface{}:
-		//                                                                                                                                                                                                                                                                                                                                                                                                                                                                        fmt.Println("LIST", value)
+		//fmt.Println("LIST", value)
 		list := make([]interface{}, 0)
 		for _, item := range value {
 			itemRule, err := buildRule(item)

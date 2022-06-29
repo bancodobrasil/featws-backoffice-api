@@ -53,11 +53,11 @@ func (rs rulesheets) Create(ctx context.Context, rulesheetDTO *dtos.Rulesheet) (
 		return
 	}
 
-	err = rs.gitlabService.Fill(rulesheetDTO)
-	if err != nil {
-		log.Errorf("Error on fill rulesheet with gitlab information: %v", err)
-		return
-	}
+	// err = rs.gitlabService.Fill(rulesheetDTO)
+	// if err != nil {
+	// 	log.Errorf("Error on fill rulesheet with gitlab information: %v", err)
+	// 	return
+	// }
 
 	return
 }
@@ -98,13 +98,13 @@ func (rs rulesheets) Get(ctx context.Context, id string) (result *dtos.Rulesheet
 
 	result = newRulesheetDTO(entity)
 
-	if result != nil {
-		err = rs.gitlabService.Fill(result)
-		if err != nil {
-			log.Errorf("Error on fill rulesheet with gitlab information: %v", err)
-			return
-		}
-	}
+	// if result != nil {
+	// 	// err = rs.gitlabService.Fill(result)
+	// 	// if err != nil {
+	// 	// 	log.Errorf("Error on fill rulesheet with gitlab information: %v", err)
+	// 	// 	return
+	// 	// }
+	// }
 
 	return
 }

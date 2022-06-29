@@ -4,19 +4,16 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/bancodobrasil/featws-api/models"
+	"github.com/bancodobrasil/featws-api/dtos"
 	"github.com/xanzy/go-gitlab"
-	"gorm.io/gorm"
 
 	mocks_services "github.com/bancodobrasil/featws-api/mocks/services"
 )
 
 func TestSave(t *testing.T) {
 
-	fakeRuleSheet := &models.Rulesheet{
-		Model: gorm.Model{
-			ID: 1,
-		},
+	fakeRuleSheet := &dtos.Rulesheet{
+		ID: 1,
 	}
 
 	fakeCommitMessage := "testCommit"
@@ -49,10 +46,8 @@ func TestCreateOrUpdateGilabFileCommitActionFailToDifineFileAction(t *testing.T)
 
 func TestFill(t *testing.T) {
 
-	fakeRuleSheet := &models.Rulesheet{
-		Model: gorm.Model{
-			ID: 1,
-		},
+	fakeRuleSheet := &dtos.Rulesheet{
+		ID: 1,
 	}
 
 	service := new(mocks_services.Gitlab)
@@ -69,12 +64,9 @@ func TestFill(t *testing.T) {
 
 func TestFillErrorOnConnectTo(t *testing.T) {
 
-	fakeRuleSheet := &models.Rulesheet{
-		Model: gorm.Model{
-			ID: 1,
-		},
+	fakeRuleSheet := &dtos.Rulesheet{
+		ID: 1,
 	}
-
 	service := new(mocks_services.Gitlab)
 
 	service.On("Fill", fakeRuleSheet).Return(errors.New("error on fill"))
