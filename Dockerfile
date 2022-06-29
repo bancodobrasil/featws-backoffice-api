@@ -1,5 +1,7 @@
 FROM golang:1.18-alpine AS BUILD
 
+RUN go install github.com/swaggo/swag/cmd/swag@v1.8.3
+
 WORKDIR /app
 
 COPY go.mod /app
