@@ -209,8 +209,8 @@ func (gs *gitlabService) Save(rulesheet *dtos.Rulesheet, commitMessage string) e
 				switch r := entry.(type) {
 				case *dtos.Rule:
 					r.Value.NomeAplicativo = strings.Trim(r.Value.NomeAplicativo, " ")
-					r.Value.TextoUrlDesvio = strings.Trim(r.Value.TextoUrlDesvio, " ")
-					r.Value.TextoUrlPadrao = strings.Trim(r.Value.TextoUrlPadrao, " ")
+					r.Value.TextoURLDesvio = strings.Trim(r.Value.TextoURLDesvio, " ")
+					r.Value.TextoURLPadrao = strings.Trim(r.Value.TextoURLPadrao, " ")
 					value, err := json.Marshal(r.Value)
 					if err != nil {
 						log.Errorf("Failed marshal rule value: %v", err)

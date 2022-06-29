@@ -136,6 +136,8 @@ func (rs rulesheets) Update(ctx context.Context, rulesheetDTO dtos.Rulesheet) (r
 	// 	return
 	// }
 
+	result = &rulesheetDTO
+
 	return
 }
 

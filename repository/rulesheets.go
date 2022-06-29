@@ -84,7 +84,7 @@ func (r *rulesheets) Update(ctx context.Context, entity models.Rulesheet) (updat
 
 	db := r.model.Session(&gorm.Session{})
 
-	result := db.Model(&entity).Save(&entity)
+	result := db.Model(entity).Save(&entity)
 
 	err = result.Error
 	if err != nil {
