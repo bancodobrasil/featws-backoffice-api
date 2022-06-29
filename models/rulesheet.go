@@ -1,34 +1,32 @@
 package models
 
 import (
-	v1 "github.com/bancodobrasil/featws-api/payloads/v1"
+	"time"
+
+	"github.com/bancodobrasil/featws-api/dtos"
 	"gorm.io/gorm"
 )
 
 // Rulesheet ...
 type Rulesheet struct {
 	gorm.Model
-	Name        string
-	Description string
-	Version     string             `gorm:"-"`
-	Features    *[]interface{}     `gorm:"-"`
-	Parameters  *[]interface{}     `gorm:"-"`
-	Rules       *map[string]string `gorm:"-"`
+	Name          string
+	Description   string
+	HasStringRule bool
+	CreatedAt     *time.Time
+	UpdatedAt     *time.Time
 }
 
 // NewRulesheetV1 ...
-func NewRulesheetV1(payload v1.Rulesheet) (entity Rulesheet, err error) {
+func NewRulesheetV1(dto dtos.Rulesheet) (entity Rulesheet, err error) {
 
 	entity = Rulesheet{
 		Model: gorm.Model{
-			ID: payload.ID,
+			ID: dto.ID,
 		},
-		Name:        payload.Name,
-		Description: payload.Description,
-		Version:     payload.Version,
-		Features:    payload.Features,
-		Parameters:  payload.Parameters,
-		Rules:       payload.Rules,
+		Name:        dto.Name,
+		Description: dto.Description,
 	}
+
 	return
 }

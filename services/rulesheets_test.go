@@ -5,20 +5,17 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/bancodobrasil/featws-api/dtos"
 	mocks_repository "github.com/bancodobrasil/featws-api/mocks/repository"
 	mocks_services "github.com/bancodobrasil/featws-api/mocks/services"
-	"github.com/bancodobrasil/featws-api/models"
-	"gorm.io/gorm"
 )
 
 func TestGetWithErrorOnFill(t *testing.T) {
 
 	ctx := context.Background()
 
-	expectedEntity := &models.Rulesheet{
-		Model: gorm.Model{
-			ID: 1,
-		},
+	expectedEntity := &dtos.Rulesheet{
+		ID: 1,
 	}
 
 	repository := new(mocks_repository.Rulesheets)

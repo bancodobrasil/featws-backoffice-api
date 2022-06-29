@@ -3,7 +3,7 @@
 package mocks
 
 import (
-	models "github.com/bancodobrasil/featws-api/models"
+	dtos "github.com/bancodobrasil/featws-api/dtos"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -13,11 +13,11 @@ type Gitlab struct {
 }
 
 // Fill provides a mock function with given fields: rulesheet
-func (_m *Gitlab) Fill(rulesheet *models.Rulesheet) error {
+func (_m *Gitlab) Fill(rulesheet *dtos.Rulesheet) error {
 	ret := _m.Called(rulesheet)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(*models.Rulesheet) error); ok {
+	if rf, ok := ret.Get(0).(func(*dtos.Rulesheet) error); ok {
 		r0 = rf(rulesheet)
 	} else {
 		r0 = ret.Error(0)
@@ -27,11 +27,11 @@ func (_m *Gitlab) Fill(rulesheet *models.Rulesheet) error {
 }
 
 // Save provides a mock function with given fields: rulesheet, commitMessage
-func (_m *Gitlab) Save(rulesheet *models.Rulesheet, commitMessage string) error {
+func (_m *Gitlab) Save(rulesheet *dtos.Rulesheet, commitMessage string) error {
 	ret := _m.Called(rulesheet, commitMessage)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(*models.Rulesheet, string) error); ok {
+	if rf, ok := ret.Get(0).(func(*dtos.Rulesheet, string) error); ok {
 		r0 = rf(rulesheet, commitMessage)
 	} else {
 		r0 = ret.Error(0)
