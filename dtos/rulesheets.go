@@ -7,18 +7,21 @@ import (
 	v1 "github.com/bancodobrasil/featws-api/payloads/v1"
 )
 
+// Rule ...
 type Rule struct {
 	Condition string    `json:"condition,omitempty"`
 	Value     RuleValue `json:"value,omitempty"`
 	Type      string    `json:"type,omitempty"`
 }
 
+// RuleValue ...
 type RuleValue struct {
 	NomeAplicativo string `json:"nomeAplicativo,omitempty"`
-	TextoUrlPadrao string `json:"textoUrlPadrao,omitempty"`
-	TextoUrlDesvio string `json:"textoUrlDesvio,omitempty"`
+	TextoURLPadrao string `json:"textoUrlPadrao,omitempty"`
+	TextoURLDesvio string `json:"textoUrlDesvio,omitempty"`
 }
 
+// Rulesheet ...
 type Rulesheet struct {
 	ID            uint
 	Name          string
