@@ -44,6 +44,10 @@ func NewRulesheetV1(payload v1.Rulesheet) (dto Rulesheet, err error) {
 
 	isRule := false
 
+	if payload.Rules == nil {
+		return
+	}
+
 	for _, v := range *payload.Rules {
 		_, isString := v.(string)
 		if !isString {
