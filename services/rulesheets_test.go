@@ -33,3 +33,44 @@ func TestGetWithErrorOnFill(t *testing.T) {
 	}
 
 }
+
+func TestGet(t *testing.T) {
+
+	ctx := context.Background()
+
+	expectedEntity := &models.Rulesheet{
+		Model: gorm.Model{
+			ID: 2,
+		},
+		Name: "test",
+	}
+
+	repository := new(mocks_repository.Rulesheets)
+	repository.On("Get", ctx, "2").Return(expectedEntity, nil)
+
+	gitlabService := new(mocks_services.Gitlab)
+	gitlabService.On("Fill", expectedEntity).Return(expectedEntity)
+
+	service := NewRulesheets(repository, gitlabService)
+
+	result, _ := service.Get(ctx, "2")
+
+	if result.Name != expectedEntity.Name {
+		t.Error("Error on get the rulesheet")
+	}
+}
+
+// func TestCreateRulesheet(t *testing.T) {
+
+// 	ctx :=  context.Background()
+
+// 	expectedEntity := &models.Rulesheet{
+// 		Model: gorm.Model{
+// 			ID: 1,
+// 		}
+// 	}
+
+// 	repository := new(mocks_repository.Rulesheets)
+// 	repository.
+
+// }

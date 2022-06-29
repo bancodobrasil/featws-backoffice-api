@@ -106,7 +106,7 @@ func (gs *gitlabService) Save(rulesheet *dtos.Rulesheet, commitMessage string) e
 		log.Errorf("Failed to parse version: %v", err)
 		return err
 	}
-	commitAction, err = createOrUpdateGitlabFileCommitAction(git, proj, cfg.GitlabDefaultBranch, "VERSION", fmt.Sprintf("%d\n", version+1))
+	commitAction, err = CreateOrUpdateGitlabFileCommitAction(git, proj, cfg.GitlabDefaultBranch, "VERSION", fmt.Sprintf("%d\n", version+1))
 	if err != nil {
 		log.Errorf("Failed to commit version: %v", err)
 		return err
@@ -114,7 +114,7 @@ func (gs *gitlabService) Save(rulesheet *dtos.Rulesheet, commitMessage string) e
 	actions = append(actions, commitAction)
 
 	ci := cfg.GitlabCIScript
-	commitAction, err = createOrUpdateGitlabFileCommitAction(git, proj, cfg.GitlabDefaultBranch, ".gitlab-ci.yml", ci)
+	commitAction, err = CreateOrUpdateGitlabFileCommitAction(git, proj, cfg.GitlabDefaultBranch, ".gitlab-ci.yml", ci)
 	if err != nil {
 		log.Errorf("Failed to commit ci: %v", err)
 		return err
@@ -145,7 +145,7 @@ func (gs *gitlabService) Save(rulesheet *dtos.Rulesheet, commitMessage string) e
 		log.Errorf("Failed to marshal features: %v", err)
 		return err
 	}
-	commitAction, err = createOrUpdateGitlabFileCommitAction(git, proj, cfg.GitlabDefaultBranch, "features.json", string(content))
+	commitAction, err = CreateOrUpdateGitlabFileCommitAction(git, proj, cfg.GitlabDefaultBranch, "features.json", string(content))
 	if err != nil {
 		log.Errorf("Failed to commit features: %v", err)
 		return err
@@ -176,7 +176,7 @@ func (gs *gitlabService) Save(rulesheet *dtos.Rulesheet, commitMessage string) e
 		log.Errorf("Failed to marshal parameters: %v", err)
 		return err
 	}
-	commitAction, err = createOrUpdateGitlabFileCommitAction(git, proj, cfg.GitlabDefaultBranch, "parameters.json", string(content))
+	commitAction, err = CreateOrUpdateGitlabFileCommitAction(git, proj, cfg.GitlabDefaultBranch, "parameters.json", string(content))
 	if err != nil {
 		log.Errorf("Failed to commit parameters: %v", err)
 		return err
@@ -227,9 +227,7 @@ func (gs *gitlabService) Save(rulesheet *dtos.Rulesheet, commitMessage string) e
 		}
 	}
 
-	// fmt.Printf("RULES: %s\n", rulesBuffer.String())
-
-	commitAction, err = createOrUpdateGitlabFileCommitAction(git, proj, cfg.GitlabDefaultBranch, "rules.featws", rulesBuffer.String())
+	commitAction, err = CreateOrUpdateGitlabFileCommitAction(git, proj, cfg.GitlabDefaultBranch, "rules.featws", rulesBuffer.String())
 	if err != nil {
 		log.Errorf("Failed to commit rules: %v", err)
 		return err
@@ -252,8 +250,8 @@ func (gs *gitlabService) Save(rulesheet *dtos.Rulesheet, commitMessage string) e
 	return err
 }
 
-func createOrUpdateGitlabFileCommitAction(git *gitlab.Client, proj *gitlab.Project, ref string, filename string, content string) (*gitlab.CommitActionOptions, error) {
-	action, err := defineCreateOrUpdateGitlabFileAction(git, proj, ref, filename)
+func CreateOrUpdateGitlabFileCommitAction(git *gitlab.Client, proj *gitlab.Project, ref string, filename string, content string) (*gitlab.CommitActionOptions, error) {
+	action, err := DefineCreateOrUpdateGitlabFileAction(git, proj, ref, filename)
 	if err != nil {
 		log.Errorf("Failed to define file action: %v", err)
 		return nil, err
@@ -265,7 +263,7 @@ func createOrUpdateGitlabFileCommitAction(git *gitlab.Client, proj *gitlab.Proje
 	}, nil
 }
 
-func defineCreateOrUpdateGitlabFileAction(git *gitlab.Client, proj *gitlab.Project, ref string, fileName string) (*gitlab.FileActionValue, error) {
+func DefineCreateOrUpdateGitlabFileAction(git *gitlab.Client, proj *gitlab.Project, ref string, fileName string) (*gitlab.FileActionValue, error) {
 	_, resp, err := git.RepositoryFiles.GetFile(proj.ID, fileName, &gitlab.GetFileOptions{
 		Ref: gitlab.String(ref),
 	})
