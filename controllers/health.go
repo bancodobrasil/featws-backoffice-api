@@ -47,14 +47,14 @@ func newHandler() healthcheck.Handler {
 		}
 		gitlabURL := gitlab.Scheme + "://" + gitlab.Host
 		health.AddReadinessCheck("gitlab", Get(gitlabURL, 1*time.Second))
-
-		database, err := database.GetConn().DB()
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		health.AddReadinessCheck("database", db.Ping(database, 1*time.Second))
 	}
+
+	database, err := database.GetConn().DB()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	health.AddReadinessCheck("database", db.Ping(database, 1*time.Second))
 	return health
 }
 
