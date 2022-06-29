@@ -82,7 +82,9 @@ func (r *rulesheets) Get(ctx context.Context, id string) (rulesheet *models.Rule
 // Update ...
 func (r *rulesheets) Update(ctx context.Context, entity models.Rulesheet) (updated *models.Rulesheet, err error) {
 
-	result := r.model.Save(&entity)
+	db := r.model.Session(&gorm.Session{})
+
+	result := db.Model(&entity).Save(&entity)
 
 	err = result.Error
 	if err != nil {

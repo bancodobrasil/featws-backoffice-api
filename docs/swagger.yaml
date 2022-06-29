@@ -11,6 +11,8 @@ definitions:
       features:
         items: {}
         type: array
+      hasStringRule:
+        type: boolean
       id:
         type: integer
       name:
@@ -19,8 +21,7 @@ definitions:
         items: {}
         type: array
       rules:
-        additionalProperties:
-          type: string
+        additionalProperties: true
         type: object
       version:
         type: string

@@ -8,7 +8,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 
-	"github.com/bancodobrasil/featws-api/models"
+	"github.com/bancodobrasil/featws-api/dtos"
 	payloads "github.com/bancodobrasil/featws-api/payloads/v1"
 	responses "github.com/bancodobrasil/featws-api/responses/v1"
 	"github.com/bancodobrasil/featws-api/services"
@@ -76,7 +76,7 @@ func (rc *rulesheets) CreateRulesheet() gin.HandlerFunc {
 			return
 		}
 
-		entity, err := models.NewRulesheetV1(payload)
+		dto, err := dtos.NewRulesheetV1(payload)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, responses.Error{
 				Error: err.Error(),
@@ -85,7 +85,7 @@ func (rc *rulesheets) CreateRulesheet() gin.HandlerFunc {
 			return
 		}
 
-		err = rc.service.Create(ctx, &entity)
+		err = rc.service.Create(ctx, &dto)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, responses.Error{
 				Error: err.Error(),
@@ -94,7 +94,7 @@ func (rc *rulesheets) CreateRulesheet() gin.HandlerFunc {
 			return
 		}
 
-		var response = responses.NewRulesheet(&entity)
+		var response = responses.NewRulesheet(&dto)
 		c.JSON(http.StatusCreated, response)
 	}
 }
@@ -129,7 +129,7 @@ func (rc *rulesheets) GetRulesheets() gin.HandlerFunc {
 			filter[param] = value
 		}
 
-		entities, err := rc.service.Find(ctx, filter)
+		dtos, err := rc.service.Find(ctx, filter)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, responses.Error{
 				Error: err.Error(),
@@ -138,10 +138,10 @@ func (rc *rulesheets) GetRulesheets() gin.HandlerFunc {
 			return
 		}
 
-		var response = make([]responses.Rulesheet, len(entities))
+		var response = make([]responses.Rulesheet, len(dtos))
 
-		for index, entity := range entities {
-			response[index] = responses.NewRulesheet(entity)
+		for index, dto := range dtos {
+			response[index] = responses.NewRulesheet(dto)
 		}
 
 		c.JSON(http.StatusOK, response)
@@ -251,7 +251,7 @@ func (rc *rulesheets) UpdateRulesheet() gin.HandlerFunc {
 		iid, _ := strconv.ParseUint(id, 10, 32)
 		payload.ID = uint(iid)
 
-		entity, err := models.NewRulesheetV1(payload)
+		dto, err := dtos.NewRulesheetV1(payload)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, responses.Error{
 				Error: err.Error(),
@@ -260,7 +260,7 @@ func (rc *rulesheets) UpdateRulesheet() gin.HandlerFunc {
 			return
 		}
 
-		updatedEntity, err := rc.service.Update(ctx, entity)
+		updatedEntity, err := rc.service.Update(ctx, dto)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, responses.Error{
 				Error: err.Error(),

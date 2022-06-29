@@ -5,7 +5,7 @@ package mocks
 import (
 	context "context"
 
-	models "github.com/bancodobrasil/featws-api/models"
+	dtos "github.com/bancodobrasil/featws-api/dtos"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -15,11 +15,11 @@ type Rulesheets struct {
 }
 
 // Create provides a mock function with given fields: _a0, _a1
-func (_m *Rulesheets) Create(_a0 context.Context, _a1 *models.Rulesheet) error {
+func (_m *Rulesheets) Create(_a0 context.Context, _a1 *dtos.Rulesheet) error {
 	ret := _m.Called(_a0, _a1)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, *models.Rulesheet) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, *dtos.Rulesheet) error); ok {
 		r0 = rf(_a0, _a1)
 	} else {
 		r0 = ret.Error(0)
@@ -50,15 +50,15 @@ func (_m *Rulesheets) Delete(ctx context.Context, id string) (bool, error) {
 }
 
 // Find provides a mock function with given fields: ctx, filter
-func (_m *Rulesheets) Find(ctx context.Context, filter interface{}) ([]*models.Rulesheet, error) {
+func (_m *Rulesheets) Find(ctx context.Context, filter interface{}) ([]*dtos.Rulesheet, error) {
 	ret := _m.Called(ctx, filter)
 
-	var r0 []*models.Rulesheet
-	if rf, ok := ret.Get(0).(func(context.Context, interface{}) []*models.Rulesheet); ok {
+	var r0 []*dtos.Rulesheet
+	if rf, ok := ret.Get(0).(func(context.Context, interface{}) []*dtos.Rulesheet); ok {
 		r0 = rf(ctx, filter)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]*models.Rulesheet)
+			r0 = ret.Get(0).([]*dtos.Rulesheet)
 		}
 	}
 
@@ -73,15 +73,15 @@ func (_m *Rulesheets) Find(ctx context.Context, filter interface{}) ([]*models.R
 }
 
 // Get provides a mock function with given fields: ctx, id
-func (_m *Rulesheets) Get(ctx context.Context, id string) (*models.Rulesheet, error) {
+func (_m *Rulesheets) Get(ctx context.Context, id string) (*dtos.Rulesheet, error) {
 	ret := _m.Called(ctx, id)
 
-	var r0 *models.Rulesheet
-	if rf, ok := ret.Get(0).(func(context.Context, string) *models.Rulesheet); ok {
+	var r0 *dtos.Rulesheet
+	if rf, ok := ret.Get(0).(func(context.Context, string) *dtos.Rulesheet); ok {
 		r0 = rf(ctx, id)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*models.Rulesheet)
+			r0 = ret.Get(0).(*dtos.Rulesheet)
 		}
 	}
 
@@ -96,20 +96,20 @@ func (_m *Rulesheets) Get(ctx context.Context, id string) (*models.Rulesheet, er
 }
 
 // Update provides a mock function with given fields: ctx, entity
-func (_m *Rulesheets) Update(ctx context.Context, entity models.Rulesheet) (*models.Rulesheet, error) {
+func (_m *Rulesheets) Update(ctx context.Context, entity dtos.Rulesheet) (*dtos.Rulesheet, error) {
 	ret := _m.Called(ctx, entity)
 
-	var r0 *models.Rulesheet
-	if rf, ok := ret.Get(0).(func(context.Context, models.Rulesheet) *models.Rulesheet); ok {
+	var r0 *dtos.Rulesheet
+	if rf, ok := ret.Get(0).(func(context.Context, dtos.Rulesheet) *dtos.Rulesheet); ok {
 		r0 = rf(ctx, entity)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*models.Rulesheet)
+			r0 = ret.Get(0).(*dtos.Rulesheet)
 		}
 	}
 
 	var r1 error
-	if rf, ok := ret.Get(1).(func(context.Context, models.Rulesheet) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, dtos.Rulesheet) error); ok {
 		r1 = rf(ctx, entity)
 	} else {
 		r1 = ret.Error(1)

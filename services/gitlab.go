@@ -12,7 +12,7 @@ import (
 	"strings"
 
 	"github.com/bancodobrasil/featws-api/config"
-	"github.com/bancodobrasil/featws-api/models"
+	"github.com/bancodobrasil/featws-api/dtos"
 	"github.com/xanzy/go-gitlab"
 
 	log "github.com/sirupsen/logrus"
@@ -20,8 +20,8 @@ import (
 
 // Gitlab ...
 type Gitlab interface {
-	Save(rulesheet *models.Rulesheet, commitMessage string) error
-	Fill(rulesheet *models.Rulesheet) error
+	Save(rulesheet *dtos.Rulesheet, commitMessage string) error
+	Fill(rulesheet *dtos.Rulesheet) error
 }
 
 type gitlabService struct {
@@ -35,7 +35,7 @@ func NewGitlab(cfg *config.Config) Gitlab {
 	}
 }
 
-func (gs *gitlabService) Save(rulesheet *models.Rulesheet, commitMessage string) error {
+func (gs *gitlabService) Save(rulesheet *dtos.Rulesheet, commitMessage string) error {
 
 	cfg := gs.cfg
 
@@ -71,6 +71,9 @@ func (gs *gitlabService) Save(rulesheet *models.Rulesheet, commitMessage string)
 			return err
 		}
 	}
+
+	// projData, _ := json.Marshal(proj)
+	// fmt.Println(string(projData))
 
 	_, resp, err = git.RepositoryFiles.GetFile(proj.ID, "VERSION", &gitlab.GetFileOptions{
 		Ref: gitlab.String(cfg.GitlabDefaultBranch),
@@ -183,21 +186,48 @@ func (gs *gitlabService) Save(rulesheet *models.Rulesheet, commitMessage string)
 	rulesBuffer := bytes.NewBufferString("")
 	// RULES
 	if rulesheet.Rules == nil {
-		empty := make(map[string]string, 0)
+		empty := make(map[string]interface{}, 0)
 		rulesheet.Rules = &empty
 	}
 
 	rules := make([]string, 0)
 
 	for k := range *rulesheet.Rules {
+		// fmt.Printf("RULE k: %s\n", k)
 		rules = append(rules, k)
 	}
 
 	sort.Strings(rules)
 
 	for _, ruleName := range rules {
-		fmt.Fprintf(rulesBuffer, "%s = %s\n", ruleName, (*rulesheet.Rules)[ruleName])
+		// fmt.Printf("RULE: %s\n", ruleName)
+		switch rule := ((*rulesheet.Rules)[ruleName]).(type) {
+		case string:
+			fmt.Fprintf(rulesBuffer, "%s = %s\n", ruleName, rule)
+		case []interface{}:
+			for _, entry := range rule {
+				switch r := entry.(type) {
+				case *dtos.Rule:
+					r.Value.NomeAplicativo = strings.Trim(r.Value.NomeAplicativo, " ")
+					r.Value.TextoUrlDesvio = strings.Trim(r.Value.TextoUrlDesvio, " ")
+					r.Value.TextoUrlPadrao = strings.Trim(r.Value.TextoUrlPadrao, " ")
+					value, err := json.Marshal(r.Value)
+					if err != nil {
+						log.Errorf("Failed marshal rule value: %v", err)
+						return err
+					}
+					fmt.Fprintf(rulesBuffer, "[[%s]]\ncondition = %s\nvalue = %s\ntype = object\n\n", ruleName, r.Condition, string(value))
+				default:
+					fmt.Fprintf(rulesBuffer, "DEFAULT ENTRY %s = %s\n", ruleName, reflect.TypeOf(rule))
+				}
+
+			}
+		default:
+			fmt.Fprintf(rulesBuffer, "DEFAULT %s = %s\n", ruleName, reflect.TypeOf(rule))
+		}
 	}
+
+	// fmt.Printf("RULES: %s\n", rulesBuffer.String())
 
 	commitAction, err = createOrUpdateGitlabFileCommitAction(git, proj, cfg.GitlabDefaultBranch, "rules.featws", rulesBuffer.String())
 	if err != nil {
@@ -205,6 +235,9 @@ func (gs *gitlabService) Save(rulesheet *models.Rulesheet, commitMessage string)
 		return err
 	}
 	actions = append(actions, commitAction)
+
+	// commitActionData, _ := json.Marshal(commitAction)
+	// fmt.Println(string(commitActionData))
 
 	_, _, err = git.Commits.CreateCommit(proj.ID, &gitlab.CreateCommitOptions{
 		Branch:        &cfg.GitlabDefaultBranch,
@@ -248,7 +281,7 @@ func defineCreateOrUpdateGitlabFileAction(git *gitlab.Client, proj *gitlab.Proje
 	return gitlab.FileAction(gitlab.FileUpdate), nil
 }
 
-func (gs *gitlabService) Fill(rulesheet *models.Rulesheet) (err error) {
+func (gs *gitlabService) Fill(rulesheet *dtos.Rulesheet) (err error) {
 	if gs.cfg.GitlabToken == "" {
 		return nil
 	}
@@ -299,7 +332,7 @@ func (gs *gitlabService) Fill(rulesheet *models.Rulesheet) (err error) {
 
 	rulesArr := strings.Split(string(bRules), "\n")
 
-	rules := make(map[string]string)
+	rules := make(map[string]interface{})
 
 	for _, line := range rulesArr {
 		if line != "" {

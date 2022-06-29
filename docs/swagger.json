@@ -379,6 +379,9 @@
                     "type": "array",
                     "items": {}
                 },
+                "hasStringRule": {
+                    "type": "boolean"
+                },
                 "id": {
                     "type": "integer"
                 },
@@ -391,9 +394,7 @@
                 },
                 "rules": {
                     "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    }
+                    "additionalProperties": true
                 },
                 "version": {
                     "type": "string"

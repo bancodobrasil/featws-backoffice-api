@@ -386,6 +386,9 @@ const docTemplate = `{
                     "type": "array",
                     "items": {}
                 },
+                "hasStringRule": {
+                    "type": "boolean"
+                },
                 "id": {
                     "type": "integer"
                 },
@@ -398,9 +401,7 @@ const docTemplate = `{
                 },
                 "rules": {
                     "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    }
+                    "additionalProperties": true
                 },
                 "version": {
                     "type": "string"
