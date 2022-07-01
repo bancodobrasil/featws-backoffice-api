@@ -10,7 +10,6 @@ import (
 	mocks_services "github.com/bancodobrasil/featws-api/mocks/services"
 	"github.com/bancodobrasil/featws-api/models"
 	log "github.com/sirupsen/logrus"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestGetWithErrorOnFill(t *testing.T) {
@@ -78,18 +77,18 @@ func TestCreateRulesheet(t *testing.T) {
 	fakeCommitMessage := "test"
 
 	repository := new(mocks_repository.Rulesheets)
-	repository.On("Create", ctx, &rulesheet).Return(rulesheet, nil, errors.New("error on create"))
+	repository.On("Create", ctx, &rulesheet).Return(rulesheet, nil)
 
 	gitlabService := new(mocks_services.Gitlab)
 	// gitlabService.On("Fill", dto).Return(nil)
-	gitlabService.On("Save", dto, fakeCommitMessage).Return(nil, errors.New("error on save"))
+	gitlabService.On("Save", dto, fakeCommitMessage).Return(nil)
 
 	service := NewRulesheets(repository, gitlabService)
 
 	result := service.Create(ctx, dto)
 
-	assert.Nil(t, result)
-	assert.NotNil(t, result)
+	// assert.Nil(t, result)
+	// assert.NotNil(t, result)
 
 	if result != nil {
 		t.Error("Error on create the rulesheet")
