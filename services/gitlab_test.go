@@ -10,7 +10,7 @@ import (
 	mocks_services "github.com/bancodobrasil/featws-api/mocks/services"
 )
 
-func TestSave(t *testing.T) {
+func TestMockSave(t *testing.T) {
 
 	fakeRuleSheet := &dtos.Rulesheet{
 		ID: 1,
@@ -44,7 +44,7 @@ func TestCreateOrUpdateGilabFileCommitActionFailToDifineFileAction(t *testing.T)
 
 }
 
-func TestFill(t *testing.T) {
+func TestMockFill(t *testing.T) {
 
 	fakeRuleSheet := &dtos.Rulesheet{
 		ID: 1,
