@@ -95,3 +95,36 @@ func TestCreateRulesheet(t *testing.T) {
 	}
 
 }
+
+func TestFind(t *testing.T) {
+
+	ctx := context.Background()
+
+	dto := &dtos.Rulesheet{
+		ID:   2,
+		Name: "test",
+	}
+
+	rulesheet, err := models.NewRulesheetV1(*dto)
+	if err != nil {
+		log.Errorf("Error on create rulesheet on create model: %v", err)
+		return
+	}
+
+	repository := new(mocks_repository.Rulesheets)
+
+	repository.On("Find", ctx, "2").Return(rulesheet, nil)
+
+	gitlabService := new(mocks_services.Gitlab)
+
+	service := NewRulesheets(repository, gitlabService)
+
+	results, _ := service.Find(ctx, "2")
+
+	for _, result := range results {
+		if result.Name != rulesheet.Name {
+			t.Error("Error on find the rulesheet")
+		}
+	}
+
+}
