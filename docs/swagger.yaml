@@ -48,6 +48,14 @@ paths:
       consumes:
       - application/json
       description: List Rulesheet description
+      parameters:
+      - description: Filter
+        in: query
+        items:
+          type: string
+        name: filter
+        required: true
+        type: array
       produces:
       - application/json
       responses:
@@ -81,7 +89,7 @@ paths:
       - ApiKeyAuth: []
       summary: List Rulesheets
       tags:
-      - rulesheet
+      - Rulesheet
     post:
       consumes:
       - application/json
@@ -89,7 +97,7 @@ paths:
       parameters:
       - description: Rulesheet body
         in: body
-        name: rulesheet
+        name: Rulesheet
         required: true
         schema:
           $ref: '#/definitions/v1.Rulesheet'
@@ -124,7 +132,7 @@ paths:
       - ApiKeyAuth: []
       summary: Create Rulesheet
       tags:
-      - rulesheet
+      - Rulesheet
   /rulesheets/{id}:
     delete:
       consumes:
@@ -167,7 +175,7 @@ paths:
       - ApiKeyAuth: []
       summary: Delete Rulesheet by ID
       tags:
-      - rulesheet
+      - Rulesheet
     get:
       consumes:
       - application/json
@@ -211,7 +219,7 @@ paths:
       - ApiKeyAuth: []
       summary: Get Rulesheet by ID
       tags:
-      - rulesheet
+      - Rulesheet
     put:
       consumes:
       - application/json
@@ -261,7 +269,7 @@ paths:
       - ApiKeyAuth: []
       summary: Update Rulesheet by ID
       tags:
-      - rulesheet
+      - Rulesheet
 securityDefinitions:
   ApiKeyAuth:
     in: header

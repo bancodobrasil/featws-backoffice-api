@@ -40,9 +40,21 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "rulesheet"
+                    "Rulesheet"
                 ],
                 "summary": "List Rulesheets",
+                "parameters": [
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "description": "Filter",
+                        "name": "filter",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -99,13 +111,13 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "rulesheet"
+                    "Rulesheet"
                 ],
                 "summary": "Create Rulesheet",
                 "parameters": [
                     {
                         "description": "Rulesheet body",
-                        "name": "rulesheet",
+                        "name": "Rulesheet",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -168,7 +180,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "rulesheet"
+                    "Rulesheet"
                 ],
                 "summary": "Get Rulesheet by ID",
                 "parameters": [
@@ -236,7 +248,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "rulesheet"
+                    "Rulesheet"
                 ],
                 "summary": "Update Rulesheet by ID",
                 "parameters": [
@@ -313,7 +325,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "rulesheet"
+                    "Rulesheet"
                 ],
                 "summary": "Delete Rulesheet by ID",
                 "parameters": [

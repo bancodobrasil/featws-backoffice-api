@@ -120,13 +120,13 @@ func (_m *Rulesheets) Update(ctx context.Context, entity models.Rulesheet) (*mod
 	return r0, r1
 }
 
-type NewRulesheetsT interface {
+type mockConstructorTestingTNewRulesheets interface {
 	mock.TestingT
 	Cleanup(func())
 }
 
 // NewRulesheets creates a new instance of Rulesheets. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
-func NewRulesheets(t NewRulesheetsT) *Rulesheets {
+func NewRulesheets(t mockConstructorTestingTNewRulesheets) *Rulesheets {
 	mock := &Rulesheets{}
 	mock.Mock.Test(t)
 
