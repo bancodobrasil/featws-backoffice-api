@@ -37,11 +37,11 @@ func NewRulesheets(service services.Rulesheets) Rulesheets {
 
 // CreateRulesheet godoc
 // @Summary 		Create Rulesheet
-// @Description Create Rulesheet description
-// @Tags 				rulesheet
+// @Description 	Create Rulesheet description
+// @Tags 			Rulesheet
 // @Accept  		json
 // @Produce  		json
-// @Param 			rulesheet body payloads.Rulesheet true "Rulesheet body"
+// @Param 			Rulesheet body payloads.Rulesheet true "Rulesheet body"
 // @Success 		200 {object} payloads.Rulesheet
 // @Header 			200 {string} Authorization "token access"
 // @Failure 		400,404 {object} responses.Error
@@ -101,17 +101,18 @@ func (rc *rulesheets) CreateRulesheet() gin.HandlerFunc {
 
 // GetRulesheets godoc
 // @Summary 		List Rulesheets
-// @Description List Rulesheet description
-// @Tags 				rulesheet
+// @Description 	List Rulesheet description
+// @Tags 			Rulesheet
 // @Accept  		json
 // @Produce  		json
+// @Param			filter path []string false "Filter"
 // @Success 		200 {array} payloads.Rulesheet
 // @Header 			200 {string} Authorization "token access"
 // @Failure 		400,404 {object} responses.Error
 // @Failure 		500 {object} responses.Error
 // @Failure 		default {object} responses.Error
 // @Security 		ApiKeyAuth
-// @Router 			/rulesheets [get]
+// @Router 			/rulesheets/{filter} [get]
 func (rc *rulesheets) GetRulesheets() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
@@ -150,11 +151,11 @@ func (rc *rulesheets) GetRulesheets() gin.HandlerFunc {
 
 // GetRulesheet godoc
 // @Summary 		Get Rulesheet by ID
-// @Description Get Rulesheet by ID description
-// @Tags 				rulesheet
+// @Description 	Get Rulesheet by ID description
+// @Tags 			Rulesheet
 // @Accept  		json
 // @Produce  		json
-// @Param				id path string true "Rulesheet ID"
+// @Param			id path string true "Rulesheet ID"
 // @Success 		200 {array} payloads.Rulesheet
 // @Header 			200 {string} Authorization "token access"
 // @Failure 		400,404 {object} responses.Error
@@ -200,11 +201,11 @@ func (rc *rulesheets) GetRulesheet() gin.HandlerFunc {
 
 // UpdateRulesheet godoc
 // @Summary 		Update Rulesheet by ID
-// @Description Update Rulesheet by ID description
-// @Tags 				rulesheet
+// @Description 	Update Rulesheet by ID description
+// @Tags 			Rulesheet
 // @Accept  		json
 // @Produce  		json
-// @Param				id path string true "Rulesheet ID"
+// @Param			id path string true "Rulesheet ID"
 // @Param 			rulesheet body payloads.Rulesheet true "Rulesheet body"
 // @Success 		200 {array} payloads.Rulesheet
 // @Header 			200 {string} Authorization "token access"
@@ -280,13 +281,13 @@ func (rc *rulesheets) UpdateRulesheet() gin.HandlerFunc {
 	}
 }
 
-// DeleteRulesheet godoc
+// DeleteRulesheet 	godoc
 // @Summary 		Delete Rulesheet by ID
-// @Description Delete Rulesheet by ID description
-// @Tags 				rulesheet
+// @Description 	Delete Rulesheet by ID description
+// @Tags 			Rulesheet
 // @Accept  		json
 // @Produce  		json
-// @Param				id path string true "Rulesheet ID"
+// @Param			id path string true "Rulesheet ID"
 // @Success 		200 {string} string ""
 // @Header 			200 {string} Authorization "token access"
 // @Failure 		400,404 {object} responses.Error
