@@ -47,6 +47,8 @@ func NewRulesheets(service services.Rulesheets) Rulesheets {
 // @Failure 		400,404 {object} responses.Error
 // @Failure 		500 {object} responses.Error
 // @Failure 		default {object} responses.Error
+// @Response 		404 "Not Found. Check if the request URL already exists"
+// @Responses 		400 "Bad Request. Check if the name of body parameters are correct, or if you set all the required parameters"
 // @Security 		ApiKeyAuth
 // @Router 			/rulesheets [post]
 func (rc *rulesheets) CreateRulesheet() gin.HandlerFunc {
@@ -111,6 +113,7 @@ func (rc *rulesheets) CreateRulesheet() gin.HandlerFunc {
 // @Failure 		400,404 {object} responses.Error
 // @Failure 		500 {object} responses.Error
 // @Failure 		default {object} responses.Error
+// @Response		404 "Not Found. Check if the request URL already exists"
 // @Security 		ApiKeyAuth
 // @Router 			/rulesheets/{filter} [get]
 func (rc *rulesheets) GetRulesheets() gin.HandlerFunc {
@@ -161,6 +164,8 @@ func (rc *rulesheets) GetRulesheets() gin.HandlerFunc {
 // @Failure 		400,404 {object} responses.Error
 // @Failure 		500 {object} responses.Error
 // @Failure 		default {object} responses.Error
+// @Response		500 "Internal Server Error. If you pass a not registered record ID or anything different as a positive number, the server will return an error"
+// @Response		404 "Not Found. Check if the request URL already exists"
 // @Security 		ApiKeyAuth
 // @Router 			/rulesheets/{id} [get]
 func (rc *rulesheets) GetRulesheet() gin.HandlerFunc {
@@ -212,6 +217,7 @@ func (rc *rulesheets) GetRulesheet() gin.HandlerFunc {
 // @Failure 		400,404 {object} responses.Error
 // @Failure 		500 {object} responses.Error
 // @Failure 		default {object} responses.Error
+// @Response		404 "Not Found. Check if the request URL already exists"
 // @Security 		ApiKeyAuth
 // @Router 			/rulesheets/{id} [put]
 func (rc *rulesheets) UpdateRulesheet() gin.HandlerFunc {
@@ -293,6 +299,8 @@ func (rc *rulesheets) UpdateRulesheet() gin.HandlerFunc {
 // @Failure 		400,404 {object} responses.Error
 // @Failure 		500 {object} responses.Error
 // @Failure 		default {object} responses.Error
+// @Responses 		404 "Not Found. Check if the request URL already exists"
+// @Response		500 "Internal Server Error. If you pass a not registered record ID or anything different as a positive number, the server will return an error"
 // @Security 		ApiKeyAuth
 // @Router 			/rulesheets/{id} [delete]
 func (rc *rulesheets) DeleteRulesheet() gin.HandlerFunc {
