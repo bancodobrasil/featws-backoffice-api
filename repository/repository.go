@@ -19,6 +19,7 @@ type FindOptions struct {
 type Repository[T any] interface {
 	Create(ctx context.Context, entity *T) error
 	Find(ctx context.Context, entity interface{}, options *FindOptions) (list []*T, err error)
+	Count(ctx context.Context, entity interface{}) (count int64, err error)
 	Get(ctx context.Context, id string) (entity *T, err error)
 	Update(ctx context.Context, entity T) (updated *T, err error)
 	Delete(ctx context.Context, id string) (deleted bool, err error)
@@ -70,6 +71,24 @@ func (r *repository[T]) Find(ctx context.Context, entity interface{}, options *F
 	}
 
 	result := db.Find(&list, entity)
+
+	err = result.Error
+	if err != nil {
+		log.Errorf("Error on find: %v", err)
+		return
+	}
+
+	return
+}
+
+// Count ...
+func (r *repository[T]) Count(ctx context.Context, entity interface{}) (count int64, err error) {
+
+	db := r.newSession()
+
+	count = 0
+
+	result := db.Count(&count)
 
 	err = result.Error
 	if err != nil {

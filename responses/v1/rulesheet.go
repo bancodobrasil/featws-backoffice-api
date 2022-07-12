@@ -4,6 +4,7 @@ import "github.com/bancodobrasil/featws-api/dtos"
 
 // Rulesheet ...
 type Rulesheet struct {
+	FindResult
 	ID          uint                    `json:"id,omitempty"`
 	Name        string                  `json:"name,omitempty"`
 	Description string                  `json:"description,omitempty"`

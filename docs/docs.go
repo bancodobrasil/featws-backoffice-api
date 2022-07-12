@@ -91,7 +91,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/rulesheets/{filter}": {
+        "/rulesheets/": {
             "get": {
                 "security": [
                     {
@@ -111,13 +111,10 @@ const docTemplate = `{
                 "summary": "List Rulesheets",
                 "parameters": [
                     {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        },
-                        "description": "Filter",
-                        "name": "filter",
-                        "in": "path"
+                        "type": "boolean",
+                        "description": "Total of results",
+                        "name": "count",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -349,10 +346,7 @@ const docTemplate = `{
                         }
                     },
                     "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/v1.Error"
-                        }
+                        "description": "Internal Server Error. If you pass a not registered record ID or anything different as a positive number, the server will return an error"
                     },
                     "default": {
                         "description": "",
@@ -368,7 +362,13 @@ const docTemplate = `{
         "v1.Error": {
             "type": "object",
             "properties": {
-                "error": {}
+                "error": {},
+                "validation_errors": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/v1.ValidationError"
+                    }
+                }
             }
         },
         "v1.Rulesheet": {
@@ -402,6 +402,20 @@ const docTemplate = `{
                     "additionalProperties": true
                 },
                 "version": {
+                    "type": "string"
+                }
+            }
+        },
+        "v1.ValidationError": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                },
+                "field": {
+                    "type": "string"
+                },
+                "tag": {
                     "type": "string"
                 }
             }
