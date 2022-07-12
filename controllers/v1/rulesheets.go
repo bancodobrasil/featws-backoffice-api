@@ -105,14 +105,13 @@ func (rc *rulesheets) CreateRulesheet() gin.HandlerFunc {
 // @Tags 			Rulesheet
 // @Accept  		json
 // @Produce  		json
-// @Param			filter path []string false "Filter"
 // @Success 		200 {array} payloads.Rulesheet
 // @Header 			200 {string} Authorization "token access"
 // @Failure 		400,404 {object} responses.Error
 // @Failure 		500 {object} responses.Error
 // @Failure 		default {object} responses.Error
 // @Security 		ApiKeyAuth
-// @Router 			/rulesheets/{filter} [get]
+// @Router 			/rulesheets/ [get]
 func (rc *rulesheets) GetRulesheets() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
