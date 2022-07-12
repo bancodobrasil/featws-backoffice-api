@@ -16,6 +16,27 @@ type Rulesheets struct {
 	mock.Mock
 }
 
+// Count provides a mock function with given fields: ctx, entity
+func (_m *Rulesheets) Count(ctx context.Context, entity interface{}) (int64, error) {
+	ret := _m.Called(ctx, entity)
+
+	var r0 int64
+	if rf, ok := ret.Get(0).(func(context.Context, interface{}) int64); ok {
+		r0 = rf(ctx, entity)
+	} else {
+		r0 = ret.Get(0).(int64)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, interface{}) error); ok {
+		r1 = rf(ctx, entity)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // Create provides a mock function with given fields: ctx, entity
 func (_m *Rulesheets) Create(ctx context.Context, entity *models.Rulesheet) error {
 	ret := _m.Called(ctx, entity)
@@ -120,13 +141,13 @@ func (_m *Rulesheets) Update(ctx context.Context, entity models.Rulesheet) (*mod
 	return r0, r1
 }
 
-type mockConstructorTestingTNewRulesheets interface {
+type NewRulesheetsT interface {
 	mock.TestingT
 	Cleanup(func())
 }
 
 // NewRulesheets creates a new instance of Rulesheets. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
-func NewRulesheets(t mockConstructorTestingTNewRulesheets) *Rulesheets {
+func NewRulesheets(t NewRulesheetsT) *Rulesheets {
 	mock := &Rulesheets{}
 	mock.Mock.Test(t)
 
