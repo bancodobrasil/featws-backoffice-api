@@ -47,6 +47,7 @@ paths:
     post:
       consumes:
       - application/json
+<<<<<<< HEAD
       description: Create Rulesheet description
       parameters:
       - description: Rulesheet body
@@ -55,6 +56,14 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/v1.Rulesheet'
+=======
+      description: List Rulesheet description
+      parameters:
+      - description: Total of results
+        in: query
+        name: count
+        type: boolean
+>>>>>>> 08befe3 (feat: count and validation errors)
       produces:
       - application/json
       responses:

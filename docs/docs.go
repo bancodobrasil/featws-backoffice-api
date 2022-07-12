@@ -54,6 +54,18 @@ const docTemplate = `{
                         }
                     }
                 ],
+<<<<<<< HEAD
+=======
+                "summary": "List Rulesheets",
+                "parameters": [
+                    {
+                        "type": "boolean",
+                        "description": "Total of results",
+                        "name": "count",
+                        "in": "query"
+                    }
+                ],
+>>>>>>> 08befe3 (feat: count and validation errors)
                 "responses": {
                     "200": {
                         "description": "OK",

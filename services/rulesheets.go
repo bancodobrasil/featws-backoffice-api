@@ -13,6 +13,7 @@ import (
 type Rulesheets interface {
 	Create(context.Context, *dtos.Rulesheet) error
 	Find(ctx context.Context, filter interface{}) ([]*dtos.Rulesheet, error)
+	Count(ctx context.Context, entity interface{}) (count int64, err error)
 	Get(ctx context.Context, id string) (*dtos.Rulesheet, error)
 	Update(ctx context.Context, entity dtos.Rulesheet) (*dtos.Rulesheet, error)
 	Delete(ctx context.Context, id string) (bool, error)
@@ -83,6 +84,18 @@ func (rs rulesheets) Find(ctx context.Context, filter interface{}) (result []*dt
 	// 		return
 	// 	}
 	// }
+
+	return
+}
+
+// Count ...
+func (rs rulesheets) Count(ctx context.Context, entity interface{}) (count int64, err error) {
+
+	count, err = rs.repository.Count(ctx, entity)
+	if err != nil {
+		log.Errorf("Error on count the entities(find): %v", err)
+		return
+	}
 
 	return
 }
