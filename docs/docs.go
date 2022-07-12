@@ -26,65 +26,6 @@ const docTemplate = `{
     "basePath": "{{.BasePath}}",
     "paths": {
         "/rulesheets": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "List Rulesheet description",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "rulesheet"
-                ],
-                "summary": "List Rulesheets",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/v1.Rulesheet"
-                            }
-                        },
-                        "headers": {
-                            "Authorization": {
-                                "type": "string",
-                                "description": "token access"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/v1.Error"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/v1.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/v1.Error"
-                        }
-                    },
-                    "default": {
-                        "description": "",
-                        "schema": {
-                            "$ref": "#/definitions/v1.Error"
-                        }
-                    }
-                }
-            },
             "post": {
                 "security": [
                     {
@@ -99,13 +40,13 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "rulesheet"
+                    "Rulesheet"
                 ],
                 "summary": "Create Rulesheet",
                 "parameters": [
                     {
                         "description": "Rulesheet body",
-                        "name": "rulesheet",
+                        "name": "Rulesheet",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -133,10 +74,76 @@ const docTemplate = `{
                         }
                     },
                     "404": {
-                        "description": "Not Found",
+                        "description": "Not Found. Check if the request URL already exists"
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/v1.Error"
                         }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/v1.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/rulesheets/{filter}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "List Rulesheet description",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Rulesheet"
+                ],
+                "summary": "List Rulesheets",
+                "parameters": [
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "description": "Filter",
+                        "name": "filter",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/v1.Rulesheet"
+                            }
+                        },
+                        "headers": {
+                            "Authorization": {
+                                "type": "string",
+                                "description": "token access"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/v1.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found. Check if the request URL already exists"
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -168,7 +175,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "rulesheet"
+                    "Rulesheet"
                 ],
                 "summary": "Get Rulesheet by ID",
                 "parameters": [
@@ -203,16 +210,10 @@ const docTemplate = `{
                         }
                     },
                     "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/v1.Error"
-                        }
+                        "description": "Not Found. Check if the request URL already exists"
                     },
                     "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/v1.Error"
-                        }
+                        "description": "Internal Server Error. If you pass a not registered record ID or anything different as a positive number, the server will return an error"
                     },
                     "default": {
                         "description": "",
@@ -236,7 +237,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "rulesheet"
+                    "Rulesheet"
                 ],
                 "summary": "Update Rulesheet by ID",
                 "parameters": [
@@ -280,10 +281,7 @@ const docTemplate = `{
                         }
                     },
                     "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/v1.Error"
-                        }
+                        "description": "Not Found. Check if the request URL already exists"
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -313,7 +311,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "rulesheet"
+                    "Rulesheet"
                 ],
                 "summary": "Delete Rulesheet by ID",
                 "parameters": [

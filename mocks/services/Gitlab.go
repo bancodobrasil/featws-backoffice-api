@@ -40,13 +40,13 @@ func (_m *Gitlab) Save(rulesheet *dtos.Rulesheet, commitMessage string) error {
 	return r0
 }
 
-type NewGitlabT interface {
+type mockConstructorTestingTNewGitlab interface {
 	mock.TestingT
 	Cleanup(func())
 }
 
 // NewGitlab creates a new instance of Gitlab. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
-func NewGitlab(t NewGitlabT) *Gitlab {
+func NewGitlab(t mockConstructorTestingTNewGitlab) *Gitlab {
 	mock := &Gitlab{}
 	mock.Mock.Test(t)
 

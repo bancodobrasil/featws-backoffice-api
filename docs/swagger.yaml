@@ -44,44 +44,6 @@ info:
   version: "1.0"
 paths:
   /rulesheets:
-    get:
-      consumes:
-      - application/json
-      description: List Rulesheet description
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          headers:
-            Authorization:
-              description: token access
-              type: string
-          schema:
-            items:
-              $ref: '#/definitions/v1.Rulesheet'
-            type: array
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/v1.Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/v1.Error'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/v1.Error'
-        default:
-          description: ""
-          schema:
-            $ref: '#/definitions/v1.Error'
-      security:
-      - ApiKeyAuth: []
-      summary: List Rulesheets
-      tags:
-      - rulesheet
     post:
       consumes:
       - application/json
@@ -89,7 +51,7 @@ paths:
       parameters:
       - description: Rulesheet body
         in: body
-        name: rulesheet
+        name: Rulesheet
         required: true
         schema:
           $ref: '#/definitions/v1.Rulesheet'
@@ -109,9 +71,7 @@ paths:
           schema:
             $ref: '#/definitions/v1.Error'
         "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/v1.Error'
+          description: Not Found. Check if the request URL already exists
         "500":
           description: Internal Server Error
           schema:
@@ -124,7 +84,51 @@ paths:
       - ApiKeyAuth: []
       summary: Create Rulesheet
       tags:
-      - rulesheet
+      - Rulesheet
+  /rulesheets/{filter}:
+    get:
+      consumes:
+      - application/json
+      description: List Rulesheet description
+      parameters:
+      - description: Filter
+        in: path
+        items:
+          type: string
+        name: filter
+        type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            Authorization:
+              description: token access
+              type: string
+          schema:
+            items:
+              $ref: '#/definitions/v1.Rulesheet'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/v1.Error'
+        "404":
+          description: Not Found. Check if the request URL already exists
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.Error'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/v1.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: List Rulesheets
+      tags:
+      - Rulesheet
   /rulesheets/{id}:
     delete:
       consumes:
@@ -167,7 +171,7 @@ paths:
       - ApiKeyAuth: []
       summary: Delete Rulesheet by ID
       tags:
-      - rulesheet
+      - Rulesheet
     get:
       consumes:
       - application/json
@@ -196,13 +200,11 @@ paths:
           schema:
             $ref: '#/definitions/v1.Error'
         "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/v1.Error'
+          description: Not Found. Check if the request URL already exists
         "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/v1.Error'
+          description: Internal Server Error. If you pass a not registered record
+            ID or anything different as a positive number, the server will return
+            an error
         default:
           description: ""
           schema:
@@ -211,7 +213,7 @@ paths:
       - ApiKeyAuth: []
       summary: Get Rulesheet by ID
       tags:
-      - rulesheet
+      - Rulesheet
     put:
       consumes:
       - application/json
@@ -246,9 +248,7 @@ paths:
           schema:
             $ref: '#/definitions/v1.Error'
         "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/v1.Error'
+          description: Not Found. Check if the request URL already exists
         "500":
           description: Internal Server Error
           schema:
@@ -261,7 +261,7 @@ paths:
       - ApiKeyAuth: []
       summary: Update Rulesheet by ID
       tags:
-      - rulesheet
+      - Rulesheet
 securityDefinitions:
   ApiKeyAuth:
     in: header
