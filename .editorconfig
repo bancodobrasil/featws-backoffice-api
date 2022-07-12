@@ -1,9 +1,8 @@
 root = true
 
 [*]
-# Space indentation
-indent_style = tab
-# Set newlines with a newline ending every file
+end_of_line = lf
 insert_final_newline = false
-# Remove any whitespace characters preceding newline characters
-trim_trailing_whitespace = true
+charset = utf-8
+indent_style = tab
+tab_width = 4
