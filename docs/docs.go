@@ -43,6 +43,14 @@ const docTemplate = `{
                     "rulesheet"
                 ],
                 "summary": "List Rulesheets",
+                "parameters": [
+                    {
+                        "type": "boolean",
+                        "description": "Total of results",
+                        "name": "count",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",

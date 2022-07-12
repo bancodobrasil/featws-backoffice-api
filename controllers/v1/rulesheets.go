@@ -68,10 +68,8 @@ func (rc *rulesheets) CreateRulesheet() gin.HandlerFunc {
 		}
 
 		// use the validator libraty to validate required fields
-		if validationErr := validate.Struct(&payload); validationErr != nil {
-			c.JSON(http.StatusBadRequest, responses.Error{
-				Error: validationErr.Error(),
-			})
+		if validationErr := validatePayload(&payload); validationErr != nil {
+			c.JSON(http.StatusBadRequest, validationErr)
 			log.Errorf("Error on validate required fields: %v", validationErr)
 			return
 		}
@@ -105,6 +103,7 @@ func (rc *rulesheets) CreateRulesheet() gin.HandlerFunc {
 // @Tags 				rulesheet
 // @Accept  		json
 // @Produce  		json
+// @Param			count query boolean false "Total of results"
 // @Success 		200 {array} payloads.Rulesheet
 // @Header 			200 {string} Authorization "token access"
 // @Failure 		400,404 {object} responses.Error
@@ -128,23 +127,45 @@ func (rc *rulesheets) GetRulesheets() gin.HandlerFunc {
 			}
 			filter[param] = value
 		}
+		_, isCount := query["count"]
 
-		dtos, err := rc.service.Find(ctx, filter)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, responses.Error{
-				Error: err.Error(),
-			})
-			log.Errorf("Error on fetch more than one rulesheet: %v", err)
-			return
+		if !isCount {
+			dtos, err := rc.service.Find(ctx, filter)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, responses.Error{
+					Error: err.Error(),
+				})
+				log.Errorf("Error on fetch more than one rulesheet: %v", err)
+				return
+			}
+
+			var response = make([]responses.Rulesheet, len(dtos))
+
+			for index, dto := range dtos {
+				response[index] = responses.NewRulesheet(dto)
+			}
+
+			c.JSON(http.StatusOK, response)
+		} else {
+			count, err := rc.service.Count(ctx, filter)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, responses.Error{
+					Error: err.Error(),
+				})
+				log.Errorf("Error on count filterValue: %v", err)
+				return
+			}
+
+			var response = []responses.Rulesheet{
+				{
+					FindResult: responses.FindResult{
+						Count: count,
+					},
+				},
+			}
+
+			c.JSON(http.StatusOK, response)
 		}
-
-		var response = make([]responses.Rulesheet, len(dtos))
-
-		for index, dto := range dtos {
-			response[index] = responses.NewRulesheet(dto)
-		}
-
-		c.JSON(http.StatusOK, response)
 	}
 }
 
@@ -240,10 +261,8 @@ func (rc *rulesheets) UpdateRulesheet() gin.HandlerFunc {
 		}
 
 		// use the validator libraty to validate required fields
-		if validationErr := validate.Struct(&payload); validationErr != nil {
-			c.JSON(http.StatusBadRequest, responses.Error{
-				Error: validationErr.Error(),
-			})
+		if validationErr := validatePayload(&payload); validationErr != nil {
+			c.JSON(http.StatusBadRequest, validationErr)
 			log.Errorf("Error on validate required fields: %v", validationErr)
 			return
 		}
