@@ -113,7 +113,7 @@ func (rc *rulesheets) CreateRulesheet() gin.HandlerFunc {
 // @Failure 		default {object} responses.Error
 // @Response		404 "Not Found. Check if the request URL already exists"
 // @Security 		ApiKeyAuth
-// @Router 			/rulesheets/{filter} [get]
+// @Router 			/rulesheets/ [get]
 func (rc *rulesheets) GetRulesheets() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
