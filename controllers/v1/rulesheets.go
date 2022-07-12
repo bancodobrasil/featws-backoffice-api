@@ -107,7 +107,6 @@ func (rc *rulesheets) CreateRulesheet() gin.HandlerFunc {
 // @Tags 			Rulesheet
 // @Accept  		json
 // @Produce  		json
-// @Param			filter path []string false "Filter"
 // @Success 		200 {array} payloads.Rulesheet
 // @Header 			200 {string} Authorization "token access"
 // @Failure 		400,404 {object} responses.Error
@@ -115,7 +114,7 @@ func (rc *rulesheets) CreateRulesheet() gin.HandlerFunc {
 // @Failure 		default {object} responses.Error
 // @Response		404 "Not Found. Check if the request URL already exists"
 // @Security 		ApiKeyAuth
-// @Router 			/rulesheets/{filter} [get]
+// @Router 			/rulesheets/ [get]
 func (rc *rulesheets) GetRulesheets() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
