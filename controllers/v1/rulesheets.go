@@ -237,6 +237,15 @@ func (rc *rulesheets) UpdateRulesheet() gin.HandlerFunc {
 			return
 		}
 
+		_, err := rc.service.Get(ctx, id)
+		if err != nil {
+			c.JSON(http.StatusNotFound, responses.Error{
+				Error: err.Error(),
+			})
+			log.Errorf("You are trying to update a non existing record: %v", err)
+			return
+		}
+
 		var payload payloads.Rulesheet
 		// validate the request body
 		if err := c.BindJSON(&payload); err != nil {
