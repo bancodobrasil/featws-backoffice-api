@@ -3,6 +3,10 @@ definitions:
   v1.Error:
     properties:
       error: {}
+      validation_errors:
+        items:
+          $ref: '#/definitions/v1.ValidationError'
+        type: array
     type: object
   v1.Rulesheet:
     properties:
@@ -28,6 +32,15 @@ definitions:
     required:
     - name
     type: object
+  v1.ValidationError:
+    properties:
+      error:
+        type: string
+      field:
+        type: string
+      tag:
+        type: string
+    type: object
 host: localhost:9007
 info:
   contact:
@@ -47,7 +60,6 @@ paths:
     post:
       consumes:
       - application/json
-<<<<<<< HEAD
       description: Create Rulesheet description
       parameters:
       - description: Rulesheet body
@@ -56,14 +68,6 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/v1.Rulesheet'
-=======
-      description: List Rulesheet description
-      parameters:
-      - description: Total of results
-        in: query
-        name: count
-        type: boolean
->>>>>>> 08befe3 (feat: count and validation errors)
       produces:
       - application/json
       responses:
@@ -76,11 +80,11 @@ paths:
           schema:
             $ref: '#/definitions/v1.Rulesheet'
         "400":
-          description: Bad Request
+          description: Bad Format
           schema:
             $ref: '#/definitions/v1.Error'
         "404":
-          description: Not Found. Check if the request URL already exists
+          description: Not Found
         "500":
           description: Internal Server Error
           schema:
@@ -94,18 +98,16 @@ paths:
       summary: Create Rulesheet
       tags:
       - Rulesheet
-  /rulesheets/{filter}:
+  /rulesheets/:
     get:
       consumes:
       - application/json
       description: List Rulesheet description
       parameters:
-      - description: Filter
-        in: path
-        items:
-          type: string
-        name: filter
-        type: array
+      - description: Total of results
+        in: query
+        name: count
+        type: boolean
       produces:
       - application/json
       responses:
@@ -120,11 +122,11 @@ paths:
               $ref: '#/definitions/v1.Rulesheet'
             type: array
         "400":
-          description: Bad Request
+          description: Bad Format
           schema:
             $ref: '#/definitions/v1.Error'
         "404":
-          description: Not Found. Check if the request URL already exists
+          description: Not Found
         "500":
           description: Internal Server Error
           schema:
@@ -161,17 +163,15 @@ paths:
           schema:
             type: string
         "400":
-          description: Bad Request
+          description: Bad Format
           schema:
             $ref: '#/definitions/v1.Error'
         "404":
           description: Not Found
+        "500":
+          description: Internal Server Error
           schema:
             $ref: '#/definitions/v1.Error'
-        "500":
-          description: Internal Server Error. If you pass a not registered record
-            ID or anything different as a positive number, the server will return
-            an error
         default:
           description: ""
           schema:
@@ -205,15 +205,15 @@ paths:
               $ref: '#/definitions/v1.Rulesheet'
             type: array
         "400":
-          description: Bad Request
+          description: Bad Format
           schema:
             $ref: '#/definitions/v1.Error'
         "404":
-          description: Not Found. Check if the request URL already exists
+          description: Not Found
         "500":
-          description: Internal Server Error. If you pass a not registered record
-            ID or anything different as a positive number, the server will return
-            an error
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.Error'
         default:
           description: ""
           schema:
@@ -253,11 +253,11 @@ paths:
               $ref: '#/definitions/v1.Rulesheet'
             type: array
         "400":
-          description: Bad Request
+          description: Bad Format
           schema:
             $ref: '#/definitions/v1.Error'
         "404":
-          description: Not Found. Check if the request URL already exists
+          description: Not Found
         "500":
           description: Internal Server Error
           schema:

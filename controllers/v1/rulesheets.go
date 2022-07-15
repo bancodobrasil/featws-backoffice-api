@@ -257,9 +257,7 @@ func (rc *rulesheets) UpdateRulesheet() gin.HandlerFunc {
 
 		_, err := rc.service.Get(ctx, id)
 		if err != nil {
-			c.JSON(http.StatusNotFound, responses.Error{
-				Error: err.Error(),
-			})
+			c.String(http.StatusNotFound, "")
 			log.Errorf("You are trying to update a non existing record: %v", err)
 			return
 		}
