@@ -68,13 +68,13 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Bad Format",
                         "schema": {
                             "$ref": "#/definitions/v1.Error"
                         }
                     },
                     "404": {
-                        "description": "Not Found. Check if the request URL already exists"
+                        "description": "Not Found"
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -134,13 +134,13 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Bad Format",
                         "schema": {
                             "$ref": "#/definitions/v1.Error"
                         }
                     },
                     "404": {
-                        "description": "Not Found. Check if the request URL already exists"
+                        "description": "Not Found"
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -201,16 +201,19 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Bad Format",
                         "schema": {
                             "$ref": "#/definitions/v1.Error"
                         }
                     },
                     "404": {
-                        "description": "Not Found. Check if the request URL already exists"
+                        "description": "Not Found"
                     },
                     "500": {
-                        "description": "Internal Server Error. If you pass a not registered record ID or anything different as a positive number, the server will return an error"
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/v1.Error"
+                        }
                     },
                     "default": {
                         "description": "",
@@ -272,13 +275,13 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Bad Format",
                         "schema": {
                             "$ref": "#/definitions/v1.Error"
                         }
                     },
                     "404": {
-                        "description": "Not Found. Check if the request URL already exists"
+                        "description": "Not Found"
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -334,19 +337,19 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Bad Format",
                         "schema": {
                             "$ref": "#/definitions/v1.Error"
                         }
                     },
                     "404": {
-                        "description": "Not Found",
+                        "description": "Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/v1.Error"
                         }
-                    },
-                    "500": {
-                        "description": "Internal Server Error. If you pass a not registered record ID or anything different as a positive number, the server will return an error"
                     },
                     "default": {
                         "description": "",
