@@ -346,10 +346,7 @@ const docTemplate = `{
                         "description": "Not Found"
                     },
                     "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/v1.Error"
-                        }
+                        "description": "Internal Server Error. If you pass a not registered record ID or anything different as a positive number, the server will return an error"
                     },
                     "default": {
                         "description": "",
