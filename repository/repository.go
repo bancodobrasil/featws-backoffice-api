@@ -88,7 +88,7 @@ func (r *repository[T]) Count(ctx context.Context, entity interface{}) (count in
 
 	count = 0
 
-	result := db.Count(&count)
+	result := db.Where(entity).Count(&count)
 
 	err = result.Error
 	if err != nil {
