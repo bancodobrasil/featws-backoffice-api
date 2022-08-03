@@ -32,8 +32,10 @@ type repository[T any] struct {
 
 // Create ...
 func (r *repository[T]) Create(ctx context.Context, entity *T) error {
+	_, span := tr.Start(ctx, "repo-create")
+	defer span.End()
 
-	db := r.newSession()
+	db := r.newSession(ctx)
 
 	result := db.Create(&entity)
 	if result.Error != nil {
@@ -52,8 +54,13 @@ func (r *repository[T]) Create(ctx context.Context, entity *T) error {
 
 // Find ...
 func (r *repository[T]) Find(ctx context.Context, entity interface{}, options *FindOptions) (list []*T, err error) {
+	_, span := tr.Start(ctx, "repo-find")
+	defer func() {
+		log.Print("Passou aqui")
+		span.End()
+	}()
 
-	db := r.newSession()
+	db := r.newSession(ctx)
 
 	if options != nil {
 		limit := 10
@@ -83,8 +90,10 @@ func (r *repository[T]) Find(ctx context.Context, entity interface{}, options *F
 
 // Count ...
 func (r *repository[T]) Count(ctx context.Context, entity interface{}) (count int64, err error) {
+	_, span := tr.Start(ctx, "repo-count")
+	defer span.End()
 
-	db := r.newSession()
+	db := r.newSession(ctx)
 
 	count = 0
 
@@ -101,8 +110,10 @@ func (r *repository[T]) Count(ctx context.Context, entity interface{}) (count in
 
 // Get ...
 func (r *repository[T]) Get(ctx context.Context, id string) (entity *T, err error) {
+	_, span := tr.Start(ctx, "repo-get")
+	defer span.End()
 
-	db := r.newSession()
+	db := r.newSession(ctx)
 
 	result := db.First(&entity, id)
 
@@ -117,8 +128,10 @@ func (r *repository[T]) Get(ctx context.Context, id string) (entity *T, err erro
 
 // Update ...
 func (r *repository[T]) Update(ctx context.Context, entity T) (updated *T, err error) {
+	_, span := tr.Start(ctx, "repo-update")
+	defer span.End()
 
-	db := r.newSession()
+	db := r.newSession(ctx)
 
 	result := db.Model(entity).Save(&entity)
 
@@ -135,8 +148,10 @@ func (r *repository[T]) Update(ctx context.Context, entity T) (updated *T, err e
 
 // Delete ...
 func (r *repository[T]) Delete(ctx context.Context, id string) (deleted bool, err error) {
+	_, span := tr.Start(ctx, "repo-delete")
+	defer span.End()
 
-	db := r.newSession()
+	db := r.newSession(ctx)
 
 	entity, err := r.Get(ctx, id)
 
@@ -163,6 +178,6 @@ func (r *repository[T]) Delete(ctx context.Context, id string) (deleted bool, er
 	return
 }
 
-func (r *repository[T]) newSession() *gorm.DB {
-	return r.db.Session(&gorm.Session{}).Model(new(T))
+func (r *repository[T]) newSession(ctx context.Context) *gorm.DB {
+	return r.db.Session(&gorm.Session{}).Model(new(T)).WithContext(ctx)
 }

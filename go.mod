@@ -4,14 +4,14 @@ go 1.18
 
 require (
 	github.com/bancodobrasil/gin-monitor v1.0.0-rc1
-	github.com/bancodobrasil/gin-telemetry v0.0.1-rc1
+	github.com/bancodobrasil/gin-telemetry v0.0.1-rc5
 	github.com/bancodobrasil/healthcheck v0.0.2-rc1
 	github.com/gin-contrib/cors v1.3.1
 	github.com/gin-gonic/gin v1.7.7
 	github.com/go-playground/validator/v10 v10.10.1
 	github.com/gsdenys/healthcheck v0.0.0-20220412001953-64e5089fa0bc
 	github.com/prometheus/client_golang v1.12.1
-	github.com/sirupsen/logrus v1.8.1
+	github.com/sirupsen/logrus v1.9.0
 	github.com/spf13/viper v1.11.0
 	github.com/stretchr/testify v1.7.1
 	github.com/swaggo/gin-swagger v1.4.2
@@ -70,14 +70,16 @@ require (
 	github.com/stretchr/objx v0.1.1 // indirect
 	github.com/subosito/gotenv v1.2.0 // indirect
 	github.com/ugorji/go/codec v1.2.7 // indirect
-	go.opentelemetry.io/otel v1.6.3 // indirect
-	go.opentelemetry.io/otel/exporters/jaeger v1.6.3 // indirect
-	go.opentelemetry.io/otel/sdk v1.6.3 // indirect
-	go.opentelemetry.io/otel/trace v1.6.3 // indirect
+	github.com/uptrace/opentelemetry-go-extra/otellogrus v0.1.15 // indirect
+	github.com/uptrace/opentelemetry-go-extra/otelutil v0.1.15 // indirect
+	go.opentelemetry.io/otel v1.8.0 // indirect
+	go.opentelemetry.io/otel/exporters/jaeger v1.8.0 // indirect
+	go.opentelemetry.io/otel/sdk v1.8.0 // indirect
+	go.opentelemetry.io/otel/trace v1.8.0 // indirect
 	golang.org/x/crypto v0.0.0-20220411220226-7b82a4e95df4 // indirect
 	golang.org/x/net v0.0.0-20220412020605-290c469a71a5 // indirect
 	golang.org/x/oauth2 v0.0.0-20220411215720-9780585627b5 // indirect
-	golang.org/x/sys v0.0.0-20220412211240-33da011f77ad // indirect
+	golang.org/x/sys v0.0.0-20220722155257-8c9f86f7a55f // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0 // indirect
 	golang.org/x/tools v0.1.7 // indirect

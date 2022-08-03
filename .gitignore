@@ -18,5 +18,6 @@ _data/
 .env
 .env.local
 .json
+.vscode
 
 data/
