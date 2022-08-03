@@ -18,6 +18,7 @@ require (
 	github.com/swaggo/swag v1.7.9
 	github.com/toorop/gin-logrus v0.0.0-20210225092905-2c785434f26f
 	github.com/xanzy/go-gitlab v0.63.0
+	go.opentelemetry.io/otel/trace v1.8.0
 	gorm.io/driver/mysql v1.3.3
 	gorm.io/gorm v1.23.5
 )
@@ -75,7 +76,6 @@ require (
 	go.opentelemetry.io/otel v1.8.0 // indirect
 	go.opentelemetry.io/otel/exporters/jaeger v1.8.0 // indirect
 	go.opentelemetry.io/otel/sdk v1.8.0 // indirect
-	go.opentelemetry.io/otel/trace v1.8.0 // indirect
 	golang.org/x/crypto v0.0.0-20220411220226-7b82a4e95df4 // indirect
 	golang.org/x/net v0.0.0-20220412020605-290c469a71a5 // indirect
 	golang.org/x/oauth2 v0.0.0-20220411215720-9780585627b5 // indirect

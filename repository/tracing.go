@@ -1,5 +1,5 @@
 package repository
 
-import "go.opentelemetry.io/otel"
+// import "go.opentelemetry.io/otel"
 
-var tr = otel.Tracer("repository")
+// var tr = otel.Tracer("repository")

@@ -4,7 +4,9 @@ import (
 	"context"
 	"errors"
 
+	telemetry "github.com/bancodobrasil/gin-telemetry"
 	log "github.com/sirupsen/logrus"
+	"go.opentelemetry.io/otel/trace"
 
 	"gorm.io/gorm"
 )
@@ -32,7 +34,9 @@ type repository[T any] struct {
 
 // Create ...
 func (r *repository[T]) Create(ctx context.Context, entity *T) error {
-	_, span := tr.Start(ctx, "repo-create")
+	// add the span of database query on the root span of the context
+	tracer := telemetry.GetTracer(ctx)
+	ctx, span := tracer.Start(ctx, "repo-create", trace.WithSpanKind(trace.SpanKindInternal))
 	defer span.End()
 
 	db := r.newSession(ctx)
@@ -54,11 +58,10 @@ func (r *repository[T]) Create(ctx context.Context, entity *T) error {
 
 // Find ...
 func (r *repository[T]) Find(ctx context.Context, entity interface{}, options *FindOptions) (list []*T, err error) {
-	_, span := tr.Start(ctx, "repo-find")
-	defer func() {
-		log.Print("Passou aqui")
-		span.End()
-	}()
+	// add the span of database query on the root span of the context
+	tracer := telemetry.GetTracer(ctx)
+	ctx, span := tracer.Start(ctx, "repo-find", trace.WithSpanKind(trace.SpanKindInternal))
+	defer span.End()
 
 	db := r.newSession(ctx)
 
@@ -90,7 +93,9 @@ func (r *repository[T]) Find(ctx context.Context, entity interface{}, options *F
 
 // Count ...
 func (r *repository[T]) Count(ctx context.Context, entity interface{}) (count int64, err error) {
-	_, span := tr.Start(ctx, "repo-count")
+	// add the span of database query on the root span of the context
+	tracer := telemetry.GetTracer(ctx)
+	ctx, span := tracer.Start(ctx, "repo-count", trace.WithSpanKind(trace.SpanKindInternal))
 	defer span.End()
 
 	db := r.newSession(ctx)
@@ -110,7 +115,9 @@ func (r *repository[T]) Count(ctx context.Context, entity interface{}) (count in
 
 // Get ...
 func (r *repository[T]) Get(ctx context.Context, id string) (entity *T, err error) {
-	_, span := tr.Start(ctx, "repo-get")
+	// add the span of database query on the root span of the context
+	tracer := telemetry.GetTracer(ctx)
+	ctx, span := tracer.Start(ctx, "repo-get", trace.WithSpanKind(trace.SpanKindInternal))
 	defer span.End()
 
 	db := r.newSession(ctx)
@@ -128,7 +135,9 @@ func (r *repository[T]) Get(ctx context.Context, id string) (entity *T, err erro
 
 // Update ...
 func (r *repository[T]) Update(ctx context.Context, entity T) (updated *T, err error) {
-	_, span := tr.Start(ctx, "repo-update")
+	// add the span of database query on the root span of the context
+	tracer := telemetry.GetTracer(ctx)
+	ctx, span := tracer.Start(ctx, "repo-update", trace.WithSpanKind(trace.SpanKindInternal))
 	defer span.End()
 
 	db := r.newSession(ctx)
@@ -148,7 +157,9 @@ func (r *repository[T]) Update(ctx context.Context, entity T) (updated *T, err e
 
 // Delete ...
 func (r *repository[T]) Delete(ctx context.Context, id string) (deleted bool, err error) {
-	_, span := tr.Start(ctx, "repo-delete")
+	// add the span of database query on the root span of the context
+	tracer := telemetry.GetTracer(ctx)
+	ctx, span := tracer.Start(ctx, "repo-delete", trace.WithSpanKind(trace.SpanKindInternal))
 	defer span.End()
 
 	db := r.newSession(ctx)
