@@ -98,13 +98,15 @@ func (rc *rulesheets) CreateRulesheet() gin.HandlerFunc {
 	}
 }
 
-// GetRulesheets 		godoc
+// GetRulesheets 	godoc
 // @Summary 			List Rulesheets
-// @Description 		List Rulesheet description
-// @Tags 				Rulesheet
+// @Description   List Rulesheet description
+// @Tags 				  Rulesheet
 // @Accept  			json
 // @Produce  			json
-// @Param				count query boolean false "Total of results"
+// @Param				  count query boolean false "Total of results"
+// @Param					limit query integer false "Max length of the array returned"
+// @Param				  page query integer false "Page number that is multiplied by 'limit' to calculate the offset"
 // @Success 			200 {array} payloads.Rulesheet
 // @Header 				200 {string} Authorization "token access"
 // @Failure 			400 {object} responses.Error "Bad Format"
@@ -122,17 +124,47 @@ func (rc *rulesheets) GetRulesheets() gin.HandlerFunc {
 
 		query := c.Request.URL.Query()
 		filter := make(map[string]interface{})
-		for param, value := range query {
-			if len(value) == 1 {
-				filter[param] = value[0]
-				continue
+		// TODO: Implement filters correctly
+		// for param, value := range query {
+		// 	if len(value) == 1 {
+		// 		filter[param] = value[0]
+		// 		continue
+		// 	}
+		// 	filter[param] = value
+		// }
+
+		opts := &services.FindOptions{}
+
+		limit, ok := query["limit"]
+		if ok {
+			limitInt, err := strconv.Atoi(limit[0])
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, responses.Error{
+					Error: err.Error(),
+				})
+				log.Errorf("Error on fetch more than one rulesheet: %v", err)
+				return
 			}
-			filter[param] = value
+			opts.Limit = limitInt
 		}
+
+		page, ok := query["page"]
+		if ok {
+			pageInt, err := strconv.Atoi(page[0])
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, responses.Error{
+					Error: err.Error(),
+				})
+				log.Errorf("Error on fetch more than one rulesheet: %v", err)
+				return
+			}
+			opts.Page = pageInt
+		}
+
 		_, isCount := query["count"]
 
 		if !isCount {
-			dtos, err := rc.service.Find(ctx, filter)
+			dtos, err := rc.service.Find(ctx, filter, opts)
 			if err != nil {
 				c.JSON(http.StatusInternalServerError, responses.Error{
 					Error: err.Error(),
