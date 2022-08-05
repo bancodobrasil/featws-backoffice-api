@@ -77,6 +77,7 @@ func main() {
 	router.Use(ginlogrus.Logger(log.StandardLogger()), gin.Recovery())
 	router.Use(monitor.Prometheus())
 	router.GET("metrics", gin.WrapH(promhttp.Handler()))
+	// inject middleware
 	router.Use(telemetry.Middleware("featws-api"))
 
 	configCors := cors.DefaultConfig()

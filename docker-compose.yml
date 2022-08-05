@@ -20,6 +20,9 @@ services:
       MYSQL_DATABASE: "api"
       MYSQL_USER: "api"
       MYSQL_PASSWORD: "api"
+      TELEMETRY_HTTPCLIENT_TLS: "false"
+      TELEMETRY_EXPORTER_JAEGER_AGENT_HOST: "localhost"
+      TELEMETRY_ENVIRONMENT: local
 
   adminer:
     image: adminer
@@ -28,4 +31,3 @@ services:
     restart: always
     ports:
       - 8080:8080
-  

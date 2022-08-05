@@ -4,7 +4,10 @@ import (
 	"context"
 	"errors"
 
+	"github.com/bancodobrasil/featws-api/utils"
+	telemetry "github.com/bancodobrasil/gin-telemetry"
 	log "github.com/sirupsen/logrus"
+	"go.opentelemetry.io/otel/trace"
 
 	"gorm.io/gorm"
 )
@@ -30,20 +33,32 @@ type repository[T any] struct {
 	db *gorm.DB
 }
 
+const (
+	create = "repo-create"
+	find   = "repo-find"
+	count  = "repo-count"
+	get    = "repo-get"
+	update = "repo-update"
+	delete = "repo-delete"
+)
+
 // Create ...
 func (r *repository[T]) Create(ctx context.Context, entity *T) error {
+	// add the span of database query on the root span of the context
+	span := utils.GenerateSpanTracer(ctx, create)
+	defer span()
 
-	db := r.newSession()
+	db := r.newSession(ctx)
 
 	result := db.Create(&entity)
 	if result.Error != nil {
-		log.Errorf("error on insert the result into model: %v", result.Error)
+		log.WithContext(ctx).Errorf("error on insert the result into model: %v", result.Error)
 		return result.Error
 	}
 
 	if result.RowsAffected != 1 {
 		err := errors.New("error on insert not inserted")
-		log.Error(err)
+		log.WithContext(ctx).Error(err.Error())
 		return err
 	}
 
@@ -52,8 +67,12 @@ func (r *repository[T]) Create(ctx context.Context, entity *T) error {
 
 // Find ...
 func (r *repository[T]) Find(ctx context.Context, entity interface{}, options *FindOptions) (list []*T, err error) {
+	// add the span of database query on the root span of the context
+	tracer := telemetry.GetTracer(ctx)
+	ctx, span := tracer.Start(ctx, "repo-find", trace.WithSpanKind(trace.SpanKindInternal))
+	defer span.End()
 
-	db := r.newSession()
+	db := r.newSession(ctx)
 
 	if options != nil {
 		limit := 10
@@ -74,7 +93,7 @@ func (r *repository[T]) Find(ctx context.Context, entity interface{}, options *F
 
 	err = result.Error
 	if err != nil {
-		log.Errorf("Error on find: %v", err)
+		log.WithContext(ctx).Errorf("Error on find: %v", err)
 		return
 	}
 
@@ -83,8 +102,12 @@ func (r *repository[T]) Find(ctx context.Context, entity interface{}, options *F
 
 // Count ...
 func (r *repository[T]) Count(ctx context.Context, entity interface{}) (count int64, err error) {
+	// add the span of database query on the root span of the context
+	tracer := telemetry.GetTracer(ctx)
+	ctx, span := tracer.Start(ctx, "repo-count", trace.WithSpanKind(trace.SpanKindInternal))
+	defer span.End()
 
-	db := r.newSession()
+	db := r.newSession(ctx)
 
 	count = 0
 
@@ -92,7 +115,7 @@ func (r *repository[T]) Count(ctx context.Context, entity interface{}) (count in
 
 	err = result.Error
 	if err != nil {
-		log.Errorf("Error on find: %v", err)
+		log.WithContext(ctx).Errorf("Error on find: %v", err)
 		return
 	}
 
@@ -101,14 +124,18 @@ func (r *repository[T]) Count(ctx context.Context, entity interface{}) (count in
 
 // Get ...
 func (r *repository[T]) Get(ctx context.Context, id string) (entity *T, err error) {
+	// add the span of database query on the root span of the context
+	tracer := telemetry.GetTracer(ctx)
+	ctx, span := tracer.Start(ctx, "repo-get", trace.WithSpanKind(trace.SpanKindInternal))
+	defer span.End()
 
-	db := r.newSession()
+	db := r.newSession(ctx)
 
 	result := db.First(&entity, id)
 
 	err = result.Error
 	if err != nil {
-		log.Errorf("Error on find one result into collection: %v", err)
+		log.WithContext(ctx).Errorf("Error on find one result into collection: %v", err)
 		return
 	}
 
@@ -117,14 +144,18 @@ func (r *repository[T]) Get(ctx context.Context, id string) (entity *T, err erro
 
 // Update ...
 func (r *repository[T]) Update(ctx context.Context, entity T) (updated *T, err error) {
+	// add the span of database query on the root span of the context
+	tracer := telemetry.GetTracer(ctx)
+	ctx, span := tracer.Start(ctx, "repo-update", trace.WithSpanKind(trace.SpanKindInternal))
+	defer span.End()
 
-	db := r.newSession()
+	db := r.newSession(ctx)
 
 	result := db.Model(entity).Save(&entity)
 
 	err = result.Error
 	if err != nil {
-		log.Errorf("Error on update into collection: %v", err)
+		log.WithContext(ctx).Errorf("Error on update into collection: %v", err)
 		return
 	}
 
@@ -135,13 +166,17 @@ func (r *repository[T]) Update(ctx context.Context, entity T) (updated *T, err e
 
 // Delete ...
 func (r *repository[T]) Delete(ctx context.Context, id string) (deleted bool, err error) {
+	// add the span of database query on the root span of the context
+	tracer := telemetry.GetTracer(ctx)
+	ctx, span := tracer.Start(ctx, "repo-delete", trace.WithSpanKind(trace.SpanKindInternal))
+	defer span.End()
 
-	db := r.newSession()
+	db := r.newSession(ctx)
 
 	entity, err := r.Get(ctx, id)
 
 	if err != nil {
-		log.Errorf("Error on get before delete: %v", err)
+		log.WithContext(ctx).Errorf("Error on get before delete: %v", err)
 		return
 	}
 
@@ -163,6 +198,6 @@ func (r *repository[T]) Delete(ctx context.Context, id string) (deleted bool, er
 	return
 }
 
-func (r *repository[T]) newSession() *gorm.DB {
-	return r.db.Session(&gorm.Session{}).Model(new(T))
+func (r *repository[T]) newSession(ctx context.Context) *gorm.DB {
+	return r.db.Session(&gorm.Session{}).Model(new(T)).WithContext(ctx)
 }
