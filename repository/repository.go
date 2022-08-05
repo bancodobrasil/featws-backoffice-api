@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/bancodobrasil/featws-api/utils"
 	telemetry "github.com/bancodobrasil/gin-telemetry"
 	log "github.com/sirupsen/logrus"
 	"go.opentelemetry.io/otel/trace"
@@ -32,24 +33,32 @@ type repository[T any] struct {
 	db *gorm.DB
 }
 
+const (
+	create = "repo-create"
+	find   = "repo-find"
+	count  = "repo-count"
+	get    = "repo-get"
+	update = "repo-update"
+	delete = "repo-delete"
+)
+
 // Create ...
 func (r *repository[T]) Create(ctx context.Context, entity *T) error {
 	// add the span of database query on the root span of the context
-	tracer := telemetry.GetTracer(ctx)
-	ctx, span := tracer.Start(ctx, "repo-create", trace.WithSpanKind(trace.SpanKindInternal))
-	defer span.End()
+	span := utils.GenerateSpanTracer(ctx, create)
+	defer span()
 
 	db := r.newSession(ctx)
 
 	result := db.Create(&entity)
 	if result.Error != nil {
-		log.Errorf("error on insert the result into model: %v", result.Error)
+		log.WithContext(ctx).Errorf("error on insert the result into model: %v", result.Error)
 		return result.Error
 	}
 
 	if result.RowsAffected != 1 {
 		err := errors.New("error on insert not inserted")
-		log.Error(err)
+		log.WithContext(ctx).Error(err.Error())
 		return err
 	}
 
@@ -84,7 +93,7 @@ func (r *repository[T]) Find(ctx context.Context, entity interface{}, options *F
 
 	err = result.Error
 	if err != nil {
-		log.Errorf("Error on find: %v", err)
+		log.WithContext(ctx).Errorf("Error on find: %v", err)
 		return
 	}
 
@@ -106,7 +115,7 @@ func (r *repository[T]) Count(ctx context.Context, entity interface{}) (count in
 
 	err = result.Error
 	if err != nil {
-		log.Errorf("Error on find: %v", err)
+		log.WithContext(ctx).Errorf("Error on find: %v", err)
 		return
 	}
 
@@ -126,7 +135,7 @@ func (r *repository[T]) Get(ctx context.Context, id string) (entity *T, err erro
 
 	err = result.Error
 	if err != nil {
-		log.Errorf("Error on find one result into collection: %v", err)
+		log.WithContext(ctx).Errorf("Error on find one result into collection: %v", err)
 		return
 	}
 
@@ -146,7 +155,7 @@ func (r *repository[T]) Update(ctx context.Context, entity T) (updated *T, err e
 
 	err = result.Error
 	if err != nil {
-		log.Errorf("Error on update into collection: %v", err)
+		log.WithContext(ctx).Errorf("Error on update into collection: %v", err)
 		return
 	}
 
@@ -167,7 +176,7 @@ func (r *repository[T]) Delete(ctx context.Context, id string) (deleted bool, er
 	entity, err := r.Get(ctx, id)
 
 	if err != nil {
-		log.Errorf("Error on get before delete: %v", err)
+		log.WithContext(ctx).Errorf("Error on get before delete: %v", err)
 		return
 	}
 
