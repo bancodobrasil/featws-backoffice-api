@@ -115,6 +115,18 @@ const docTemplate = `{
                         "description": "Total of results",
                         "name": "count",
                         "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Max length of the array returned",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page number that is multiplied by 'limit' to calculate the offset",
+                        "name": "page",
+                        "in": "query"
                     }
                 ],
                 "responses": {

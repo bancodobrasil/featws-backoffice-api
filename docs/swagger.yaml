@@ -108,6 +108,14 @@ paths:
         in: query
         name: count
         type: boolean
+      - description: Max length of the array returned
+        in: query
+        name: limit
+        type: integer
+      - description: Page number that is multiplied by 'limit' to calculate the offset
+        in: query
+        name: page
+        type: integer
       produces:
       - application/json
       responses:
