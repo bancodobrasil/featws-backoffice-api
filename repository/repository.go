@@ -79,13 +79,9 @@ func (r *repository[T]) Find(ctx context.Context, entity interface{}, options *F
 		if options.Limit != 0 {
 			limit = options.Limit
 		}
-		db.Limit(limit)
+		db = db.Limit(limit)
 		if options.Page != 0 {
-			page := options.Page
-			if page == 0 {
-				page = 1
-			}
-			db.Offset((page - 1) * limit)
+			db = db.Offset((options.Page - 1) * limit)
 		}
 	}
 
