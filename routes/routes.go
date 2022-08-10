@@ -27,6 +27,7 @@ func SetupRoutes(router *gin.Engine) {
 // APIRoutes define all api routes
 func APIRoutes(router *gin.Engine) {
 	// inject middleware
-	router.Use(telemetry.Middleware("featws-api"))
-	api.Router(router.Group("/api"))
+	group := router.Group("/api")
+	group.Use(telemetry.Middleware("featws-api"))
+	api.Router(group)
 }
