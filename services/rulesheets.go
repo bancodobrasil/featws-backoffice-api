@@ -9,6 +9,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// FindOptions ...
 type FindOptions struct {
 	Limit int
 	Page  int

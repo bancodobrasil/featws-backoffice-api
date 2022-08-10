@@ -83,7 +83,7 @@ func main() {
 	router.Use(cors.New(configCors))
 
 	// Setup API routers
-	routes.ApiRoutes(router)
+	routes.APIRoutes(router)
 
 	port := cfg.Port
 
