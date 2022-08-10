@@ -3,7 +3,6 @@ package routes
 import (
 	"github.com/bancodobrasil/featws-api/config"
 	"github.com/bancodobrasil/featws-api/docs"
-	"github.com/bancodobrasil/featws-api/routes/api"
 	"github.com/bancodobrasil/featws-api/routes/health"
 	"github.com/gin-gonic/gin"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -18,7 +17,6 @@ func SetupRoutes(router *gin.Engine) {
 	docs.SwaggerInfo.Host = cfg.ExternalHost
 
 	homeRouter(router.Group("/"))
-	api.Router(router.Group("/api"))
 	health.Router(router.Group("/health"))
 	// setup swagger docs
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
