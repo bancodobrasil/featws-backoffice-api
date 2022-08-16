@@ -9,10 +9,17 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// FindOptions ...
+type FindOptions struct {
+	Limit int
+	Page  int
+}
+
 // Rulesheets ...
 type Rulesheets interface {
 	Create(context.Context, *dtos.Rulesheet) error
-	Find(ctx context.Context, filter interface{}) ([]*dtos.Rulesheet, error)
+	Find(ctx context.Context, filter interface{}, options *FindOptions) ([]*dtos.Rulesheet, error)
+	Count(ctx context.Context, entity interface{}) (count int64, err error)
 	Get(ctx context.Context, id string) (*dtos.Rulesheet, error)
 	Update(ctx context.Context, entity dtos.Rulesheet) (*dtos.Rulesheet, error)
 	Delete(ctx context.Context, id string) (bool, error)
@@ -63,9 +70,18 @@ func (rs rulesheets) Create(ctx context.Context, rulesheetDTO *dtos.Rulesheet) (
 }
 
 // FetchRulesheets ...
-func (rs rulesheets) Find(ctx context.Context, filter interface{}) (result []*dtos.Rulesheet, err error) {
+func (rs rulesheets) Find(ctx context.Context, filter interface{}, options *FindOptions) (result []*dtos.Rulesheet, err error) {
 
-	entities, err := rs.repository.Find(ctx, filter, &repository.FindOptions{})
+	var opts *repository.FindOptions = nil
+
+	if options != nil {
+		opts = &repository.FindOptions{
+			Limit: options.Limit,
+			Page:  options.Page,
+		}
+	}
+
+	entities, err := rs.repository.Find(ctx, filter, opts)
 	if err != nil {
 		log.Errorf("Error on fetch the rulesheets(find): %v", err)
 		return
@@ -83,6 +99,18 @@ func (rs rulesheets) Find(ctx context.Context, filter interface{}) (result []*dt
 	// 		return
 	// 	}
 	// }
+
+	return
+}
+
+// Count ...
+func (rs rulesheets) Count(ctx context.Context, entity interface{}) (count int64, err error) {
+
+	count, err = rs.repository.Count(ctx, entity)
+	if err != nil {
+		log.Errorf("Error on count the entities(find): %v", err)
+		return
+	}
 
 	return
 }

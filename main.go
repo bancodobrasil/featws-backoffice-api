@@ -9,7 +9,6 @@ import (
 	_ "github.com/bancodobrasil/featws-api/docs"
 	"github.com/bancodobrasil/featws-api/routes"
 	ginMonitor "github.com/bancodobrasil/gin-monitor"
-	telemetry "github.com/bancodobrasil/gin-telemetry"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -77,13 +76,14 @@ func main() {
 	router.Use(ginlogrus.Logger(log.StandardLogger()), gin.Recovery())
 	router.Use(monitor.Prometheus())
 	router.GET("metrics", gin.WrapH(promhttp.Handler()))
-	router.Use(telemetry.Middleware("featws-api"))
-
+	// Setup Routers of health resources, swagger and home endpoint
+	routes.SetupRoutes(router)
 	configCors := cors.DefaultConfig()
 	configCors.AllowOrigins = strings.Split(cfg.AllowOrigins, ",")
 	router.Use(cors.New(configCors))
 
-	routes.SetupRoutes(router)
+	// Setup API routers
+	routes.APIRoutes(router)
 
 	port := cfg.Port
 

@@ -26,65 +26,6 @@ const docTemplate = `{
     "basePath": "{{.BasePath}}",
     "paths": {
         "/rulesheets": {
-            "get": {
-                "security": [
-                    {
-                        "ApiKeyAuth": []
-                    }
-                ],
-                "description": "List Rulesheet description",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "rulesheet"
-                ],
-                "summary": "List Rulesheets",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/v1.Rulesheet"
-                            }
-                        },
-                        "headers": {
-                            "Authorization": {
-                                "type": "string",
-                                "description": "token access"
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/v1.Error"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/v1.Error"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/v1.Error"
-                        }
-                    },
-                    "default": {
-                        "description": "",
-                        "schema": {
-                            "$ref": "#/definitions/v1.Error"
-                        }
-                    }
-                }
-            },
             "post": {
                 "security": [
                     {
@@ -99,13 +40,13 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "rulesheet"
+                    "Rulesheet"
                 ],
                 "summary": "Create Rulesheet",
                 "parameters": [
                     {
                         "description": "Rulesheet body",
-                        "name": "rulesheet",
+                        "name": "Rulesheet",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -127,16 +68,91 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Bad Format",
                         "schema": {
                             "$ref": "#/definitions/v1.Error"
                         }
                     },
                     "404": {
-                        "description": "Not Found",
+                        "description": "Not Found"
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/v1.Error"
                         }
+                    },
+                    "default": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/v1.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/rulesheets/": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "List Rulesheet description",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Rulesheet"
+                ],
+                "summary": "List Rulesheets",
+                "parameters": [
+                    {
+                        "type": "boolean",
+                        "description": "Total of results",
+                        "name": "count",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Max length of the array returned",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page number that is multiplied by 'limit' to calculate the offset",
+                        "name": "page",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/v1.Rulesheet"
+                            }
+                        },
+                        "headers": {
+                            "Authorization": {
+                                "type": "string",
+                                "description": "token access"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Format",
+                        "schema": {
+                            "$ref": "#/definitions/v1.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found"
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -168,7 +184,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "rulesheet"
+                    "Rulesheet"
                 ],
                 "summary": "Get Rulesheet by ID",
                 "parameters": [
@@ -197,16 +213,13 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Bad Format",
                         "schema": {
                             "$ref": "#/definitions/v1.Error"
                         }
                     },
                     "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/v1.Error"
-                        }
+                        "description": "Not Found"
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -236,7 +249,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "rulesheet"
+                    "Rulesheet"
                 ],
                 "summary": "Update Rulesheet by ID",
                 "parameters": [
@@ -274,16 +287,13 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Bad Format",
                         "schema": {
                             "$ref": "#/definitions/v1.Error"
                         }
                     },
                     "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/v1.Error"
-                        }
+                        "description": "Not Found"
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -313,7 +323,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "rulesheet"
+                    "Rulesheet"
                 ],
                 "summary": "Delete Rulesheet by ID",
                 "parameters": [
@@ -339,16 +349,13 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Bad Format",
                         "schema": {
                             "$ref": "#/definitions/v1.Error"
                         }
                     },
                     "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/v1.Error"
-                        }
+                        "description": "Not Found"
                     },
                     "500": {
                         "description": "Internal Server Error",
@@ -370,7 +377,13 @@ const docTemplate = `{
         "v1.Error": {
             "type": "object",
             "properties": {
-                "error": {}
+                "error": {},
+                "validation_errors": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/v1.ValidationError"
+                    }
+                }
             }
         },
         "v1.Rulesheet": {
@@ -404,6 +417,20 @@ const docTemplate = `{
                     "additionalProperties": true
                 },
                 "version": {
+                    "type": "string"
+                }
+            }
+        },
+        "v1.ValidationError": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                },
+                "field": {
+                    "type": "string"
+                },
+                "tag": {
                     "type": "string"
                 }
             }

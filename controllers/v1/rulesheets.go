@@ -35,25 +35,27 @@ func NewRulesheets(service services.Rulesheets) Rulesheets {
 	}
 }
 
-// CreateRulesheet godoc
-// @Summary 		Create Rulesheet
-// @Description Create Rulesheet description
-// @Tags 				rulesheet
+// CreateRulesheet 	  	godoc
+// @Summary 			Create Rulesheet
+// @Description 		Create Rulesheet description
+// @Tags 			Rulesheet
 // @Accept  		json
-// @Produce  		json
-// @Param 			rulesheet body payloads.Rulesheet true "Rulesheet body"
-// @Success 		200 {object} payloads.Rulesheet
-// @Header 			200 {string} Authorization "token access"
-// @Failure 		400,404 {object} responses.Error
-// @Failure 		500 {object} responses.Error
-// @Failure 		default {object} responses.Error
-// @Security 		ApiKeyAuth
-// @Router 			/rulesheets [post]
+// @Produce  			json
+// @Param			Rulesheet body payloads.Rulesheet true "Rulesheet body"
+// @Success 			200 {object} payloads.Rulesheet
+// @Header 				200 {string} Authorization "token access"
+// @Failure 			400 {object} responses.Error "Bad Format"
+// @Failure 			500 {object} responses.Error "Internal Server Error"
+// @Failure 			default {object} responses.Error
+// @Response 		404 "Not Found"
+// @Security 			ApiKeyAuth
+// @Router 				/rulesheets [post]
 func (rc *rulesheets) CreateRulesheet() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
 
-		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		// Pass the context of gin Request
+		ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Second)
 		var payload payloads.Rulesheet
 		defer cancel()
 
@@ -68,10 +70,8 @@ func (rc *rulesheets) CreateRulesheet() gin.HandlerFunc {
 		}
 
 		// use the validator libraty to validate required fields
-		if validationErr := validate.Struct(&payload); validationErr != nil {
-			c.JSON(http.StatusBadRequest, responses.Error{
-				Error: validationErr.Error(),
-			})
+		if validationErr := validatePayload(&payload); validationErr != nil {
+			c.JSON(http.StatusBadRequest, validationErr)
 			log.Errorf("Error on validate required fields: %v", validationErr)
 			return
 		}
@@ -99,74 +99,131 @@ func (rc *rulesheets) CreateRulesheet() gin.HandlerFunc {
 	}
 }
 
-// GetRulesheets godoc
-// @Summary 		List Rulesheets
-// @Description List Rulesheet description
-// @Tags 				rulesheet
-// @Accept  		json
-// @Produce  		json
-// @Success 		200 {array} payloads.Rulesheet
-// @Header 			200 {string} Authorization "token access"
-// @Failure 		400,404 {object} responses.Error
-// @Failure 		500 {object} responses.Error
-// @Failure 		default {object} responses.Error
-// @Security 		ApiKeyAuth
-// @Router 			/rulesheets [get]
+// GetRulesheets 	godoc
+// @Summary 			List Rulesheets
+// @Description   List Rulesheet description
+// @Tags 				  Rulesheet
+// @Accept  			json
+// @Produce  			json
+// @Param				  count query boolean false "Total of results"
+// @Param					limit query integer false "Max length of the array returned"
+// @Param				  page query integer false "Page number that is multiplied by 'limit' to calculate the offset"
+// @Success 			200 {array} payloads.Rulesheet
+// @Header 				200 {string} Authorization "token access"
+// @Failure 			400 {object} responses.Error "Bad Format"
+// @Failure 			500 {object} responses.Error "Internal Server Error"
+// @Failure 			default {object} responses.Error
+// @Response 			404 "Not Found"
+// @Security 			ApiKeyAuth
+// @Router 				/rulesheets/ [get]
 func (rc *rulesheets) GetRulesheets() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
 
-		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Second)
 		defer cancel()
 
 		query := c.Request.URL.Query()
 		filter := make(map[string]interface{})
-		for param, value := range query {
-			if len(value) == 1 {
-				filter[param] = value[0]
-				continue
+		// TODO: Implement filters correctly
+		// for param, value := range query {
+		// 	if len(value) == 1 {
+		// 		filter[param] = value[0]
+		// 		continue
+		// 	}
+		// 	filter[param] = value
+		// }
+
+		opts := &services.FindOptions{}
+
+		limit, ok := query["limit"]
+		if ok {
+			limitInt, err := strconv.Atoi(limit[0])
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, responses.Error{
+					Error: err.Error(),
+				})
+				log.Errorf("Error on fetch more than one rulesheet: %v", err)
+				return
 			}
-			filter[param] = value
+			opts.Limit = limitInt
 		}
 
-		dtos, err := rc.service.Find(ctx, filter)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, responses.Error{
-				Error: err.Error(),
-			})
-			log.Errorf("Error on fetch more than one rulesheet: %v", err)
-			return
+		page, ok := query["page"]
+		if ok {
+			pageInt, err := strconv.Atoi(page[0])
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, responses.Error{
+					Error: err.Error(),
+				})
+				log.Errorf("Error on fetch more than one rulesheet: %v", err)
+				return
+			}
+			opts.Page = pageInt
 		}
 
-		var response = make([]responses.Rulesheet, len(dtos))
+		_, isCount := query["count"]
 
-		for index, dto := range dtos {
-			response[index] = responses.NewRulesheet(dto)
+		if !isCount {
+			dtos, err := rc.service.Find(ctx, filter, opts)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, responses.Error{
+					Error: err.Error(),
+				})
+				log.Errorf("Error on fetch more than one rulesheet: %v", err)
+				return
+			}
+
+			var response = make([]responses.Rulesheet, len(dtos))
+
+			for index, dto := range dtos {
+				response[index] = responses.NewRulesheet(dto)
+			}
+
+			c.JSON(http.StatusOK, response)
+		} else {
+			count, err := rc.service.Count(ctx, filter)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, responses.Error{
+					Error: err.Error(),
+				})
+				log.Errorf("Error on count filterValue: %v", err)
+				return
+			}
+
+			var response = []responses.Rulesheet{
+				{
+					FindResult: responses.FindResult{
+						Count: count,
+					},
+				},
+			}
+
+			c.JSON(http.StatusOK, response)
 		}
-
-		c.JSON(http.StatusOK, response)
 	}
 }
 
-// GetRulesheet godoc
-// @Summary 		Get Rulesheet by ID
-// @Description Get Rulesheet by ID description
-// @Tags 				rulesheet
-// @Accept  		json
-// @Produce  		json
+// GetRulesheet 		godoc
+// @Summary 			Get Rulesheet by ID
+// @Description 		Get Rulesheet by ID description
+// @Tags 				Rulesheet
+// @Accept  			json
+// @Produce  			json
 // @Param				id path string true "Rulesheet ID"
-// @Success 		200 {array} payloads.Rulesheet
-// @Header 			200 {string} Authorization "token access"
-// @Failure 		400,404 {object} responses.Error
-// @Failure 		500 {object} responses.Error
-// @Failure 		default {object} responses.Error
-// @Security 		ApiKeyAuth
-// @Router 			/rulesheets/{id} [get]
+// @Success 			200 {array} payloads.Rulesheet
+// @Header 				200 {string} Authorization "token access"
+// @Failure 			400 {object} responses.Error "Bad Format"
+// @Failure 			500 {object} responses.Error "Internal Server Error"
+// @Failure 			default {object} responses.Error
+// @Response 			404 "Not Found"
+// @Security 			ApiKeyAuth
+// @Router 				/rulesheets/{id} [get]
 func (rc *rulesheets) GetRulesheet() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
 
-		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		ctx, cancel := context.WithTimeout(c.Request.Context(), 100*time.Second)
 		defer cancel()
 		id, exists := c.Params.Get("id")
 
@@ -198,26 +255,27 @@ func (rc *rulesheets) GetRulesheet() gin.HandlerFunc {
 	}
 }
 
-// UpdateRulesheet godoc
-// @Summary 		Update Rulesheet by ID
-// @Description Update Rulesheet by ID description
-// @Tags 				rulesheet
-// @Accept  		json
-// @Produce  		json
+// UpdateRulesheet 		godoc
+// @Summary 			Update Rulesheet by ID
+// @Description 		Update Rulesheet by ID description
+// @Tags 				Rulesheet
+// @Accept  			json
+// @Produce  			json
 // @Param				id path string true "Rulesheet ID"
-// @Param 			rulesheet body payloads.Rulesheet true "Rulesheet body"
-// @Success 		200 {array} payloads.Rulesheet
-// @Header 			200 {string} Authorization "token access"
-// @Failure 		400,404 {object} responses.Error
-// @Failure 		500 {object} responses.Error
-// @Failure 		default {object} responses.Error
-// @Security 		ApiKeyAuth
-// @Router 			/rulesheets/{id} [put]
+// @Param				rulesheet body payloads.Rulesheet true "Rulesheet body"
+// @Success 			200 {array} payloads.Rulesheet
+// @Header 				200 {string} Authorization "token access"
+// @Failure 			400 {object} responses.Error "Bad Format"
+// @Failure 			500 {object} responses.Error "Internal Server Error"
+// @Failure 			default {object} responses.Error
+// @Response 			404 "Not Found"
+// @Security 			ApiKeyAuth
+// @Router 				/rulesheets/{id} [put]
 func (rc *rulesheets) UpdateRulesheet() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
 
-		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Second)
 		defer cancel()
 
 		id, exists := c.Params.Get("id")
@@ -227,6 +285,13 @@ func (rc *rulesheets) UpdateRulesheet() gin.HandlerFunc {
 				Error: "Required param 'id'",
 			})
 			log.Error("Error on check if the rulesheet exist")
+			return
+		}
+
+		_, err := rc.service.Get(ctx, id)
+		if err != nil {
+			c.String(http.StatusNotFound, "")
+			log.Errorf("You are trying to update a non existing record: %v", err)
 			return
 		}
 
@@ -240,10 +305,8 @@ func (rc *rulesheets) UpdateRulesheet() gin.HandlerFunc {
 		}
 
 		// use the validator libraty to validate required fields
-		if validationErr := validate.Struct(&payload); validationErr != nil {
-			c.JSON(http.StatusBadRequest, responses.Error{
-				Error: validationErr.Error(),
-			})
+		if validationErr := validatePayload(&payload); validationErr != nil {
+			c.JSON(http.StatusBadRequest, validationErr)
 			log.Errorf("Error on validate required fields: %v", validationErr)
 			return
 		}
@@ -280,25 +343,26 @@ func (rc *rulesheets) UpdateRulesheet() gin.HandlerFunc {
 	}
 }
 
-// DeleteRulesheet godoc
-// @Summary 		Delete Rulesheet by ID
-// @Description Delete Rulesheet by ID description
-// @Tags 				rulesheet
-// @Accept  		json
-// @Produce  		json
+// DeleteRulesheet 		godoc
+// @Summary 			Delete Rulesheet by ID
+// @Description 		Delete Rulesheet by ID description
+// @Tags 				Rulesheet
+// @Accept  			json
+// @Produce  			json
 // @Param				id path string true "Rulesheet ID"
-// @Success 		200 {string} string ""
-// @Header 			200 {string} Authorization "token access"
-// @Failure 		400,404 {object} responses.Error
-// @Failure 		500 {object} responses.Error
-// @Failure 		default {object} responses.Error
-// @Security 		ApiKeyAuth
-// @Router 			/rulesheets/{id} [delete]
+// @Success 			200 {string} string ""
+// @Header 				200 {string} Authorization "token access"
+// @Failure 			400 {object} responses.Error "Bad Format"
+// @Failure 			500 {object} responses.Error "Internal Server Error"
+// @Failure 			default {object} responses.Error
+// @Response 			404 "Not Found"
+// @Security 			ApiKeyAuth
+// @Router 				/rulesheets/{id} [delete]
 func (rc *rulesheets) DeleteRulesheet() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
 
-		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Second)
 		defer cancel()
 
 		id, exists := c.Params.Get("id")

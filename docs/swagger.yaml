@@ -3,6 +3,10 @@ definitions:
   v1.Error:
     properties:
       error: {}
+      validation_errors:
+        items:
+          $ref: '#/definitions/v1.ValidationError'
+        type: array
     type: object
   v1.Rulesheet:
     properties:
@@ -28,6 +32,15 @@ definitions:
     required:
     - name
     type: object
+  v1.ValidationError:
+    properties:
+      error:
+        type: string
+      field:
+        type: string
+      tag:
+        type: string
+    type: object
 host: localhost:9007
 info:
   contact:
@@ -44,44 +57,6 @@ info:
   version: "1.0"
 paths:
   /rulesheets:
-    get:
-      consumes:
-      - application/json
-      description: List Rulesheet description
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          headers:
-            Authorization:
-              description: token access
-              type: string
-          schema:
-            items:
-              $ref: '#/definitions/v1.Rulesheet'
-            type: array
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/v1.Error'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/v1.Error'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/v1.Error'
-        default:
-          description: ""
-          schema:
-            $ref: '#/definitions/v1.Error'
-      security:
-      - ApiKeyAuth: []
-      summary: List Rulesheets
-      tags:
-      - rulesheet
     post:
       consumes:
       - application/json
@@ -89,7 +64,7 @@ paths:
       parameters:
       - description: Rulesheet body
         in: body
-        name: rulesheet
+        name: Rulesheet
         required: true
         schema:
           $ref: '#/definitions/v1.Rulesheet'
@@ -105,13 +80,11 @@ paths:
           schema:
             $ref: '#/definitions/v1.Rulesheet'
         "400":
-          description: Bad Request
+          description: Bad Format
           schema:
             $ref: '#/definitions/v1.Error'
         "404":
           description: Not Found
-          schema:
-            $ref: '#/definitions/v1.Error'
         "500":
           description: Internal Server Error
           schema:
@@ -124,7 +97,57 @@ paths:
       - ApiKeyAuth: []
       summary: Create Rulesheet
       tags:
-      - rulesheet
+      - Rulesheet
+  /rulesheets/:
+    get:
+      consumes:
+      - application/json
+      description: List Rulesheet description
+      parameters:
+      - description: Total of results
+        in: query
+        name: count
+        type: boolean
+      - description: Max length of the array returned
+        in: query
+        name: limit
+        type: integer
+      - description: Page number that is multiplied by 'limit' to calculate the offset
+        in: query
+        name: page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          headers:
+            Authorization:
+              description: token access
+              type: string
+          schema:
+            items:
+              $ref: '#/definitions/v1.Rulesheet'
+            type: array
+        "400":
+          description: Bad Format
+          schema:
+            $ref: '#/definitions/v1.Error'
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/v1.Error'
+        default:
+          description: ""
+          schema:
+            $ref: '#/definitions/v1.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: List Rulesheets
+      tags:
+      - Rulesheet
   /rulesheets/{id}:
     delete:
       consumes:
@@ -148,13 +171,11 @@ paths:
           schema:
             type: string
         "400":
-          description: Bad Request
+          description: Bad Format
           schema:
             $ref: '#/definitions/v1.Error'
         "404":
           description: Not Found
-          schema:
-            $ref: '#/definitions/v1.Error'
         "500":
           description: Internal Server Error
           schema:
@@ -167,7 +188,7 @@ paths:
       - ApiKeyAuth: []
       summary: Delete Rulesheet by ID
       tags:
-      - rulesheet
+      - Rulesheet
     get:
       consumes:
       - application/json
@@ -192,13 +213,11 @@ paths:
               $ref: '#/definitions/v1.Rulesheet'
             type: array
         "400":
-          description: Bad Request
+          description: Bad Format
           schema:
             $ref: '#/definitions/v1.Error'
         "404":
           description: Not Found
-          schema:
-            $ref: '#/definitions/v1.Error'
         "500":
           description: Internal Server Error
           schema:
@@ -211,7 +230,7 @@ paths:
       - ApiKeyAuth: []
       summary: Get Rulesheet by ID
       tags:
-      - rulesheet
+      - Rulesheet
     put:
       consumes:
       - application/json
@@ -242,13 +261,11 @@ paths:
               $ref: '#/definitions/v1.Rulesheet'
             type: array
         "400":
-          description: Bad Request
+          description: Bad Format
           schema:
             $ref: '#/definitions/v1.Error'
         "404":
           description: Not Found
-          schema:
-            $ref: '#/definitions/v1.Error'
         "500":
           description: Internal Server Error
           schema:
@@ -261,7 +278,7 @@ paths:
       - ApiKeyAuth: []
       summary: Update Rulesheet by ID
       tags:
-      - rulesheet
+      - Rulesheet
 securityDefinitions:
   ApiKeyAuth:
     in: header
