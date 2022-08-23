@@ -416,6 +416,9 @@ const docTemplate = `{
                     "type": "object",
                     "additionalProperties": true
                 },
+                "slug": {
+                    "type": "string"
+                },
                 "version": {
                     "type": "string"
                 }

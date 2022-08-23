@@ -2,10 +2,12 @@ package services
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/bancodobrasil/featws-api/dtos"
 	"github.com/bancodobrasil/featws-api/models"
 	"github.com/bancodobrasil/featws-api/repository"
+	"github.com/gosimple/slug"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -43,6 +45,8 @@ func (rs rulesheets) Create(ctx context.Context, rulesheetDTO *dtos.Rulesheet) (
 
 	//TODO verifica unicidade do nome
 	rulesheet, err := models.NewRulesheetV1(*rulesheetDTO)
+	rulesheet.Slug = slug.Make(rulesheet.Slug)
+	fmt.Print(rulesheet.Slug)
 	if err != nil {
 		log.Errorf("Error on create rulesheet on create model: %v", err)
 		return
@@ -186,6 +190,7 @@ func newRulesheetDTO(entity *models.Rulesheet) *dtos.Rulesheet {
 		ID:            entity.ID,
 		Name:          entity.Name,
 		Description:   entity.Description,
+		Slug:          entity.Slug,
 		HasStringRule: entity.HasStringRule,
 	}
 }

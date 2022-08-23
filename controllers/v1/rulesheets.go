@@ -288,7 +288,7 @@ func (rc *rulesheets) UpdateRulesheet() gin.HandlerFunc {
 			return
 		}
 
-		_, err := rc.service.Get(ctx, id)
+		foudedEntity, err := rc.service.Get(ctx, id)
 		if err != nil {
 			c.String(http.StatusNotFound, "")
 			log.Errorf("You are trying to update a non existing record: %v", err)
@@ -296,6 +296,7 @@ func (rc *rulesheets) UpdateRulesheet() gin.HandlerFunc {
 		}
 
 		var payload payloads.Rulesheet
+
 		// validate the request body
 		if err := c.BindJSON(&payload); err != nil {
 			c.JSON(http.StatusBadRequest, responses.Error{
@@ -313,6 +314,15 @@ func (rc *rulesheets) UpdateRulesheet() gin.HandlerFunc {
 
 		iid, _ := strconv.ParseUint(id, 10, 32)
 		payload.ID = uint(iid)
+
+		if payload.Slug != "" {
+			c.JSON(http.StatusBadRequest, responses.Error{
+				Error: "You can't update a slug already defined",
+			})
+			log.Errorf("You can't update a slug already defined: %v", err)
+			return
+		}
+		payload.Slug = foudedEntity.Slug
 
 		dto, err := dtos.NewRulesheetV1(payload)
 		if err != nil {

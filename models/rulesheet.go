@@ -12,6 +12,7 @@ type Rulesheet struct {
 	gorm.Model
 	Name          string
 	Description   string
+	Slug          string //`gorm:"unique_index"`
 	HasStringRule bool
 	CreatedAt     *time.Time
 	UpdatedAt     *time.Time
@@ -26,6 +27,7 @@ func NewRulesheetV1(dto dtos.Rulesheet) (entity Rulesheet, err error) {
 		},
 		Name:        dto.Name,
 		Description: dto.Description,
+		Slug:        dto.Slug,
 	}
 
 	return
