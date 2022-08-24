@@ -26,6 +26,7 @@ type Rulesheet struct {
 	ID            uint
 	Name          string
 	Description   string
+	Slug          string
 	HasStringRule bool
 	Version       string
 	Features      *[]interface{}
@@ -40,6 +41,7 @@ func NewRulesheetV1(payload v1.Rulesheet) (dto Rulesheet, err error) {
 		ID:          payload.ID,
 		Name:        payload.Name,
 		Description: payload.Description,
+		Slug:        payload.Slug,
 		Version:     payload.Version,
 		Features:    payload.Features,
 		Parameters:  payload.Parameters,

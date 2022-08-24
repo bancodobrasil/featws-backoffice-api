@@ -27,6 +27,8 @@ definitions:
       rules:
         additionalProperties: true
         type: object
+      slug:
+        type: string
       version:
         type: string
     required:
