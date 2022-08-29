@@ -23,7 +23,7 @@ go mod tidy
 - Copiar arquivo `.env.sample` e renomear para `.env`.
 - Adicione seu Token GitLab em `FEATWS_API_GITLAB_TOKEN`.
 
-1.Entrar no GitLab: <https://gitlab.com/>.
+1. Entrar no GitLab: <https://gitlab.com/>.
 2. Entre no `Edit Profile`.
 3. Clique em `Access Token`.
 4. Coloque escolha um token name, selecione os scopes e data de expiração. Em seguida, clique no botão abaixo.
