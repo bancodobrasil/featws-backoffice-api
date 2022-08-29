@@ -224,12 +224,37 @@ func TestFindSuccess(t *testing.T) {
 		t.Error("unexpected error on model creation")
 	}
 	repo := new(mocks_repository.Rulesheets)
-	repo.On("Find", ctx, dto.ID, *repository.FindOptions{0, 0}).Return(entity, nil)
+	repoFindOptions := repository.FindOptions{}
+	entities := []*models.Rulesheet{&entity}
+	repo.On("Find", ctx, dto.ID, &repoFindOptions).Return(entities, nil)
 	service := services.NewRulesheets(repo, nil)
-	_, err = service.Find(ctx, dto.ID, nil)
+	serviceFindOptions := services.FindOptions{0, 0}
+	_, err = service.Find(ctx, dto.ID, &serviceFindOptions)
 	if err != nil {
 		t.Error("unexpected error on find")
 	}
+}
+
+func TestFindWithError(t *testing.T) {
+	ctx := context.Background()
+	dto := &dtos.Rulesheet{
+		ID: 1,
+	}
+	entity, err := models.NewRulesheetV1(*dto)
+	if err != nil {
+		t.Error("unexpected error on model creation")
+	}
+	repo := new(mocks_repository.Rulesheets)
+	repoFindOptions := repository.FindOptions{}
+	entities := []*models.Rulesheet{&entity}
+	repo.On("Find", ctx, dto.ID, &repoFindOptions).Return(entities, errors.New("error on find"))
+	service := services.NewRulesheets(repo, nil)
+	serviceFindOptions := services.FindOptions{0, 0}
+	_, err = service.Find(ctx, dto.ID, &serviceFindOptions)
+	if err != nil && err.Error() != "error on find" {
+		t.Error("unexpected error on find")
+	}
+
 }
 
 // func TestFindSucess(t *testing.T) {
