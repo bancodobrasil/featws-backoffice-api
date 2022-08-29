@@ -15,5 +15,7 @@ import (
 
 // HomeHandler ...
 func HomeHandler(c *gin.Context) {
-	c.String(http.StatusOK, "FeatWS API Works!!!")
+	c.JSON(http.StatusOK, gin.H{
+		"message": "FeatWS API Works!!!",
+	})
 }

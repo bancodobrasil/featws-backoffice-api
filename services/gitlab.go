@@ -22,6 +22,7 @@ import (
 type Gitlab interface {
 	Save(rulesheet *dtos.Rulesheet, commitMessage string) error
 	Fill(rulesheet *dtos.Rulesheet) error
+	Connect() (*gitlab.Client, error)
 }
 
 type gitlabService struct {
@@ -43,7 +44,7 @@ func (gs *gitlabService) Save(rulesheet *dtos.Rulesheet, commitMessage string) e
 		return nil
 	}
 
-	git, err := connectGitlab(gs.cfg)
+	git, err := gs.Connect()
 	if err != nil {
 		log.Errorf("Error on connect the gitlab client: %v", err)
 		return err
@@ -286,7 +287,7 @@ func (gs *gitlabService) Fill(rulesheet *dtos.Rulesheet) (err error) {
 		return nil
 	}
 
-	git, err := connectGitlab(gs.cfg)
+	git, err := gs.Connect()
 	if err != nil {
 		log.Errorf("Error on connect the gitlab client: %v", err)
 		return
@@ -346,8 +347,8 @@ func (gs *gitlabService) Fill(rulesheet *dtos.Rulesheet) (err error) {
 	return
 }
 
-func connectGitlab(cfg *config.Config) (*gitlab.Client, error) {
-	git, err := gitlab.NewClient(cfg.GitlabToken, gitlab.WithBaseURL(cfg.GitlabURL))
+func (gs *gitlabService) Connect() (*gitlab.Client, error) {
+	git, err := gitlab.NewClient(gs.cfg.GitlabToken, gitlab.WithBaseURL(gs.cfg.GitlabURL))
 
 	if err != nil {
 		log.Errorf("Failed to create client: %v", err)

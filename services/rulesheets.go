@@ -44,13 +44,9 @@ func NewRulesheets(repository repository.Rulesheets, gitlabService Gitlab) Rules
 func (rs rulesheets) Create(ctx context.Context, rulesheetDTO *dtos.Rulesheet) (err error) {
 
 	//TODO verifica unicidade do nome
-	rulesheet, err := models.NewRulesheetV1(*rulesheetDTO)
+	rulesheet, _ := models.NewRulesheetV1(*rulesheetDTO)
 	rulesheet.Slug = slug.Make(rulesheet.Slug)
 	fmt.Print(rulesheet.Slug)
-	if err != nil {
-		log.Errorf("Error on create rulesheet on create model: %v", err)
-		return
-	}
 
 	err = rs.repository.Create(ctx, &rulesheet)
 	if err != nil {
@@ -97,13 +93,6 @@ func (rs rulesheets) Find(ctx context.Context, filter interface{}, options *Find
 		result = append(result, newRulesheetDTO(entity))
 	}
 
-	// for _, rulesheet := range result {
-	// 	err = fillWithGitlab(rulesheet)
-	// 	if err != nil {
-	// 		return
-	// 	}
-	// }
-
 	return
 }
 
@@ -144,11 +133,7 @@ func (rs rulesheets) Get(ctx context.Context, id string) (result *dtos.Rulesheet
 // UpdateRulesheet ...
 func (rs rulesheets) Update(ctx context.Context, rulesheetDTO dtos.Rulesheet) (result *dtos.Rulesheet, err error) {
 
-	entity, err := models.NewRulesheetV1(rulesheetDTO)
-	if err != nil {
-		log.Errorf("Error on create rulesheet on create model: %v", err)
-		return
-	}
+	entity, _ := models.NewRulesheetV1(rulesheetDTO)
 
 	_, err = rs.repository.Update(ctx, entity)
 	if err != nil {
@@ -161,12 +146,6 @@ func (rs rulesheets) Update(ctx context.Context, rulesheetDTO dtos.Rulesheet) (r
 		log.Errorf("Error on save the rulesheet into repository: %v", err)
 		return
 	}
-
-	// err = rs.gitlabService.Fill(&rulesheetDTO)
-	// if err != nil {
-	// 	log.Errorf("Error on fill rulesheet with gitlab information: %v", err)
-	// 	return
-	// }
 
 	result = &rulesheetDTO
 
