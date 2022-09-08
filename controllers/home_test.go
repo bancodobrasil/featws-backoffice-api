@@ -36,10 +36,10 @@ func TestHomeHandler(t *testing.T) {
 
 }
 
-r.GET("/recipes", ListRecipesHandler)
+// r.GET("/recipes", ListRecipesHandler)
 
-   req, _ := http.NewRequest("GET", "/recipes", nil)
+//    req, _ := http.NewRequest("GET", "/recipes", nil)
 
-   w := httptest.NewRecorder()
+//    w := httptest.NewRecorder()
 
-   r.ServeHTTP(w, req)
+//    r.ServeHTTP(w, req)

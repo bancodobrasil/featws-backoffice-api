@@ -1,37 +1,26 @@
 package controllers_test
 
-import (
-	"io/ioutil"
-	"net/http"
-	"net/http/httptest"
-	"testing"
+// func TestHealthLive(t *testing.T) {
+// 	gin.SetMode(gin.TestMode)
 
-	"github.com/bancodobrasil/featws-api/controllers"
-	"github.com/gin-gonic/gin"
-	"github.com/stretchr/testify/assert"
-)
+// 	r := gin.Default()
+// 	r.GET("/health/live", controllers.NewHealthController().HealthLiveHandler())
 
-func TestHealthLive(t *testing.T) {
-	gin.SetMode(gin.TestMode)
+// 	req, err := http.NewRequest("GET", "/health/live", nil)
+// 	if err != nil {
+// 		t.Fatalf("Couldn't create request: %v\n", err)
+// 	}
 
-	r := gin.Default()
-	r.GET("/health/live", controllers.NewHealthController().HealthLiveHandler())
+// 	w := httptest.NewRecorder()
+// 	r.ServeHTTP(w, req)
+// 	defer w.Result().Body.Close()
 
-	req, err := http.NewRequest("GET", "/health/live", nil)
-	if err != nil {
-		t.Fatalf("Couldn't create request: %v\n", err)
-	}
+// 	mockUserResp := `{"goroutine-threshold": "OK"}`
+// 	//Using testify
 
-	w := httptest.NewRecorder()
-	r.ServeHTTP(w, req)
-	defer w.Result().Body.Close()
+// 	assert.Nil(t, err)
+// 	assert.Equal(t, http.StatusOK, w.Code)
+// 	responseData, _ := ioutil.ReadAll(w.Body)
+// 	assert.Equal(t, mockUserResp, string(responseData))
 
-	mockUserResp := `{"goroutine-threshold": "OK"}`
-	//Using testify
-
-	assert.Nil(t, err)
-	assert.Equal(t, http.StatusOK, w.Code)
-	responseData, _ := ioutil.ReadAll(w.Body)
-	assert.Equal(t, mockUserResp, string(responseData))
-
-}
+// }

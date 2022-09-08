@@ -29,8 +29,8 @@ type Rulesheet struct {
 	Slug          string
 	HasStringRule bool
 	Version       string
-	Features      *[]interface{}
-	Parameters    *[]interface{}
+	Features      *[]map[string]interface{}
+	Parameters    *[]map[string]interface{}
 	Rules         *map[string]interface{}
 }
 
