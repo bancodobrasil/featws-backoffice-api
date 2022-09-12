@@ -328,24 +328,65 @@ func TestSaveTestFilesCreationWithParameters(t *testing.T) {
 	}
 }
 
-func TestSaveTestFilesCreationWithRules(t *testing.T) {
+func TestSaveTestFilesCreationWithRuleInterface(t *testing.T) {
 	dto := SetupRulesheet()
+	// func SetupRulesheet() *dtos.Rulesheet {
+	// 	rulesheet := dtos.Rulesheet{
+	// 		ID:          1,
+	// 		Name:        "Test",
+	// 		Description: "Test",
+	// 	}
+	// 	return &rulesheet
+	// }
 
-	parameters := make([]map[string]interface{}, 0)
+	// type Server struct {
+	// 	Name    string
+	// 	ID      int32
+	// 	Enabled bool
+	// }
 
-	parameters = append(parameters, map[string]interface{}{
-		"name": "test1",
-	})
+	// s := &Server{
+	// 	Name:    "gopher",
+	// 	ID:      123456,
+	// 	Enabled: true,
+	// }
 
-	parameters = append(parameters, map[string]interface{}{
-		"name": "test2",
-	})
+	// dtos.Rule{
+	// 	Condition: "test",
+	// 	Value: dtos.RuleValue{
+	// 		NomeAplicativo: "testAplicativo",
+	// 		TextoURLPadrao: "testURLpadrao",
+	// 		TextoURLDesvio: "testURLdesvio",
+	// 	},
+	// 	Type: "testType",
+	// }
 
-	parameters = append(parameters, map[string]interface{}{
-		"name": "test3",
-	})
+	// values := dtos.RuleValue{
+	// 		NomeAplicativo: "testAplicativo",
+	// 		TextoURLPadrao: "testURLpadrao",
+	// 		TextoURLDesvio: "testURLdesvio",
+	// }
 
-	dto.Parameters = &parameters
+	rules := []interface{}{
+		&dtos.Rule{
+
+			Condition: "test",
+			Value: dtos.RuleValue{
+				NomeAplicativo: "testAplicativo",
+				TextoURLPadrao: "testURLpadrao",
+				TextoURLDesvio: "testURLdesvio",
+			},
+			Type: "testType",
+		},
+	}
+
+	mappedRules := map[string]interface{}{
+		"tags": rules,
+	}
+	// data, _ := json.Marshal(mappedRules)
+	// json.Unmarshal(data, &mappedRules)
+
+	dto.Rules = &mappedRules
 
 	namespace := "test"
 
@@ -372,9 +413,73 @@ func TestSaveTestFilesCreationWithRules(t *testing.T) {
 			features := c["actions"].([]interface{})[2].(map[string]interface{})["content"].(string)
 			assert.Equal(t, "[]", features)
 			parameters := c["actions"].([]interface{})[3].(map[string]interface{})["content"].(string)
-			assert.Equal(t, "[\n  {\n    \"name\": \"test1\"\n  },\n  {\n    \"name\": \"test2\"\n  },\n  {\n    \"name\": \"test3\"\n  }\n]", parameters)
+			assert.Equal(t, "[]", parameters)
 			rulesFeatws := c["actions"].([]interface{})[4].(map[string]interface{})["content"].(string)
-			assert.Equal(t, "", rulesFeatws)
+			assert.Equal(t, "[[tags]]\ncondition = test\nvalue = {\"nomeAplicativo\":\"testAplicativo\",\"textoUrlPadrao\":\"testURLpadrao\",\"textoUrlDesvio\":\"testURLdesvio\"}\ntype = object\n\n", rulesFeatws)
+
+			w.Write(data)
+			return
+		}
+		w.WriteHeader(http.StatusNotFound)
+	}))
+	defer s.Close()
+
+	cfg := config.Config{
+		GitlabURL:       s.URL,
+		GitlabNamespace: namespace,
+		GitlabToken:     "test",
+		GitlabPrefix:    "prefix-",
+		GitlabCIScript:  "test ci-script",
+	}
+
+	ngl := services.NewGitlab(&cfg)
+	ngl.Connect()
+	err := ngl.Save(dto, "test")
+
+	if err != nil {
+		t.Error("unexpected error")
+	}
+}
+
+func TestSaveTestFilesCreationWithStringRule(t *testing.T) {
+	dto := SetupRulesheet()
+
+	rules := make(map[string]interface{})
+
+	rules["test1"] = "test1"
+	rules["test2"] = "test2"
+	rules["test3"] = "test3"
+
+	dto.Rules = &rules
+
+	namespace := "test"
+
+	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/api/v4/namespaces/"+namespace {
+			w.Write([]byte(`{"id":1,"name":"teste"}`))
+			return
+		}
+		if r.Method == "POST" && r.URL.Path == "/api/v4/projects" {
+
+			data, _ := io.ReadAll(r.Body)
+			w.Write(data)
+			return
+		}
+		if r.Method == "POST" && r.URL.Path == "/api/v4/projects/0/repository/commits" {
+			data, _ := io.ReadAll(r.Body)
+			c := make(map[string]interface{})
+			json.Unmarshal(data, &c)
+
+			version := c["actions"].([]interface{})[0].(map[string]interface{})["content"].(string)
+			assert.Equal(t, "1\n", version)
+			gitlab_ci := c["actions"].([]interface{})[1].(map[string]interface{})["content"].(string)
+			assert.Equal(t, "test ci-script", gitlab_ci)
+			features := c["actions"].([]interface{})[2].(map[string]interface{})["content"].(string)
+			assert.Equal(t, "[]", features)
+			parameters := c["actions"].([]interface{})[3].(map[string]interface{})["content"].(string)
+			assert.Equal(t, "[]", parameters)
+			rulesFeatws := c["actions"].([]interface{})[4].(map[string]interface{})["content"].(string)
+			assert.Equal(t, "test1 = test1\ntest2 = test2\ntest3 = test3\n", rulesFeatws)
 
 			w.Write(data)
 			return
