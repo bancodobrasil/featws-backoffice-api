@@ -3,7 +3,6 @@ package services_test
 import (
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -11,11 +10,21 @@ import (
 
 	"github.com/bancodobrasil/featws-api/config"
 	"github.com/bancodobrasil/featws-api/dtos"
-	mocks_services "github.com/bancodobrasil/featws-api/mocks/services"
 	"github.com/bancodobrasil/featws-api/services"
 	"github.com/stretchr/testify/assert"
 	"github.com/xanzy/go-gitlab"
 )
+
+func SetupConfig(url *httptest.Server) *config.Config {
+	cfg := config.Config{
+		GitlabURL:       url.URL,
+		GitlabNamespace: "test",
+		GitlabToken:     "test",
+		GitlabPrefix:    "prefix-",
+		GitlabCIScript:  "test ci-script",
+	}
+	return &cfg
+}
 
 func SetupRulesheet() *dtos.Rulesheet {
 	rulesheet := dtos.Rulesheet{
@@ -26,6 +35,7 @@ func SetupRulesheet() *dtos.Rulesheet {
 	return &rulesheet
 }
 
+// Functions for test Save function
 func TestSaveAndCreateProject(t *testing.T) {
 	dto := SetupRulesheet()
 
@@ -53,15 +63,9 @@ func TestSaveAndCreateProject(t *testing.T) {
 	}))
 	defer s.Close()
 
-	cfg := config.Config{
-		GitlabURL:       s.URL,
-		GitlabNamespace: namespace,
-		GitlabToken:     "test",
-		GitlabPrefix:    "prefix-",
-		GitlabCIScript:  "test ci-script",
-	}
+	cfg := SetupConfig(s)
 
-	ngl := services.NewGitlab(&cfg)
+	ngl := services.NewGitlab(cfg)
 	ngl.Connect()
 	err := ngl.Save(dto, "test")
 
@@ -110,15 +114,9 @@ func TestSaveAndUpdateProject(t *testing.T) {
 	}))
 	defer s.Close()
 
-	cfg := config.Config{
-		GitlabURL:       s.URL,
-		GitlabNamespace: namespace,
-		GitlabToken:     "test",
-		GitlabPrefix:    "prefix-",
-		GitlabCIScript:  "test ci-script",
-	}
+	cfg := SetupConfig(s)
 
-	ngl := services.NewGitlab(&cfg)
+	ngl := services.NewGitlab(cfg)
 	ngl.Connect()
 	err := ngl.Save(dto, "test")
 
@@ -167,15 +165,9 @@ func TestSaveTestFilesCreation(t *testing.T) {
 	}))
 	defer s.Close()
 
-	cfg := config.Config{
-		GitlabURL:       s.URL,
-		GitlabNamespace: namespace,
-		GitlabToken:     "test",
-		GitlabPrefix:    "prefix-",
-		GitlabCIScript:  "test ci-script",
-	}
+	cfg := SetupConfig(s)
 
-	ngl := services.NewGitlab(&cfg)
+	ngl := services.NewGitlab(cfg)
 	ngl.Connect()
 	err := ngl.Save(dto, "test")
 
@@ -239,15 +231,9 @@ func TestSaveTestFilesCreationWithFeatures(t *testing.T) {
 	}))
 	defer s.Close()
 
-	cfg := config.Config{
-		GitlabURL:       s.URL,
-		GitlabNamespace: namespace,
-		GitlabToken:     "test",
-		GitlabPrefix:    "prefix-",
-		GitlabCIScript:  "test ci-script",
-	}
+	cfg := SetupConfig(s)
 
-	ngl := services.NewGitlab(&cfg)
+	ngl := services.NewGitlab(cfg)
 	ngl.Connect()
 	err := ngl.Save(dto, "test")
 
@@ -311,15 +297,9 @@ func TestSaveTestFilesCreationWithParameters(t *testing.T) {
 	}))
 	defer s.Close()
 
-	cfg := config.Config{
-		GitlabURL:       s.URL,
-		GitlabNamespace: namespace,
-		GitlabToken:     "test",
-		GitlabPrefix:    "prefix-",
-		GitlabCIScript:  "test ci-script",
-	}
+	cfg := SetupConfig(s)
 
-	ngl := services.NewGitlab(&cfg)
+	ngl := services.NewGitlab(cfg)
 	ngl.Connect()
 	err := ngl.Save(dto, "test")
 
@@ -330,42 +310,6 @@ func TestSaveTestFilesCreationWithParameters(t *testing.T) {
 
 func TestSaveTestFilesCreationWithRuleInterface(t *testing.T) {
 	dto := SetupRulesheet()
-	// func SetupRulesheet() *dtos.Rulesheet {
-	// 	rulesheet := dtos.Rulesheet{
-	// 		ID:          1,
-	// 		Name:        "Test",
-	// 		Description: "Test",
-	// 	}
-	// 	return &rulesheet
-	// }
-
-	// type Server struct {
-	// 	Name    string
-	// 	ID      int32
-	// 	Enabled bool
-	// }
-
-	// s := &Server{
-	// 	Name:    "gopher",
-	// 	ID:      123456,
-	// 	Enabled: true,
-	// }
-
-	// dtos.Rule{
-	// 	Condition: "test",
-	// 	Value: dtos.RuleValue{
-	// 		NomeAplicativo: "testAplicativo",
-	// 		TextoURLPadrao: "testURLpadrao",
-	// 		TextoURLDesvio: "testURLdesvio",
-	// 	},
-	// 	Type: "testType",
-	// }
-
-	// values := dtos.RuleValue{
-	// 		NomeAplicativo: "testAplicativo",
-	// 		TextoURLPadrao: "testURLpadrao",
-	// 		TextoURLDesvio: "testURLdesvio",
-	// }
 
 	rules := []interface{}{
 		&dtos.Rule{
@@ -424,15 +368,71 @@ func TestSaveTestFilesCreationWithRuleInterface(t *testing.T) {
 	}))
 	defer s.Close()
 
-	cfg := config.Config{
-		GitlabURL:       s.URL,
-		GitlabNamespace: namespace,
-		GitlabToken:     "test",
-		GitlabPrefix:    "prefix-",
-		GitlabCIScript:  "test ci-script",
+	cfg := SetupConfig(s)
+
+	ngl := services.NewGitlab(cfg)
+	ngl.Connect()
+	err := ngl.Save(dto, "test")
+
+	if err != nil {
+		t.Error("unexpected error")
+	}
+}
+
+func TestSaveTestFilesCreationWithRuleInterfaceWithDefault(t *testing.T) {
+	dto := SetupRulesheet()
+
+	rules := []interface{}{
+		"test",
 	}
 
-	ngl := services.NewGitlab(&cfg)
+	mappedRules := map[string]interface{}{
+		"tags": rules,
+	}
+	// data, _ := json.Marshal(mappedRules)
+	// json.Unmarshal(data, &mappedRules)
+
+	dto.Rules = &mappedRules
+
+	namespace := "test"
+
+	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/api/v4/namespaces/"+namespace {
+			w.Write([]byte(`{"id":1,"name":"teste"}`))
+			return
+		}
+		if r.Method == "POST" && r.URL.Path == "/api/v4/projects" {
+
+			data, _ := io.ReadAll(r.Body)
+			w.Write(data)
+			return
+		}
+		if r.Method == "POST" && r.URL.Path == "/api/v4/projects/0/repository/commits" {
+			data, _ := io.ReadAll(r.Body)
+			c := make(map[string]interface{})
+			json.Unmarshal(data, &c)
+
+			version := c["actions"].([]interface{})[0].(map[string]interface{})["content"].(string)
+			assert.Equal(t, "1\n", version)
+			gitlab_ci := c["actions"].([]interface{})[1].(map[string]interface{})["content"].(string)
+			assert.Equal(t, "test ci-script", gitlab_ci)
+			features := c["actions"].([]interface{})[2].(map[string]interface{})["content"].(string)
+			assert.Equal(t, "[]", features)
+			parameters := c["actions"].([]interface{})[3].(map[string]interface{})["content"].(string)
+			assert.Equal(t, "[]", parameters)
+			rulesFeatws := c["actions"].([]interface{})[4].(map[string]interface{})["content"].(string)
+			assert.Equal(t, "DEFAULT ENTRY tags = []interface {}\n", rulesFeatws)
+
+			w.Write(data)
+			return
+		}
+		w.WriteHeader(http.StatusNotFound)
+	}))
+	defer s.Close()
+
+	cfg := SetupConfig(s)
+
+	ngl := services.NewGitlab(cfg)
 	ngl.Connect()
 	err := ngl.Save(dto, "test")
 
@@ -488,15 +488,79 @@ func TestSaveTestFilesCreationWithStringRule(t *testing.T) {
 	}))
 	defer s.Close()
 
-	cfg := config.Config{
-		GitlabURL:       s.URL,
-		GitlabNamespace: namespace,
-		GitlabToken:     "test",
-		GitlabPrefix:    "prefix-",
-		GitlabCIScript:  "test ci-script",
-	}
+	cfg := SetupConfig(s)
 
-	ngl := services.NewGitlab(&cfg)
+	ngl := services.NewGitlab(cfg)
+	ngl.Connect()
+	err := ngl.Save(dto, "test")
+
+	if err != nil {
+		t.Error("unexpected error")
+	}
+}
+
+func TestSaveTestFilesCreationWithDefaultRule(t *testing.T) {
+	dto := SetupRulesheet()
+
+	rules :=
+		&dtos.Rule{
+
+			Condition: "test",
+			Value: dtos.RuleValue{
+				NomeAplicativo: "testAplicativo",
+				TextoURLPadrao: "testURLpadrao",
+				TextoURLDesvio: "testURLdesvio",
+			},
+			Type: "testType",
+		}
+
+	mappedRules := map[string]interface{}{
+		"tags": rules,
+	}
+	// data, _ := json.Marshal(mappedRules)
+	// json.Unmarshal(data, &mappedRules)
+
+	dto.Rules = &mappedRules
+
+	namespace := "test"
+
+	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/api/v4/namespaces/"+namespace {
+			w.Write([]byte(`{"id":1,"name":"teste"}`))
+			return
+		}
+		if r.Method == "POST" && r.URL.Path == "/api/v4/projects" {
+
+			data, _ := io.ReadAll(r.Body)
+			w.Write(data)
+			return
+		}
+		if r.Method == "POST" && r.URL.Path == "/api/v4/projects/0/repository/commits" {
+			data, _ := io.ReadAll(r.Body)
+			c := make(map[string]interface{})
+			json.Unmarshal(data, &c)
+
+			version := c["actions"].([]interface{})[0].(map[string]interface{})["content"].(string)
+			assert.Equal(t, "1\n", version)
+			gitlab_ci := c["actions"].([]interface{})[1].(map[string]interface{})["content"].(string)
+			assert.Equal(t, "test ci-script", gitlab_ci)
+			features := c["actions"].([]interface{})[2].(map[string]interface{})["content"].(string)
+			assert.Equal(t, "[]", features)
+			parameters := c["actions"].([]interface{})[3].(map[string]interface{})["content"].(string)
+			assert.Equal(t, "[]", parameters)
+			rulesFeatws := c["actions"].([]interface{})[4].(map[string]interface{})["content"].(string)
+			assert.Equal(t, "DEFAULT tags = *dtos.Rule\n", rulesFeatws)
+
+			w.Write(data)
+			return
+		}
+		w.WriteHeader(http.StatusNotFound)
+	}))
+	defer s.Close()
+
+	cfg := SetupConfig(s)
+
+	ngl := services.NewGitlab(cfg)
 	ngl.Connect()
 	err := ngl.Save(dto, "test")
 
@@ -532,6 +596,7 @@ func TestSaveTestFilesUpdate(t *testing.T) {
 			w.Write(data)
 			return
 		}
+
 		if r.Method == "POST" && r.URL.Path == "/api/v4/projects/0/repository/commits" {
 			data, _ := io.ReadAll(r.Body)
 			c := make(map[string]interface{})
@@ -555,15 +620,9 @@ func TestSaveTestFilesUpdate(t *testing.T) {
 	}))
 	defer s.Close()
 
-	cfg := config.Config{
-		GitlabURL:       s.URL,
-		GitlabNamespace: namespace,
-		GitlabToken:     "test",
-		GitlabPrefix:    "prefix-",
-		GitlabCIScript:  "test ci-script",
-	}
+	cfg := SetupConfig(s)
 
-	ngl := services.NewGitlab(&cfg)
+	ngl := services.NewGitlab(cfg)
 	ngl.Connect()
 	err := ngl.Save(dto, "test")
 
@@ -572,30 +631,56 @@ func TestSaveTestFilesUpdate(t *testing.T) {
 	}
 }
 
+// Functions to test fill function
 func TestFill(t *testing.T) {
-	dto := &dtos.Rulesheet{
-		ID:          1,
-		Name:        "Teste",
-		Description: "Teste",
-	}
+	dto := SetupRulesheet()
+
+	namespace := "test"
 
 	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Printf("%s %s %s\n", r.Method, r.URL, r.Proto)
+		if r.URL.Path == "/api/v4/namespaces/"+namespace {
+			w.Write([]byte(`{"id":1,"name":"teste", "path":"testpath"}`))
+			return
+		}
+
+		if r.Method == "GET" && r.URL.Path == "/api/v4/projects/testpath/prefix-Test" {
+			w.Write([]byte(`{"id":1,"description":"testeDesc","name":"teste"}`))
+			return
+		}
+
+		if r.Method == "GET" && r.URL.Path == "/api/v4/projects/1/repository/files/rules.featws" {
+			content := base64.StdEncoding.EncodeToString([]byte("regra = $test"))
+
+			file := gitlab.File{
+				Content: content,
+			}
+			data, _ := json.Marshal(file)
+			w.Write(data)
+			return
+		}
+
+		if r.Method == "GET" && r.URL.Path == "/api/v4/projects/1/repository/files/parameters.json" {
+			content := base64.StdEncoding.EncodeToString([]byte("[]"))
+
+			file := gitlab.File{
+				Content: content,
+			}
+			data, _ := json.Marshal(file)
+			w.Write(data)
+			return
+		}
+
+		w.WriteHeader(http.StatusNotFound)
 	}))
 	defer s.Close()
 
-	cfg := config.Config{
-		GitlabURL: s.URL,
-	}
+	cfg := SetupConfig(s)
 
-	gitlabService := new(mocks_services.Gitlab)
-	gitlabService.On("Fill", &dto, "test").Return(nil)
-
-	ngl := services.NewGitlab(&cfg)
+	ngl := services.NewGitlab(cfg)
 	ngl.Connect()
 	err := ngl.Fill(dto)
-	if !assert.Nil(t, err) {
-		t.Fail()
+	if err != nil {
+		t.Error("unexpected error")
 	}
 }
 
@@ -703,15 +788,9 @@ func TestSaveErrorOnCreateProject(t *testing.T) {
 	}))
 	defer s.Close()
 
-	cfg := config.Config{
-		GitlabURL:       s.URL,
-		GitlabNamespace: namespace,
-		GitlabToken:     "test",
-		GitlabPrefix:    "prefix-",
-		GitlabCIScript:  "test ci-script",
-	}
+	cfg := SetupConfig(s)
 
-	ngl := services.NewGitlab(&cfg)
+	ngl := services.NewGitlab(cfg)
 	ngl.Connect()
 	err := ngl.Save(dto, "test")
 
@@ -752,15 +831,9 @@ func TestSaveErrorOnResolveVersion(t *testing.T) {
 	}))
 	defer s.Close()
 
-	cfg := config.Config{
-		GitlabURL:       s.URL,
-		GitlabNamespace: namespace,
-		GitlabToken:     "test",
-		GitlabPrefix:    "prefix-",
-		GitlabCIScript:  "test ci-script",
-	}
+	cfg := SetupConfig(s)
 
-	ngl := services.NewGitlab(&cfg)
+	ngl := services.NewGitlab(cfg)
 	ngl.Connect()
 	err := ngl.Save(dto, "test")
 
@@ -797,15 +870,9 @@ func TestSaveErrorOnParseVersion(t *testing.T) {
 	}))
 	defer s.Close()
 
-	cfg := config.Config{
-		GitlabURL:       s.URL,
-		GitlabNamespace: namespace,
-		GitlabToken:     "test",
-		GitlabPrefix:    "prefix-",
-		GitlabCIScript:  "test ci-script",
-	}
+	cfg := SetupConfig(s)
 
-	ngl := services.NewGitlab(&cfg)
+	ngl := services.NewGitlab(cfg)
 	ngl.Connect()
 	err := ngl.Save(dto, "test")
 
@@ -854,7 +921,7 @@ func TestSaveErrorOnParseVersion(t *testing.T) {
 // 		GitlabCIScript:  "test ci-script",
 // 	}
 
-// 	ngl := services.NewGitlab(&cfg)
+// 	ngl := services.NewGitlab(cfg)
 // 	ngl.Connect()
 // 	err := ngl.Save(dto, "test")
 
