@@ -3,7 +3,7 @@ package middlewares
 import (
 	"bytes"
 	"context"
-	"fmt"
+	"log"
 	"strings"
 	"time"
 
@@ -22,7 +22,7 @@ func InitializeSignatureKeyCache() {
 	signatureKeyCache.Register(cfg.OpenAMURL, jwk.WithMinRefreshInterval(15*time.Minute))
 	_, err := signatureKeyCache.Refresh(ctx, cfg.OpenAMURL)
 	if err != nil {
-		fmt.Printf("Failed to refresh OpenAM JWKS: %s\n", err)
+		log.Panicf("Failed to refresh OpenAM JWKS: %s\n", err)
 	}
 }
 
@@ -45,12 +45,12 @@ func getSignatureKey(c *gin.Context) jwk.Key {
 	keyset, err := signatureKeyCache.Get(ctx, cfg.OpenAMURL)
 	errorMsg := "Failed to fetch OpenAM JWKS"
 	if err != nil {
-		fmt.Printf("%s: %s\n", errorMsg, err)
+		log.Printf("%s: %s\n", errorMsg, err)
 		respondWithError(c, 502, errorMsg)
 	}
 	key, exists := keyset.Key(0)
 	if !exists {
-		fmt.Printf("%s: %s\n", errorMsg, err)
+		log.Printf("%s: %s\n", errorMsg, err)
 		respondWithError(c, 502, errorMsg)
 	}
 	return key
