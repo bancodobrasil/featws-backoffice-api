@@ -1,5 +1,9 @@
 package middlewares
 
+type Middleware interface {
+	Run()
+}
+
 func InitializeMiddlewares() {
-	InitializeSignatureKeyCache()
+	NewVerifyAuthTokenMiddleware()
 }

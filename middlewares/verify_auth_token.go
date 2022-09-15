@@ -14,48 +14,36 @@ import (
 	"github.com/lestrrat-go/jwx/v2/jws"
 )
 
-var cfg = config.GetConfig()
-var ctx = context.Background()
-var signatureKeyCache = jwk.NewCache(ctx)
+type VerifyAuthTokenMiddleware struct {
+	OpenAMURL         string
+	ctx               context.Context
+	signatureKeyCache *jwk.Cache
+}
 
-func InitializeSignatureKeyCache() {
-	signatureKeyCache.Register(cfg.OpenAMURL, jwk.WithMinRefreshInterval(15*time.Minute))
-	_, err := signatureKeyCache.Refresh(ctx, cfg.OpenAMURL)
+var verifyAuthTokenMiddleware *VerifyAuthTokenMiddleware
+
+func NewVerifyAuthTokenMiddleware() {
+	cfg := config.GetConfig()
+	ctx := context.Background()
+
+	verifyAuthTokenMiddleware = &VerifyAuthTokenMiddleware{
+		OpenAMURL:         cfg.OpenAMURL,
+		ctx:               ctx,
+		signatureKeyCache: jwk.NewCache(ctx, jwk.WithRefreshWindow(5*time.Minute)),
+	}
+
+	verifyAuthTokenMiddleware.signatureKeyCache.Register(cfg.OpenAMURL, jwk.WithMinRefreshInterval(15*time.Minute))
+	_, err := verifyAuthTokenMiddleware.signatureKeyCache.Refresh(ctx, cfg.OpenAMURL)
 	if err != nil {
 		log.Panicf("Failed to refresh OpenAM JWKS: %s\n", err)
 	}
 }
 
-func respondWithError(c *gin.Context, code int, message interface{}) {
-	c.AbortWithStatusJSON(code, gin.H{"error": message})
+func RunVerifyAuthTokenMiddleware() gin.HandlerFunc {
+	return verifyAuthTokenMiddleware.Run()
 }
 
-func extractTokenFromHeader(c *gin.Context) string {
-	authorizationHeader := c.Request.Header.Get("Authorization")
-	if authorizationHeader == "" {
-		respondWithError(c, 401, "Missing Authorization Header")
-	}
-	splitHeader := strings.Split(authorizationHeader, "Auth JWT")
-	if len(splitHeader) != 2 {
-		respondWithError(c, 401, "Invalid Authorization Header")
-	}
-	return strings.TrimSpace(splitHeader[1])
-}
-func getSignatureKey(c *gin.Context) jwk.Key {
-	keyset, err := signatureKeyCache.Get(ctx, cfg.OpenAMURL)
-	errorMsg := "Failed to fetch OpenAM JWKS"
-	if err != nil {
-		log.Printf("%s: %s\n", errorMsg, err)
-		respondWithError(c, 502, errorMsg)
-	}
-	key, exists := keyset.Key(0)
-	if !exists {
-		log.Printf("%s: %s\n", errorMsg, err)
-		respondWithError(c, 502, errorMsg)
-	}
-	return key
-}
-func VerifyAuthTokenMiddleware() gin.HandlerFunc {
+func (m *VerifyAuthTokenMiddleware) Run() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token := extractTokenFromHeader(c)
 
@@ -77,4 +65,34 @@ func VerifyAuthTokenMiddleware() gin.HandlerFunc {
 
 		c.Next()
 	}
+}
+
+func respondWithError(c *gin.Context, code int, message interface{}) {
+	c.AbortWithStatusJSON(code, gin.H{"error": message})
+}
+
+func extractTokenFromHeader(c *gin.Context) string {
+	authorizationHeader := c.Request.Header.Get("Authorization")
+	if authorizationHeader == "" {
+		respondWithError(c, 401, "Missing Authorization Header")
+	}
+	splitHeader := strings.Split(authorizationHeader, "Auth JWT")
+	if len(splitHeader) != 2 {
+		respondWithError(c, 401, "Invalid Authorization Header")
+	}
+	return strings.TrimSpace(splitHeader[1])
+}
+func getSignatureKey(c *gin.Context) jwk.Key {
+	keyset, err := verifyAuthTokenMiddleware.signatureKeyCache.Get(verifyAuthTokenMiddleware.ctx, verifyAuthTokenMiddleware.OpenAMURL)
+	errorMsg := "Failed to fetch OpenAM JWKS"
+	if err != nil {
+		log.Printf("%s: %s\n", errorMsg, err)
+		respondWithError(c, 502, errorMsg)
+	}
+	key, exists := keyset.Key(0)
+	if !exists {
+		log.Printf("%s: %s\n", errorMsg, err)
+		respondWithError(c, 502, errorMsg)
+	}
+	return key
 }

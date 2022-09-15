@@ -7,7 +7,7 @@ import (
 
 // Router define routes the API V1
 func Router(router *gin.RouterGroup) {
-	router.Use(middlewares.VerifyAuthTokenMiddleware())
+	router.Use(middlewares.RunVerifyAuthTokenMiddleware())
 	rulesheetsRouter(router.Group("/rulesheets"))
 	//rpcRouter(router.Group("/"))
 }
