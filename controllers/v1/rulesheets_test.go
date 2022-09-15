@@ -1,129 +1,241 @@
 package v1_test
 
 import (
-	"context"
-	"encoding/json"
 	"errors"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"testing"
 
 	v1 "github.com/bancodobrasil/featws-api/controllers/v1"
 	"github.com/bancodobrasil/featws-api/dtos"
-	mocks_repository "github.com/bancodobrasil/featws-api/mocks/repository"
-	mocks_services "github.com/bancodobrasil/featws-api/mocks/services"
-	"github.com/bancodobrasil/featws-api/models"
+	mock_services "github.com/bancodobrasil/featws-api/mocks/services"
 	"github.com/bancodobrasil/featws-api/services"
 	"github.com/gin-gonic/gin"
-	"github.com/go-playground/assert/v2"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
-// type Rulesheet struct {
-// 	ID          string `json:"id"`
-// 	Name        string `json:"name"`
-// 	Description string `json:"description"`
-// }
+func TestRulesheet_GetRulesheetByID(t *testing.T) {
+	t.Run("Not Found Rulesheet Flow", func(t *testing.T) {
+		gin.SetMode(gin.TestMode)
 
-func Setup() *gin.Engine {
-	gin.SetMode(gin.TestMode)
-	r := gin.Default()
-	return r
+		w := httptest.NewRecorder()
+		c, _ := gin.CreateTestContext(w)
+
+		c.Request = &http.Request{
+			Header: make(http.Header),
+		}
+
+		ctx, _ := gin.CreateTestContext(w)
+		ctx.Request = &http.Request{
+			Header: make(http.Header),
+		}
+
+		c.Params = gin.Params{gin.Param{Key: "id", Value: "1"}}
+		srv := new(mock_services.Rulesheets)
+		srv.On("Get", mock.Anything, "1").Return(nil, nil)
+		v1.NewRulesheets(srv).GetRulesheet()(c)
+		assert.Equal(t, http.StatusNotFound, w.Code)
+	})
+
+	t.Run("Test Without ID Flow", func(t *testing.T) {
+		gin.SetMode(gin.TestMode)
+
+		w := httptest.NewRecorder()
+		c, _ := gin.CreateTestContext(w)
+		c.Request = &http.Request{
+			Header: make(http.Header),
+		}
+
+		srv := new(mock_services.Rulesheets)
+		v1.NewRulesheets(srv).GetRulesheet()(c)
+		assert.Equal(t, http.StatusBadRequest, w.Code)
+	})
+
+	t.Run("Wrong ID Flow", func(t *testing.T) {
+		gin.SetMode(gin.TestMode)
+
+		w := httptest.NewRecorder()
+		c, _ := gin.CreateTestContext(w)
+		c.Request = &http.Request{
+			Header: make(http.Header),
+		}
+
+		c.Params = gin.Params{gin.Param{Key: "id", Value: "1"}}
+		srv := new(mock_services.Rulesheets)
+		srv.On("Get", mock.Anything, "1").Return(nil, errors.New("error"))
+		v1.NewRulesheets(srv).GetRulesheet()(c)
+		assert.Equal(t, http.StatusInternalServerError, w.Code)
+	})
+
+	t.Run("Entity Different Nil Flow", func(t *testing.T) {
+		gin.SetMode(gin.TestMode)
+
+		w := httptest.NewRecorder()
+		c, _ := gin.CreateTestContext(w)
+		c.Request = &http.Request{
+			Header: make(http.Header),
+		}
+
+		reponseEntity := &dtos.Rulesheet{
+			ID:   uint(1),
+			Name: "Test",
+		}
+
+		c.Params = gin.Params{gin.Param{Key: "id", Value: "1"}}
+		srv := new(mock_services.Rulesheets)
+		srv.On("Get", mock.Anything, "1").Return(reponseEntity, nil)
+		v1.NewRulesheets(srv).GetRulesheet()(c)
+		assert.Equal(t, http.StatusOK, w.Code)
+
+	})
+
 }
 
-type rulesheets struct {
-	service *mocks_services.Rulesheets
+func TestRulesheet_GetAllRulesheets(t *testing.T) {
+	t.Run("Error on parse limit Query Flow", func(t *testing.T) {
+		gin.SetMode(gin.TestMode)
+
+		w := httptest.NewRecorder()
+		c, _ := gin.CreateTestContext(w)
+		c.Request = &http.Request{
+			Header: make(http.Header),
+		}
+		c.Request.URL, _ = url.Parse("?limit=?^&page=1")
+
+		srv := new(mock_services.Rulesheets)
+		v1.NewRulesheets(srv).GetRulesheets()(c)
+		assert.Equal(t, http.StatusInternalServerError, w.Code)
+
+	})
+
+	t.Run("Error on parse page Query Flow", func(t *testing.T) {
+		gin.SetMode(gin.TestMode)
+
+		w := httptest.NewRecorder()
+		c, _ := gin.CreateTestContext(w)
+		c.Request = &http.Request{
+			Header: make(http.Header),
+		}
+		c.Request.URL, _ = url.Parse("?limit=1&page=?^")
+
+		srv := new(mock_services.Rulesheets)
+		v1.NewRulesheets(srv).GetRulesheets()(c)
+		assert.Equal(t, http.StatusInternalServerError, w.Code)
+
+	})
+
+	t.Run("Normal flow with count query", func(t *testing.T) {
+		gin.SetMode(gin.TestMode)
+
+		w := httptest.NewRecorder()
+		c, _ := gin.CreateTestContext(w)
+		c.Request = &http.Request{
+			Header: make(http.Header),
+		}
+		c.Request.URL, _ = url.Parse("?limit=1&page=1")
+
+		srv := new(mock_services.Rulesheets)
+		findOpts := &services.FindOptions{
+			Limit: 1,
+			Page:  1,
+		}
+		filter := make(map[string]interface{})
+		srv.On("Find", mock.Anything, filter, findOpts).Return(nil, nil)
+		v1.NewRulesheets(srv).GetRulesheets()(c)
+		assert.Equal(t, http.StatusOK, w.Code)
+	})
+
+	t.Run("Normal flow without count query and array of rulesheets", func(t *testing.T) {
+		gin.SetMode(gin.TestMode)
+
+		w := httptest.NewRecorder()
+		c, _ := gin.CreateTestContext(w)
+		c.Request = &http.Request{
+			Header: make(http.Header),
+		}
+		c.Request.URL, _ = url.Parse("?limit=1&page=1")
+
+		srv := new(mock_services.Rulesheets)
+		findOpts := &services.FindOptions{
+			Limit: 1,
+			Page:  1,
+		}
+		filter := make(map[string]interface{})
+		reponseEntities := []*dtos.Rulesheet{
+			{
+				ID:   uint(1),
+				Name: "Test",
+			},
+			{
+				ID:   uint(2),
+				Name: "Test2",
+			},
+		}
+
+		srv.On("Find", mock.Anything, filter, findOpts).Return(reponseEntities, nil)
+		v1.NewRulesheets(srv).GetRulesheets()(c)
+		assert.Equal(t, http.StatusOK, w.Code)
+	})
+
+	t.Run("Error flow without count query", func(t *testing.T) {
+		gin.SetMode(gin.TestMode)
+
+		w := httptest.NewRecorder()
+		c, _ := gin.CreateTestContext(w)
+		c.Request = &http.Request{
+			Header: make(http.Header),
+		}
+		c.Request.URL, _ = url.Parse("?limit=1&page=1")
+
+		srv := new(mock_services.Rulesheets)
+		findOpts := &services.FindOptions{
+			Limit: 1,
+			Page:  1,
+		}
+		filter := make(map[string]interface{})
+		srv.On("Find", mock.Anything, filter, findOpts).Return(nil, errors.New("error"))
+		v1.NewRulesheets(srv).GetRulesheets()(c)
+		assert.Equal(t, http.StatusInternalServerError, w.Code)
+	})
+
+	t.Run("Normal flow with count query", func(t *testing.T) {
+		gin.SetMode(gin.TestMode)
+
+		w := httptest.NewRecorder()
+		c, _ := gin.CreateTestContext(w)
+		c.Request = &http.Request{
+			Header: make(http.Header),
+		}
+		c.Request.URL, _ = url.Parse("?limit=1&page=1&count=true")
+
+		srv := new(mock_services.Rulesheets)
+		findOpts := &services.FindOptions{}
+		filter := make(map[string]interface{})
+		srv.On("Find", mock.Anything, filter, findOpts).Return(nil, nil)
+		srv.On("Count", mock.Anything, filter).Return(int64(0), nil)
+		v1.NewRulesheets(srv).GetRulesheets()(c)
+		assert.Equal(t, http.StatusOK, w.Code)
+	})
+
+	t.Run("Error flow with count query", func(t *testing.T) {
+		gin.SetMode(gin.TestMode)
+
+		w := httptest.NewRecorder()
+		c, _ := gin.CreateTestContext(w)
+		c.Request = &http.Request{
+			Header: make(http.Header),
+		}
+		c.Request.URL, _ = url.Parse("?limit=1&page=1&count=true")
+
+		srv := new(mock_services.Rulesheets)
+		findOpts := &services.FindOptions{}
+		filter := make(map[string]interface{})
+		srv.On("Find", mock.Anything, filter, findOpts).Return(nil, nil)
+		srv.On("Count", mock.Anything, filter).Return(int64(0), errors.New("error"))
+		v1.NewRulesheets(srv).GetRulesheets()(c)
+		assert.Equal(t, http.StatusInternalServerError, w.Code)
+	})
+
 }
-
-func SetupRulesheet(t *testing.T) v1.Rulesheets {
-	ctx := context.Background()
-
-	dto := &dtos.Rulesheet{
-		ID: 1,
-	}
-
-	entity, err := models.NewRulesheetV1(*dto)
-	if err != nil {
-		t.Error("unexpected error on model creation")
-	}
-
-	repository := new(mocks_repository.Rulesheets)
-	repository.On("Get", ctx, "1").Return(&entity, nil)
-
-	gitlabService := new(mocks_services.Gitlab)
-	gitlabService.On("Fill", dto).Return(errors.New("error on fill"))
-
-	// Provavel referencia ciclica pois esta testando o servico chanmando o proprio servico ao inves do mock
-	services := services.NewRulesheets(repository, gitlabService)
-
-	return &rulesheets{
-		service: services,
-	}
-}
-
-func TestListRulesheets(t *testing.T) {
-
-	gin.SetMode(gin.TestMode)
-	// service, _ := services.Rulesheets.Find()
-
-	r := gin.Default()
-
-	rulesheet := SetupRulesheet(t)
-
-	r.GET("/api/v1/rulesheets/", v1.Rulesheets.GetRulesheets())
-
-	req, err := http.NewRequest("GET", "/api/v1/rulesheets", nil)
-	if err != nil {
-		t.Fatalf("Couldn't create request: %v\n", err)
-	}
-
-	w := httptest.NewRecorder()
-	r.ServeHTTP(w, req)
-	defer w.Result().Body.Close()
-
-	var rulesheets []Rulesheet
-	json.Unmarshal([]byte(w.Body.String()), &rulesheets)
-	//Using testify
-	assert.Equal(t, http.StatusOK, w.Code)
-	assert.Equal(t, 10, len(rulesheets))
-
-}
-
-// func TestFindRulesheet(t *testing.T) {
-
-// 	// iniciolizacao de um servidor Gin
-// 	ts := httptest.NewServer(routes.SetupRoutesWithReturn())
-// 	defer ts.Close()
-
-// 	// criacao da folha de regras esperada
-// 	expectedRulesheet := Rulesheet{
-// 		ID:          "1",
-// 		Name:        "Rulesheet 1",
-// 		Description: "Rulesheet 1 description",
-// 	}
-
-// 	// chamada do servico de busca da folha de regras especifica
-// 	resp, err := http.Get(fmt.Sprintf("%s/v1/rulesheets/1", ts.URL))
-// 	if err != nil {
-// 		t.Fatalf("Couldn't make request: %v\n", err)
-// 	}
-// 	defer resp.Body.Close()
-// 	//Usando o testify
-
-// 	//Testa se os erros sao nulos
-// 	assert.Nil(t, err)
-
-// 	// Testa se o codigo de resposta e 200
-// 	assert.Equal(t, http.StatusOK, resp.StatusCode)
-
-// 	// Faz a leitura do corpo da resposta
-// 	data, _ := ioutil.ReadAll(resp.Body)
-
-// 	// instancia um objeto do tipo Rulesheet, esta errado nao sei qual utlizar
-// 	var actualRulesheet Rulesheet
-
-// 	// faz o parse do corpo da resposta para o objeto actualRulesheet
-// 	json.Unmarshal(data, &actualRulesheet)
-
-// 	//Using testify
-// 	assert.Equal(t, expectedRulesheet.Name, actualRulesheet.Name)
-// }

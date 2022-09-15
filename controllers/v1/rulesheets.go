@@ -120,7 +120,7 @@ func (rc *rulesheets) GetRulesheets() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
 
-		ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Second)
+		ctx, cancel := context.WithTimeout(c.Request.Context(), 100000*time.Second)
 		defer cancel()
 
 		query := c.Request.URL.Query()
@@ -223,7 +223,7 @@ func (rc *rulesheets) GetRulesheet() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
 
-		ctx, cancel := context.WithTimeout(c.Request.Context(), 100*time.Second)
+		ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Second)
 		defer cancel()
 		id, exists := c.Params.Get("id")
 
