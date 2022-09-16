@@ -34,7 +34,7 @@ func NewVerifyAuthTokenMiddleware() {
 	verifyAuthTokenMiddleware = &VerifyAuthTokenMiddleware{
 		url:               cfg.OpenAMURL,
 		ctx:               ctx,
-		signatureKeyCache: jwk.NewCache(ctx, jwk.WithRefreshWindow(5*time.Minute)),
+		signatureKeyCache: jwk.NewCache(ctx, jwk.WithRefreshWindow(1*time.Minute)),
 	}
 
 	verifyAuthTokenMiddleware.setup()
@@ -42,8 +42,8 @@ func NewVerifyAuthTokenMiddleware() {
 
 func (m *VerifyAuthTokenMiddleware) setup() {
 	log.Println("Initializing VerifyAuthTokenMiddleware")
-	m.signatureKeyCache.Register(m.url, jwk.WithMinRefreshInterval(15*time.Minute))
-	_, err := verifyAuthTokenMiddleware.signatureKeyCache.Refresh(m.ctx, m.url)
+	m.signatureKeyCache.Register(m.url, jwk.WithMinRefreshInterval(5*time.Minute))
+	_, err := m.signatureKeyCache.Refresh(m.ctx, m.url)
 	if err != nil {
 		log.Panicf("Failed to refresh OpenAM JWKS: %s\n", err)
 	}
