@@ -31,7 +31,6 @@ func TestGetWithErrorOnFill(t *testing.T) {
 	gitlabService := new(mocks_services.Gitlab)
 	gitlabService.On("Fill", dto).Return(errors.New("error on fill"))
 
-	// Provavel referencia ciclica pois esta testando o servico chanmando o proprio servico ao inves do mock
 	services := services.NewRulesheets(repository, gitlabService)
 	_, err = services.Get(ctx, "1")
 
@@ -127,26 +126,6 @@ func TestCreateSuccess(t *testing.T) {
 
 }
 
-// func TestCreateWithErrorOnModelCreation(t *testing.T) {
-// 	ctx := context.Background()
-// 	dto := &dtos.Rulesheet{
-// 		ID: 1,
-// 	}
-
-// 	entity, err1 := models.NewRulesheetV1(*dto)
-// 	err1 = errors.New("error on model creation")
-// 	repository := new(mocks_repository.Rulesheets)
-// 	repository.On("Create", ctx, &entity).Return(nil)
-// 	gitlabService := new(mocks_services.Gitlab)
-// 	gitlabService.On("Save", dto, "[FEATWS BOT] Create Repo").Return(nil)
-// 	gitlabService.On("Fill", dto).Return(nil)
-// 	service := NewRulesheets(repository, gitlabService)
-// 	_ = service.Create(ctx, dto)
-// 	if err1.Error() != "error on model creation" {
-// 		t.Error("expected error on model creation")
-// 	}
-// }
-
 func TestCreateWithError(t *testing.T) {
 	ctx := context.Background()
 	dto := &dtos.Rulesheet{
@@ -213,7 +192,6 @@ func TestUpdateWithErrorOnSave(t *testing.T) {
 	}
 }
 
-//tipos de retorno sao diferentes do mock e da chamada real
 func TestFindSuccess(t *testing.T) {
 	ctx := context.Background()
 	dto := &dtos.Rulesheet{
@@ -256,24 +234,6 @@ func TestFindWithError(t *testing.T) {
 	}
 
 }
-
-// func TestFindSucess(t *testing.T) {
-// 	ctx := context.Background()
-// 	dto := &dtos.Rulesheet{
-// 		ID: 1,
-// 	}
-// 	entity, err := models.NewRulesheetV1(*dto)
-// 	if err != nil {
-// 		t.Error("unexpected error on model creation")
-// 	}
-// 	repositoryMocado := new(mocks_repository.Rulesheets)
-// 	repositoryMocado.On("Find", ctx, dto.ID, &repository.FindOptions{}).Return(entity, nil)
-// 	service := services.NewRulesheets(repositoryMocado, nil)
-// 	_, err = service.Find(ctx, dto.ID, &FindOptions{0, 0})
-// 	if err != nil {
-// 		t.Error("unexpected error on find")
-// 	}
-// }
 
 func TestCountSuccess(t *testing.T) {
 	ctx := context.Background()
@@ -352,27 +312,6 @@ func TestUpdateWithError(t *testing.T) {
 		t.Error("expected error on update")
 	}
 }
-
-// func TestUpdateWithErrorOnGenerateModel(t *testing.T) {
-// 	ctx := context.Background()
-// 	dto := &dtos.Rulesheet{
-
-// 	}
-// 	entity, err := models.NewRulesheetV1()
-// 	if err != nil {
-// 		t.Error("unexpected error on model creation")
-// 	}
-// 	repository := new(mocks_repository.Rulesheets)
-// 	repository.On("Update", ctx, entity).Return(nil, errors.New("error on update"))
-// 	gitlabService := new(mocks_services.Gitlab)
-// 	gitlabService.On("Save", dto, "[FEATWS BOT] Update Repo").Return(nil)
-// 	gitlabService.On("Fill", dto).Return(nil)
-// 	service := services.NewRulesheets(repository, gitlabService)
-// 	_, err = service.Update(ctx, *dto)
-// 	if err == nil || err.Error() != "error on update" {
-// 		t.Error("expected error on update")
-// 	}
-// }
 
 func TestDeleteSuccess(t *testing.T) {
 	ctx := context.Background()

@@ -327,8 +327,6 @@ func TestSaveTestFilesCreationWithRuleInterface(t *testing.T) {
 	mappedRules := map[string]interface{}{
 		"tags": rules,
 	}
-	// data, _ := json.Marshal(mappedRules)
-	// json.Unmarshal(data, &mappedRules)
 
 	dto.Rules = &mappedRules
 
@@ -389,9 +387,6 @@ func TestSaveTestFilesCreationWithRuleInterfaceWithDefault(t *testing.T) {
 	mappedRules := map[string]interface{}{
 		"tags": rules,
 	}
-	// data, _ := json.Marshal(mappedRules)
-	// json.Unmarshal(data, &mappedRules)
-
 	dto.Rules = &mappedRules
 
 	namespace := "test"
@@ -517,8 +512,6 @@ func TestSaveTestFilesCreationWithDefaultRule(t *testing.T) {
 	mappedRules := map[string]interface{}{
 		"tags": rules,
 	}
-	// data, _ := json.Marshal(mappedRules)
-	// json.Unmarshal(data, &mappedRules)
 
 	dto.Rules = &mappedRules
 
@@ -773,7 +766,6 @@ func TestSaveErrorOnCreateProject(t *testing.T) {
 		}
 		if r.Method == "POST" && r.URL.Path == "/api/v4/projects" {
 
-			// _, _ := io.ReadAll(r.Body)
 			w.Write(nil)
 			return
 		}
@@ -880,53 +872,3 @@ func TestSaveErrorOnParseVersion(t *testing.T) {
 		t.Error("unexpected error")
 	}
 }
-
-// TODO: test save error on fetch version,
-// func TestSaveErrorOnFetchVersion(t *testing.T) {
-// 	dto := SetupRulesheet()
-
-// 	namespace := "test"
-
-// 	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-// 		if r.URL.Path == "/api/v4/namespaces/"+namespace {
-// 			w.Write([]byte(`{"id":1,"name":"teste"}`))
-// 			return
-// 		}
-// 		if r.Method == "POST" && r.URL.Path == "/api/v4/projects" {
-// 			data, _ := io.ReadAll(r.Body)
-// 			w.Write(data)
-// 			return
-// 		}
-
-// 		if r.Method == "GET" && r.URL.Path == "/api/v4/projects/0/repository/files/VERSION" {
-
-// 		}
-
-// 		if r.Method == "POST" && r.URL.Path == "/api/v4/projects/0/repository/commits" {
-// 			data, _ := io.ReadAll(r.Body)
-// 			c := make(map[string]interface{})
-// 			json.Unmarshal(data, &c)
-// 			w.Write(data)
-// 			return
-// 		}
-// 		w.WriteHeader(http.StatusNotFound)
-// 	}))
-// 	defer s.Close()
-
-// 	cfg := config.Config{
-// 		GitlabURL:       s.URL,
-// 		GitlabNamespace: namespace,
-// 		GitlabToken:     "test",
-// 		GitlabPrefix:    "prefix-",
-// 		GitlabCIScript:  "test ci-script",
-// 	}
-
-// 	ngl := services.NewGitlab(cfg)
-// 	ngl.Connect()
-// 	err := ngl.Save(dto, "test")
-
-// 	if err != nil {
-// 		t.Error("expected error on resolve version")
-// 	}
-
-// }

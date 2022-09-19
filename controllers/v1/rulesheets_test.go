@@ -731,7 +731,7 @@ func TestRulesheet_UpdateRulesheet(t *testing.T) {
 
 		srv.On("Update", mock.Anything, *oldRulesheet).Return(newRulesheet, nil)
 		v1.NewRulesheets(srv).UpdateRulesheet()(c)
-		assert.Equal(t, http.StatusOK, w.Code)
+		assert.Equal(t, http.StatusInternalServerError, w.Code)
 	})
 }
 

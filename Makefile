@@ -15,6 +15,10 @@ up:up-services
 run:build
 	./api
 
+coverage:
+	go test ./...  -coverprofile=coverage.out
+	go tool cover -html=coverage.out
+
 test:
 	@make run-on-our-code-directories ARGS="go test -v -coverprofile=coverage.out"
 
