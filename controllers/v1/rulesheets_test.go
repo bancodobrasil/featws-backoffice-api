@@ -321,36 +321,39 @@ func TestRulesheet_CreateRulesheet(t *testing.T) {
 		assert.Equal(t, http.StatusBadRequest, w.Code)
 	})
 
-	// t.Run("Error on define rulesheet entity", func(t *testing.T) {
-	// 	gin.SetMode(gin.TestMode)
+	t.Run("Error on define rulesheet entity", func(t *testing.T) {
+		gin.SetMode(gin.TestMode)
 
-	// 	w := httptest.NewRecorder()
-	// 	c, _ := gin.CreateTestContext(w)
+		w := httptest.NewRecorder()
+		c, _ := gin.CreateTestContext(w)
 
-	// 	c.Request = &http.Request{
-	// 		Header: make(http.Header),
-	// 	}
+		c.Request = &http.Request{
+			Header: make(http.Header),
+		}
 
-	// 	payload := &payloads.Rulesheet{
-	// 		ID:   uint(1),
-	// 		Name: "test",
-	// 	}
+		rules := make(map[string]interface{})
+		rules["test"] = 12
+		payload := &payloads.Rulesheet{
+			ID:    uint(1),
+			Name:  "test",
+			Rules: &rules,
+		}
 
-	// 	bytedPayload, _ := json.Marshal(payload)
+		bytedPayload, _ := json.Marshal(payload)
 
-	// 	c.Request.Body = ioutil.NopCloser(bytes.NewReader(bytedPayload))
+		c.Request.Body = ioutil.NopCloser(bytes.NewReader(bytedPayload))
 
-	// 	srv := new(mock_services.Rulesheets)
+		srv := new(mock_services.Rulesheets)
 
-	// 	createdRulesheet := &dtos.Rulesheet{
-	// 		ID:   uint(1),
-	// 		Name: "Test",
-	// 	}
+		createdRulesheet := &dtos.Rulesheet{
+			ID:   uint(1),
+			Name: "Test",
+		}
 
-	// 	srv.On("Create", mock.Anything, createdRulesheet).Return(nil)
-	// 	v1.NewRulesheets(srv).CreateRulesheet()(c)
-	// 	assert.Equal(t, http.StatusBadRequest, w.Code)
-	// })
+		srv.On("Create", mock.Anything, createdRulesheet).Return(nil)
+		v1.NewRulesheets(srv).CreateRulesheet()(c)
+		assert.Equal(t, http.StatusInternalServerError, w.Code)
+	})
 
 	t.Run("Error on define rulesheet entity", func(t *testing.T) {
 		gin.SetMode(gin.TestMode)
@@ -685,6 +688,50 @@ func TestRulesheet_UpdateRulesheet(t *testing.T) {
 		srv.On("Update", mock.Anything, *oldRulesheet).Return(nil, nil)
 		v1.NewRulesheets(srv).UpdateRulesheet()(c)
 		assert.Equal(t, http.StatusNotFound, w.Code)
+	})
+
+	t.Run("Error on define entity Flow", func(t *testing.T) {
+		gin.SetMode(gin.TestMode)
+
+		w := httptest.NewRecorder()
+		c, _ := gin.CreateTestContext(w)
+
+		c.Request = &http.Request{
+			Header: make(http.Header),
+		}
+
+		c.Params = gin.Params{gin.Param{Key: "id", Value: "1"}}
+
+		rules := make(map[string]interface{})
+		rules["rules"] = 0
+
+		payload := &payloads.Rulesheet{
+			ID:    uint(1),
+			Name:  "Test",
+			Rules: &rules,
+		}
+
+		bytedPayload, _ := json.Marshal(payload)
+
+		c.Request.Body = ioutil.NopCloser(bytes.NewReader(bytedPayload))
+
+		srv := new(mock_services.Rulesheets)
+
+		oldRulesheet := &dtos.Rulesheet{
+			ID:   uint(1),
+			Name: "Test",
+		}
+
+		newRulesheet := &dtos.Rulesheet{
+			ID:   uint(1),
+			Name: "Test",
+		}
+
+		srv.On("Get", mock.Anything, "1").Return(oldRulesheet, nil)
+
+		srv.On("Update", mock.Anything, *oldRulesheet).Return(newRulesheet, nil)
+		v1.NewRulesheets(srv).UpdateRulesheet()(c)
+		assert.Equal(t, http.StatusOK, w.Code)
 	})
 }
 

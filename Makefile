@@ -16,7 +16,7 @@ run:build
 	./api
 
 test:
-	@make run-on-our-code-directories ARGS="go test -v"
+	@make run-on-our-code-directories ARGS="go test -v -coverprofile=coverage.out"
 
 run-on-our-code-directories:
 	@echo "${ARGS} <our-code-directories>"

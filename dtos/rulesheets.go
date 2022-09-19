@@ -62,6 +62,7 @@ func NewRulesheetV1(payload v1.Rulesheet) (dto Rulesheet, err error) {
 
 	dto.HasStringRule = !isRule
 
+	// FIXME - Remover restricao de exclusividade entre regras string e complexas
 	if dto.HasStringRule {
 		return
 	}

@@ -6,13 +6,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// func HomeHandler() gin.HandlerFunc {
-// 	return func(c *gin.Context) {
-// 		c.String(http.StatusOK, "FeatWS Resolver Works!!!")
-// 	}
-
-// }
-
 // HomeHandler ...
 func HomeHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
