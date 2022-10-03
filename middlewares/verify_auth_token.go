@@ -78,7 +78,7 @@ func (m *VerifyAuthTokenMiddleware) extractTokenFromHeader(c *gin.Context) strin
 	if authorizationHeader == "" {
 		respondWithError(c, 401, "Missing Authorization Header")
 	}
-	splitHeader := strings.Split(authorizationHeader, "Auth JWT")
+	splitHeader := strings.Split(authorizationHeader, "Bearer")
 	if len(splitHeader) != 2 {
 		respondWithError(c, 401, "Invalid Authorization Header")
 	}
