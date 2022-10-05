@@ -9,16 +9,9 @@ import (
 
 // Rule ...
 type Rule struct {
-	Condition string    `json:"condition,omitempty"`
-	Value     RuleValue `json:"value,omitempty"`
-	Type      string    `json:"type,omitempty"`
-}
-
-// RuleValue ...
-type RuleValue struct {
-	NomeAplicativo string `json:"nomeAplicativo,omitempty"`
-	TextoURLPadrao string `json:"textoUrlPadrao,omitempty"`
-	TextoURLDesvio string `json:"textoUrlDesvio,omitempty"`
+	Condition string      `json:"condition,omitempty"`
+	Value     interface{} `json:"value,omitempty"`
+	Type      string      `json:"type,omitempty"`
 }
 
 // Rulesheet ...

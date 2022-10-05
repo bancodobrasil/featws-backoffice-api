@@ -198,21 +198,17 @@ func (gs *gitlabService) Save(rulesheet *dtos.Rulesheet, commitMessage string) e
 			fmt.Fprintf(rulesBuffer, "%s = %s\n", ruleName, rule)
 		case []interface{}:
 			for _, entry := range rule {
-				switch r := entry.(type) {
-				case *dtos.Rule:
-					r.Value.NomeAplicativo = strings.Trim(r.Value.NomeAplicativo, " ")
-					r.Value.TextoURLDesvio = strings.Trim(r.Value.TextoURLDesvio, " ")
-					r.Value.TextoURLPadrao = strings.Trim(r.Value.TextoURLPadrao, " ")
-					value, err := json.Marshal(r.Value)
-					if err != nil {
-						log.Errorf("Failed marshal rule value: %v", err)
-						return err
-					}
-					fmt.Fprintf(rulesBuffer, "[[%s]]\ncondition = %s\nvalue = %s\ntype = object\n\n", ruleName, r.Condition, string(value))
-				default:
-					fmt.Fprintf(rulesBuffer, "DEFAULT ENTRY %s = %s\n", ruleName, reflect.TypeOf(rule))
+				err := printRule(entry, rulesBuffer, ruleName, true)
+				if err != nil {
+					log.Errorf("Failed marshal rule: %v", err)
+					return err
 				}
-
+			}
+		case interface{}:
+			err := printRule(rule, rulesBuffer, ruleName, false)
+			if err != nil {
+				log.Errorf("Failed marshal rule: %v", err)
+				return err
 			}
 		default:
 			fmt.Fprintf(rulesBuffer, "DEFAULT %s = %s\n", ruleName, reflect.TypeOf(rule))
@@ -242,6 +238,40 @@ func (gs *gitlabService) Save(rulesheet *dtos.Rulesheet, commitMessage string) e
 	}
 
 	return err
+}
+
+func printRule(rule interface{}, rulesBuffer *bytes.Buffer, ruleName string, isSliceItem bool) error {
+	ruleNameTag := "[%s]"
+	if isSliceItem {
+		ruleNameTag = "[" + ruleNameTag + "]"
+	}
+
+	switch r := rule.(type) {
+	case *dtos.Rule:
+		value, err := json.Marshal(r.Value)
+		if err != nil {
+			log.Errorf("Failed marshal rule value: %v", err)
+			return err
+		}
+		fmt.Fprintf(rulesBuffer, ruleNameTag+"\ncondition = %s\nvalue = %s\ntype = object\n\n", ruleName, r.Condition, string(value))
+	case map[string]interface{}:
+		fmt.Fprintf(rulesBuffer, ruleNameTag+"\n", ruleName)
+		keys := make([]string, 0)
+
+		for k := range r {
+			// fmt.Printf("RULE k: %s\n", k)
+			keys = append(keys, k)
+		}
+		sort.Strings(keys)
+		for _, k := range keys {
+			v := r[k]
+			fmt.Fprintf(rulesBuffer, "%s = %s\n", k, v)
+		}
+		fmt.Fprintf(rulesBuffer, "\n")
+	default:
+		fmt.Fprintf(rulesBuffer, "DEFAULT ENTRY %s = %s\n", ruleName, reflect.TypeOf(rule))
+	}
+	return nil
 }
 
 func createOrUpdateGitlabFileCommitAction(git *gitlab.Client, proj *gitlab.Project, ref string, filename string, content string) (*gitlab.CommitActionOptions, error) {

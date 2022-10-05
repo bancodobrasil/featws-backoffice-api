@@ -313,12 +313,11 @@ func TestSaveTestFilesCreationWithRuleInterface(t *testing.T) {
 
 	rules := []interface{}{
 		&dtos.Rule{
-
 			Condition: "test",
-			Value: dtos.RuleValue{
-				NomeAplicativo: "testAplicativo",
-				TextoURLPadrao: "testURLpadrao",
-				TextoURLDesvio: "testURLdesvio",
+			Value: map[string]string{
+				"nomeAplicativo": "testAplicativo",
+				"textoUrlPadrao": "testURLpadrao",
+				"textoUrlDesvio": "testURLdesvio",
 			},
 			Type: "testType",
 		},
@@ -357,7 +356,7 @@ func TestSaveTestFilesCreationWithRuleInterface(t *testing.T) {
 			parameters := c["actions"].([]interface{})[3].(map[string]interface{})["content"].(string)
 			assert.Equal(t, "[]", parameters)
 			rulesFeatws := c["actions"].([]interface{})[4].(map[string]interface{})["content"].(string)
-			assert.Equal(t, "[[tags]]\ncondition = test\nvalue = {\"nomeAplicativo\":\"testAplicativo\",\"textoUrlPadrao\":\"testURLpadrao\",\"textoUrlDesvio\":\"testURLdesvio\"}\ntype = object\n\n", rulesFeatws)
+			assert.Equal(t, "[[tags]]\ncondition = test\nvalue = {\"nomeAplicativo\":\"testAplicativo\",\"textoUrlDesvio\":\"testURLdesvio\",\"textoUrlPadrao\":\"testURLpadrao\"}\ntype = object\n\n", rulesFeatws)
 
 			w.Write(data)
 			return
@@ -377,15 +376,12 @@ func TestSaveTestFilesCreationWithRuleInterface(t *testing.T) {
 	}
 }
 
-func TestSaveTestFilesCreationWithRuleInterfaceWithDefault(t *testing.T) {
+func TestSaveTestFilesCreationWithRuleString(t *testing.T) {
 	dto := SetupRulesheet()
 
-	rules := []interface{}{
-		"test",
-	}
-
 	mappedRules := map[string]interface{}{
-		"tags": rules,
+		"rule1": "true",
+		"rule2": "\"test\"",
 	}
 	dto.Rules = &mappedRules
 
@@ -416,7 +412,7 @@ func TestSaveTestFilesCreationWithRuleInterfaceWithDefault(t *testing.T) {
 			parameters := c["actions"].([]interface{})[3].(map[string]interface{})["content"].(string)
 			assert.Equal(t, "[]", parameters)
 			rulesFeatws := c["actions"].([]interface{})[4].(map[string]interface{})["content"].(string)
-			assert.Equal(t, "DEFAULT ENTRY tags = []interface {}\n", rulesFeatws)
+			assert.Equal(t, "rule1 = true\nrule2 = \"test\"\n", rulesFeatws)
 
 			w.Write(data)
 			return
@@ -497,20 +493,29 @@ func TestSaveTestFilesCreationWithStringRule(t *testing.T) {
 func TestSaveTestFilesCreationWithDefaultRule(t *testing.T) {
 	dto := SetupRulesheet()
 
-	rules :=
+	rules := []interface{}{
 		&dtos.Rule{
-
 			Condition: "test",
-			Value: dtos.RuleValue{
-				NomeAplicativo: "testAplicativo",
-				TextoURLPadrao: "testURLpadrao",
-				TextoURLDesvio: "testURLdesvio",
+			Value: map[string]string{
+				"NomeAplicativo": "testAplicativo",
+				"TextoURLPadrao": "testURLpadrao",
+				"TextoURLDesvio": "testURLdesvio",
 			},
 			Type: "testType",
-		}
+		},
+	}
 
 	mappedRules := map[string]interface{}{
+		// "mystring": "teste",
 		"tags": rules,
+		// "mycomplexrule": &dtos.Rule{
+		// 	Condition: "true",
+		// 	Value: map[string]string{
+		// 		"field1": "value1",
+		// 		"field2": "value2",
+		// 	},
+		// 	Type: "testType",
+		// },
 	}
 
 	dto.Rules = &mappedRules
@@ -542,7 +547,7 @@ func TestSaveTestFilesCreationWithDefaultRule(t *testing.T) {
 			parameters := c["actions"].([]interface{})[3].(map[string]interface{})["content"].(string)
 			assert.Equal(t, "[]", parameters)
 			rulesFeatws := c["actions"].([]interface{})[4].(map[string]interface{})["content"].(string)
-			assert.Equal(t, "DEFAULT tags = *dtos.Rule\n", rulesFeatws)
+			assert.Equal(t, "[[tags]]\ncondition = test\nvalue = {\"NomeAplicativo\":\"testAplicativo\",\"TextoURLDesvio\":\"testURLdesvio\",\"TextoURLPadrao\":\"testURLpadrao\"}\ntype = object\n\n", rulesFeatws)
 
 			w.Write(data)
 			return
