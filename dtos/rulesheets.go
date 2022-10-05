@@ -29,8 +29,8 @@ type Rulesheet struct {
 	Slug          string
 	HasStringRule bool
 	Version       string
-	Features      *[]interface{}
-	Parameters    *[]interface{}
+	Features      *[]map[string]interface{}
+	Parameters    *[]map[string]interface{}
 	Rules         *map[string]interface{}
 }
 
@@ -62,6 +62,7 @@ func NewRulesheetV1(payload v1.Rulesheet) (dto Rulesheet, err error) {
 
 	dto.HasStringRule = !isRule
 
+	// FIXME - Remover restricao de exclusividade entre regras string e complexas
 	if dto.HasStringRule {
 		return
 	}

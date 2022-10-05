@@ -55,7 +55,7 @@ func (rc *rulesheets) CreateRulesheet() gin.HandlerFunc {
 	return func(c *gin.Context) {
 
 		// Pass the context of gin Request
-		ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Second)
+		ctx, cancel := context.WithTimeout(c.Request.Context(), 1000*time.Second)
 		var payload payloads.Rulesheet
 		defer cancel()
 
@@ -223,7 +223,7 @@ func (rc *rulesheets) GetRulesheet() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
 
-		ctx, cancel := context.WithTimeout(c.Request.Context(), 100*time.Second)
+		ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Second)
 		defer cancel()
 		id, exists := c.Params.Get("id")
 
