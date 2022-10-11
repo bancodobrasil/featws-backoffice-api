@@ -21,3 +21,5 @@ _data/
 .vscode
 
 data/
+
+__debug_bin

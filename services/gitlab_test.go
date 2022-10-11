@@ -677,8 +677,102 @@ func TestFill(t *testing.T) {
 	ngl := services.NewGitlab(cfg)
 	ngl.Connect()
 	err := ngl.Fill(dto)
+
+	if (*dto.Rules)["regra"].(string) != "$test" {
+		t.Error("error on unmarshalling rules")
+	}
+
 	if err != nil {
 		t.Error("unexpected error")
+	}
+}
+
+// Functions to test fill function
+func TestFillRulesSlices(t *testing.T) {
+	dto := SetupRulesheet()
+
+	namespace := "test"
+
+	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/api/v4/namespaces/"+namespace {
+			w.Write([]byte(`{"id":1,"name":"teste", "path":"testpath"}`))
+			return
+		}
+
+		if r.Method == "GET" && r.URL.Path == "/api/v4/projects/testpath/prefix-Test" {
+			w.Write([]byte(`{"id":1,"description":"testeDesc","name":"teste"}`))
+			return
+		}
+
+		if r.Method == "GET" && r.URL.Path == "/api/v4/projects/1/repository/files/rules.featws" {
+			content := base64.StdEncoding.EncodeToString([]byte("[feat]\n condition = $test\n[[tags]]\n condition = $test"))
+
+			file := gitlab.File{
+				Content: content,
+			}
+			data, _ := json.Marshal(file)
+			w.Write(data)
+			return
+		}
+
+		if r.Method == "GET" && r.URL.Path == "/api/v4/projects/1/repository/files/parameters.json" {
+			content := base64.StdEncoding.EncodeToString([]byte("[]"))
+
+			file := gitlab.File{
+				Content: content,
+			}
+			data, _ := json.Marshal(file)
+			w.Write(data)
+			return
+		}
+
+		w.WriteHeader(http.StatusNotFound)
+	}))
+	defer s.Close()
+
+	cfg := SetupConfig(s)
+
+	ngl := services.NewGitlab(cfg)
+	ngl.Connect()
+	err := ngl.Fill(dto)
+
+	feat, ok := (*dto.Rules)["feat"]
+	if !ok {
+		t.Error("error on unmarshalling rules: not found feat")
+		return
+	}
+
+	featMap, ok := feat.(map[string]interface{})
+	if !ok {
+		t.Error("error on unmarshalling rules: feat is no map")
+		return
+	}
+
+	if featMap["condition"].(string) != "$test" {
+		t.Error("error on unmarshalling rules")
+		return
+	}
+
+	tags, ok := (*dto.Rules)["tags"]
+	if !ok {
+		t.Error("error on unmarshalling rules: not found tags array")
+		return
+	}
+
+	arr, ok := tags.([]map[string]interface{})
+	if !ok {
+		t.Error("error on unmarshalling rules: tags is no array")
+		return
+	}
+
+	if arr[0]["condition"].(string) != "$test" {
+		t.Error("error on unmarshalling rules")
+		return
+	}
+
+	if err != nil {
+		t.Error("unexpected error")
+		return
 	}
 }
 

@@ -15,6 +15,7 @@ import (
 	"github.com/bancodobrasil/featws-api/dtos"
 	"github.com/xanzy/go-gitlab"
 
+	"github.com/bancodobrasil/go-featws"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -352,15 +353,47 @@ func (gs *gitlabService) Fill(rulesheet *dtos.Rulesheet) (err error) {
 		return
 	}
 
-	rulesArr := strings.Split(string(bRules), "\n")
+	rulesFile, err := featws.Load(bRules)
+	if err != nil {
+		log.Errorf("Failed to load featws file: %v", err)
+		return
+	}
 
 	rules := make(map[string]interface{})
 
-	for _, line := range rulesArr {
-		if line != "" {
-			parts := strings.SplitN(line, "=", 2)
-			rules[strings.Trim(parts[0], " ")] = strings.Trim(parts[1], " ")
+	s := rulesFile.Section("")
+
+	for _, k := range s.Keys() {
+		rules[k.Name()] = k.Value()
+	}
+
+	for _, sname := range rulesFile.SectionStrings() {
+		if sname == featws.DefaultSection {
+			continue
 		}
+		if sname[:1] == "[" {
+			continue
+		}
+		sec := make(map[string]interface{})
+		for _, k := range rulesFile.Section(sname).Keys() {
+			sec[k.Name()] = k.Value()
+		}
+		rules[sname] = sec
+	}
+
+	for _, aname := range rulesFile.ArrayStrings() {
+		a := rulesFile.Array(aname)
+
+		arr := make([]map[string]interface{}, 0)
+
+		for _, s := range a.Sections() {
+			sec := make(map[string]interface{})
+			for _, k := range s.Keys() {
+				sec[k.Name()] = k.Value()
+			}
+			arr = append(arr, sec)
+		}
+		rules[aname[1:len(aname)-1]] = arr
 	}
 
 	rulesheet.Rules = &rules
