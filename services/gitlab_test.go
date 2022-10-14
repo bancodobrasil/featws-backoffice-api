@@ -676,6 +676,26 @@ func TestFill(t *testing.T) {
 			return
 		}
 
+		if r.Method == "GET" && r.URL.Path == "/api/v4/projects/1/repository/files/features.json" {
+			content := base64.StdEncoding.EncodeToString([]byte(`[
+				{
+					"name": "feat1",
+					"type": "string"
+				},
+				{
+					"name": "feat2",
+					"type": "string"
+				  }				
+			]`))
+
+			file := gitlab.File{
+				Content: content,
+			}
+			data, _ := json.Marshal(file)
+			w.Write(data)
+			return
+		}
+
 		w.WriteHeader(http.StatusNotFound)
 	}))
 	defer s.Close()
@@ -713,6 +733,22 @@ func TestFill(t *testing.T) {
 		return
 	}
 
+	if (dto.Features) == nil || len(*dto.Features) != 2 {
+		t.Error("error on unmarshalling Features")
+		return
+	}
+
+	feat1 := (*dto.Features)[0]
+	if feat1["name"] != "feat1" || feat1["type"] != "string" {
+		t.Error("error on unmarshalling Feature 1")
+		return
+	}
+
+	feat2 := (*dto.Features)[1]
+	if feat2["name"] != "feat2" || param1["type"] != "string" {
+		t.Error("error on unmarshalling Feature 2")
+		return
+	}
 }
 
 // Functions to test fill function
