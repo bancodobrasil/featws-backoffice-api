@@ -397,7 +397,10 @@ const docTemplate = `{
                 },
                 "features": {
                     "type": "array",
-                    "items": {}
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": true
+                    }
                 },
                 "hasStringRule": {
                     "type": "boolean"
@@ -410,7 +413,10 @@ const docTemplate = `{
                 },
                 "parameters": {
                     "type": "array",
-                    "items": {}
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": true
+                    }
                 },
                 "rules": {
                     "type": "object",

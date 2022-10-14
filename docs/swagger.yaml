@@ -13,7 +13,9 @@ definitions:
       description:
         type: string
       features:
-        items: {}
+        items:
+          additionalProperties: true
+          type: object
         type: array
       hasStringRule:
         type: boolean
@@ -22,7 +24,9 @@ definitions:
       name:
         type: string
       parameters:
-        items: {}
+        items:
+          additionalProperties: true
+          type: object
         type: array
       rules:
         additionalProperties: true

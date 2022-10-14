@@ -14,6 +14,7 @@ import (
 	"github.com/lestrrat-go/jwx/v2/jws"
 )
 
+// VerifyAuthTokenMiddleware ...
 type VerifyAuthTokenMiddleware struct {
 	url               string
 	ctx               context.Context
@@ -22,11 +23,12 @@ type VerifyAuthTokenMiddleware struct {
 
 var verifyAuthTokenMiddleware *VerifyAuthTokenMiddleware
 
-// Middleware function to verify the JWT token
+// VerifyAuthToken Middleware function to verify the JWT token
 func VerifyAuthToken() gin.HandlerFunc {
 	return verifyAuthTokenMiddleware.Run()
 }
 
+// NewVerifyAuthTokenMiddleware ...
 func NewVerifyAuthTokenMiddleware() {
 	cfg := config.GetConfig()
 	ctx := context.Background()
@@ -49,6 +51,7 @@ func (m *VerifyAuthTokenMiddleware) setup() {
 	}
 }
 
+// Run ...
 func (m *VerifyAuthTokenMiddleware) Run() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token := m.extractTokenFromHeader(c)

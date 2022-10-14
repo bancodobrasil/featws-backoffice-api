@@ -24,23 +24,6 @@ func SetupRoutes(router *gin.Engine) {
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 }
 
-// SetupRoutes define all routes
-func SetupRoutesWithReturn() *gin.Engine {
-
-	router := gin.Default()
-
-	cfg := config.GetConfig()
-
-	docs.SwaggerInfo.Host = cfg.ExternalHost
-
-	homeRouter(router.Group("/"))
-	health.Router(router.Group("/health"))
-	// setup swagger docs
-	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-
-	return router
-}
-
 // APIRoutes define all api routes
 func APIRoutes(router *gin.Engine) {
 	// inject middleware

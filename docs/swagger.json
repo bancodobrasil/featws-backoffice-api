@@ -390,7 +390,10 @@
                 },
                 "features": {
                     "type": "array",
-                    "items": {}
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": true
+                    }
                 },
                 "hasStringRule": {
                     "type": "boolean"
@@ -403,7 +406,10 @@
                 },
                 "parameters": {
                     "type": "array",
-                    "items": {}
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": true
+                    }
                 },
                 "rules": {
                     "type": "object",
