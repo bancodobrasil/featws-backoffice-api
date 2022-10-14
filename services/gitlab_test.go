@@ -631,7 +631,6 @@ func TestSaveTestFilesUpdate(t *testing.T) {
 
 // Functions to test fill function
 func TestFill(t *testing.T) {
-	dto := SetupRulesheet()
 
 	namespace := "test"
 
@@ -658,7 +657,16 @@ func TestFill(t *testing.T) {
 		}
 
 		if r.Method == "GET" && r.URL.Path == "/api/v4/projects/1/repository/files/parameters.json" {
-			content := base64.StdEncoding.EncodeToString([]byte("[]"))
+			content := base64.StdEncoding.EncodeToString([]byte(`[
+				{
+					"name": "param1",
+					"type": "string"
+				},
+				{
+					"name": "param2",
+					"type": "string"
+				  }				
+			]`))
 
 			file := gitlab.File{
 				Content: content,
@@ -676,15 +684,35 @@ func TestFill(t *testing.T) {
 
 	ngl := services.NewGitlab(cfg)
 	ngl.Connect()
+	dto := SetupRulesheet()
 	err := ngl.Fill(dto)
+	if err != nil {
+		t.Errorf("unexpected error on fill: %s", err.Error())
+		return
+	}
 
 	if (*dto.Rules)["regra"].(string) != "$test" {
 		t.Error("error on unmarshalling rules")
+		return
 	}
 
-	if err != nil {
-		t.Error("unexpected error")
+	if (dto.Parameters) == nil || len(*dto.Parameters) != 2 {
+		t.Error("error on unmarshalling parameters")
+		return
 	}
+
+	param1 := (*dto.Parameters)[0]
+	if param1["name"] != "param1" || param1["type"] != "string" {
+		t.Error("error on unmarshalling parameter 1")
+		return
+	}
+
+	param2 := (*dto.Parameters)[1]
+	if param2["name"] != "param2" || param1["type"] != "string" {
+		t.Error("error on unmarshalling parameter 2")
+		return
+	}
+
 }
 
 // Functions to test fill function

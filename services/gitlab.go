@@ -335,13 +335,13 @@ func (gs *gitlabService) Fill(rulesheet *dtos.Rulesheet) (err error) {
 
 	rulesheet.Version = strings.Replace(string(bVersion), "\n", "", -1)
 
-	err = gitlabLoadJSON(git, proj, gs.cfg.GitlabDefaultBranch, "features.json", rulesheet.Features)
+	err = gitlabLoadJSON(git, proj, gs.cfg.GitlabDefaultBranch, "features.json", &rulesheet.Features)
 	if err != nil {
 		log.Errorf("Failed to fetch features: %v", err)
 		return
 	}
 
-	err = gitlabLoadJSON(git, proj, gs.cfg.GitlabDefaultBranch, "parameters.json", rulesheet.Parameters)
+	err = gitlabLoadJSON(git, proj, gs.cfg.GitlabDefaultBranch, "parameters.json", &rulesheet.Parameters)
 	if err != nil {
 		log.Errorf("Failed to fetch parameters: %v", err)
 		return
