@@ -100,7 +100,7 @@ paths:
           schema:
             $ref: '#/definitions/v1.Error'
       security:
-      - ApiKeyAuth: []
+      - Authentication: []
       summary: Create Rulesheet
       tags:
       - Rulesheet
@@ -150,7 +150,7 @@ paths:
           schema:
             $ref: '#/definitions/v1.Error'
       security:
-      - ApiKeyAuth: []
+      - Authentication: []
       summary: List Rulesheets
       tags:
       - Rulesheet
@@ -191,7 +191,7 @@ paths:
           schema:
             $ref: '#/definitions/v1.Error'
       security:
-      - ApiKeyAuth: []
+      - Authentication: []
       summary: Delete Rulesheet by ID
       tags:
       - Rulesheet
@@ -233,7 +233,7 @@ paths:
           schema:
             $ref: '#/definitions/v1.Error'
       security:
-      - ApiKeyAuth: []
+      - Authentication: []
       summary: Get Rulesheet by ID
       tags:
       - Rulesheet
@@ -281,12 +281,12 @@ paths:
           schema:
             $ref: '#/definitions/v1.Error'
       security:
-      - ApiKeyAuth: []
+      - Authentication: []
       summary: Update Rulesheet by ID
       tags:
       - Rulesheet
 securityDefinitions:
-  ApiKeyAuth:
+  Authentication:
     in: header
     name: Authorization
     type: apiKey

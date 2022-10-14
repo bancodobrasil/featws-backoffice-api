@@ -48,7 +48,7 @@ func NewRulesheets(service services.Rulesheets) Rulesheets {
 // @Failure 			500 {object} responses.Error "Internal Server Error"
 // @Failure 			default {object} responses.Error
 // @Response 		404 "Not Found"
-// @Security 			ApiKeyAuth
+// @Security 			Authentication
 // @Router 				/rulesheets [post]
 func (rc *rulesheets) CreateRulesheet() gin.HandlerFunc {
 
@@ -114,7 +114,7 @@ func (rc *rulesheets) CreateRulesheet() gin.HandlerFunc {
 // @Failure 			500 {object} responses.Error "Internal Server Error"
 // @Failure 			default {object} responses.Error
 // @Response 			404 "Not Found"
-// @Security 			ApiKeyAuth
+// @Security 			Authentication
 // @Router 				/rulesheets/ [get]
 func (rc *rulesheets) GetRulesheets() gin.HandlerFunc {
 
@@ -217,7 +217,7 @@ func (rc *rulesheets) GetRulesheets() gin.HandlerFunc {
 // @Failure 			500 {object} responses.Error "Internal Server Error"
 // @Failure 			default {object} responses.Error
 // @Response 			404 "Not Found"
-// @Security 			ApiKeyAuth
+// @Security 			Authentication
 // @Router 				/rulesheets/{id} [get]
 func (rc *rulesheets) GetRulesheet() gin.HandlerFunc {
 
@@ -269,7 +269,7 @@ func (rc *rulesheets) GetRulesheet() gin.HandlerFunc {
 // @Failure 			500 {object} responses.Error "Internal Server Error"
 // @Failure 			default {object} responses.Error
 // @Response 			404 "Not Found"
-// @Security 			ApiKeyAuth
+// @Security 			Authentication
 // @Router 				/rulesheets/{id} [put]
 func (rc *rulesheets) UpdateRulesheet() gin.HandlerFunc {
 
@@ -366,7 +366,7 @@ func (rc *rulesheets) UpdateRulesheet() gin.HandlerFunc {
 // @Failure 			500 {object} responses.Error "Internal Server Error"
 // @Failure 			default {object} responses.Error
 // @Response 			404 "Not Found"
-// @Security 			ApiKeyAuth
+// @Security 			Authentication
 // @Router 				/rulesheets/{id} [delete]
 func (rc *rulesheets) DeleteRulesheet() gin.HandlerFunc {
 

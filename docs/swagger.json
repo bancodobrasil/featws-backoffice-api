@@ -22,7 +22,7 @@
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "Authentication": []
                     }
                 ],
                 "description": "Create Rulesheet description",
@@ -88,7 +88,7 @@
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "Authentication": []
                     }
                 ],
                 "description": "List Rulesheet description",
@@ -166,7 +166,7 @@
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "Authentication": []
                     }
                 ],
                 "description": "Get Rulesheet by ID description",
@@ -231,7 +231,7 @@
             "put": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "Authentication": []
                     }
                 ],
                 "description": "Update Rulesheet by ID description",
@@ -305,7 +305,7 @@
             "delete": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "Authentication": []
                     }
                 ],
                 "description": "Delete Rulesheet by ID description",
@@ -439,7 +439,7 @@
         }
     },
     "securityDefinitions": {
-        "ApiKeyAuth": {
+        "Authentication": {
             "type": "apiKey",
             "name": "Authorization",
             "in": "header"

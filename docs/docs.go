@@ -29,7 +29,7 @@ const docTemplate = `{
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "Authentication": []
                     }
                 ],
                 "description": "Create Rulesheet description",
@@ -95,7 +95,7 @@ const docTemplate = `{
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "Authentication": []
                     }
                 ],
                 "description": "List Rulesheet description",
@@ -173,7 +173,7 @@ const docTemplate = `{
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "Authentication": []
                     }
                 ],
                 "description": "Get Rulesheet by ID description",
@@ -238,7 +238,7 @@ const docTemplate = `{
             "put": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "Authentication": []
                     }
                 ],
                 "description": "Update Rulesheet by ID description",
@@ -312,7 +312,7 @@ const docTemplate = `{
             "delete": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "Authentication": []
                     }
                 ],
                 "description": "Delete Rulesheet by ID description",
@@ -446,7 +446,7 @@ const docTemplate = `{
         }
     },
     "securityDefinitions": {
-        "ApiKeyAuth": {
+        "Authentication": {
             "type": "apiKey",
             "name": "Authorization",
             "in": "header"

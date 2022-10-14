@@ -40,7 +40,7 @@ func setupLog() {
 // @host localhost:9007
 // @BasePath /api/v1
 
-// @securityDefinitions.apikey ApiKeyAuth
+// @securityDefinitions.apikey Authentication
 // @in header
 // @name Authorization
 
