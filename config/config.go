@@ -20,6 +20,7 @@ type Config struct {
 	GitlabCIScript      string `mapstructure:"FEATWS_API_GITLAB_CI_SCRIPT"`
 	ExternalHost        string `mapstructure:"EXTERNAL_HOST"`
 	OpenAMURL           string `mapstructure:"OPENAM_URL"`
+	AuthMode            string `mapstructure:"FEATWS_API_AUTH_MODE"`
 }
 
 var config = &Config{}
@@ -43,6 +44,7 @@ func LoadConfig() (err error) {
 	viper.SetDefault("FEATWS_API_GITLAB_CI_SCRIPT", "")
 	viper.SetDefault("EXTERNAL_HOST", "localhost:9007")
 	viper.SetDefault("OPENAM_URL", "")
+	viper.SetDefault("FEATWS_API_AUTH_MODE", "none")
 
 	err = viper.ReadInConfig()
 	if err != nil {
