@@ -21,6 +21,7 @@ type Config struct {
 	ExternalHost        string `mapstructure:"EXTERNAL_HOST"`
 	OpenAMURL           string `mapstructure:"OPENAM_URL"`
 	AuthMode            string `mapstructure:"FEATWS_API_AUTH_MODE"`
+	AuthAPIKey          string `mapstructure:"FEATWS_API_AUTH_API_KEY"`
 }
 
 var config = &Config{}
@@ -45,6 +46,7 @@ func LoadConfig() (err error) {
 	viper.SetDefault("EXTERNAL_HOST", "localhost:9007")
 	viper.SetDefault("OPENAM_URL", "")
 	viper.SetDefault("FEATWS_API_AUTH_MODE", "none")
+	viper.SetDefault("FEATWS_API_AUTH_API_KEY", "")
 
 	err = viper.ReadInConfig()
 	if err != nil {
