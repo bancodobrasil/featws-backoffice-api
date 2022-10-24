@@ -75,8 +75,6 @@ github.com/bancodobrasil/gin-monitor v1.0.0-rc1 h1:l98a1muGLLMQJ6BAudvL1263vj+26
 github.com/bancodobrasil/gin-monitor v1.0.0-rc1/go.mod h1:hfOEzz5YWVYU8cdyK6O5/zGy34O1lhp2/Wfo6eMCPNg=
 github.com/bancodobrasil/gin-telemetry v0.0.1-rc5 h1:0isKPZ3IHkINJLibI+bXEQ/ex6v/a0SAPmUCb/l2pLg=
 github.com/bancodobrasil/gin-telemetry v0.0.1-rc5/go.mod h1:amKV8U6OFB355twaZO92vy3GYesdTpT3esi2c13HNDI=
-github.com/bancodobrasil/go-featws v0.0.0-20221010233623-acdac4e32d39 h1:9YxfUdmOA5VycHSzOeaEfiKTsfnEzbLsOC7BNWrxd94=
-github.com/bancodobrasil/go-featws v0.0.0-20221010233623-acdac4e32d39/go.mod h1:hOjhXXhYmMrjninF6V6w6ZAaGvLZzWs5G+wIqH+PAX4=
 github.com/bancodobrasil/go-featws v0.0.0-20221011001318-743544d3c8a4 h1:GOmDN95lCh0VJoulLMVvDRrj+uYLoKGhSx02sFVOlpQ=
 github.com/bancodobrasil/go-featws v0.0.0-20221011001318-743544d3c8a4/go.mod h1:hOjhXXhYmMrjninF6V6w6ZAaGvLZzWs5G+wIqH+PAX4=
 github.com/bancodobrasil/healthcheck v0.0.2-rc1 h1:CcM4cZglmDokOtiaMSH9JokQqEQCsdtHQ2Ej0oqvTrg=

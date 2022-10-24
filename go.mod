@@ -5,6 +5,7 @@ go 1.18
 require (
 	github.com/bancodobrasil/gin-monitor v1.0.0-rc1
 	github.com/bancodobrasil/gin-telemetry v0.0.1-rc5
+	github.com/bancodobrasil/go-featws v0.0.0-20221011001318-743544d3c8a4
 	github.com/bancodobrasil/healthcheck v0.0.2-rc1
 	github.com/gin-contrib/cors v1.3.1
 	github.com/gin-gonic/gin v1.7.7
@@ -29,7 +30,6 @@ require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/PuerkitoBio/purell v1.1.1 // indirect
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
-	github.com/bancodobrasil/go-featws v0.0.0-20221011001318-743544d3c8a4 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
