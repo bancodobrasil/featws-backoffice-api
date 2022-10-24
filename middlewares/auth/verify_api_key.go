@@ -23,23 +23,23 @@ func NewVerifyAPIKeyMiddleware() *VerifyAPIKeyMiddleware {
 }
 
 // Authenticate runs the authentication middleware
-func (m *VerifyAPIKeyMiddleware) Authenticate(h *http.Header) (err error, statusCode int) {
-	key, err, statusCode := m.extractKeyFromHeader(h)
+func (m *VerifyAPIKeyMiddleware) Authenticate(h *http.Header) (statusCode int, err error) {
+	key, statusCode, err := m.extractKeyFromHeader(h)
 	if err != nil {
-		return err, statusCode
+		return statusCode, err
 	}
 
 	if key != m.key {
-		return errors.New("Unauthorized"), 401
+		return 401, errors.New("Unauthorized")
 	}
 
-	return nil, 0
+	return 0, nil
 }
 
-func (m *VerifyAPIKeyMiddleware) extractKeyFromHeader(h *http.Header) (key string, err error, statusCode int) {
+func (m *VerifyAPIKeyMiddleware) extractKeyFromHeader(h *http.Header) (key string, statusCode int, err error) {
 	authorizationHeader := h.Get("X-API-Key")
 	if authorizationHeader == "" {
-		return "", errors.New("Missing X-API-Key Header"), 401
+		return "", 401, errors.New("Missing X-API-Key Header")
 	}
-	return authorizationHeader, nil, 0
+	return authorizationHeader, 0, nil
 }

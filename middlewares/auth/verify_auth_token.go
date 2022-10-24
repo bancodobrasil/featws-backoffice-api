@@ -50,10 +50,10 @@ func (m *VerifyAuthTokenMiddleware) setup() {
 }
 
 // Authenticate runs the authentication middleware
-func (m *VerifyAuthTokenMiddleware) Authenticate(h *http.Header) (err error, statusCode int) {
-	token, err, statusCode := m.extractTokenFromHeader(h)
+func (m *VerifyAuthTokenMiddleware) Authenticate(h *http.Header) (statusCode int, err error) {
+	token, statusCode, err := m.extractTokenFromHeader(h)
 	if err != nil {
-		return err, statusCode
+		return statusCode, err
 	}
 
 	invalidJWTError := errors.New("Invalid JWT token")
@@ -61,48 +61,48 @@ func (m *VerifyAuthTokenMiddleware) Authenticate(h *http.Header) (err error, sta
 
 	msg, internalErr := jws.Parse([]byte(token))
 	if internalErr != nil {
-		return invalidJWTError, defaultStatusCode
+		return defaultStatusCode, invalidJWTError
 	}
 
-	key, err, statusCode := m.getSignatureKey()
+	key, statusCode, err := m.getSignatureKey()
 	if err != nil {
-		return err, statusCode
+		return statusCode, err
 	}
 
 	verified, internalErr := jws.Verify([]byte(token), jws.WithKey(jwa.RS256, key))
 	if internalErr != nil {
-		return invalidJWTError, defaultStatusCode
+		return defaultStatusCode, invalidJWTError
 	}
 
 	if !bytes.Equal(verified, msg.Payload()) {
-		return invalidJWTError, defaultStatusCode
+		return defaultStatusCode, invalidJWTError
 	}
 
-	return nil, 0
+	return 0, nil
 }
 
-func (m *VerifyAuthTokenMiddleware) extractTokenFromHeader(h *http.Header) (string, error, int) {
+func (m *VerifyAuthTokenMiddleware) extractTokenFromHeader(h *http.Header) (string, int, error) {
 	authorizationHeader := h.Get("Authorization")
 	if authorizationHeader == "" {
-		return "", errors.New("Missing Authorization Header"), 401
+		return "", 401, errors.New("Missing Authorization Header")
 	}
 	splitHeader := strings.Split(authorizationHeader, "Bearer")
 	if len(splitHeader) != 2 {
-		return "", errors.New("Invalid Authorization Header"), 401
+		return "", 401, errors.New("Invalid Authorization Header")
 	}
-	return strings.TrimSpace(splitHeader[1]), nil, 0
+	return strings.TrimSpace(splitHeader[1]), 0, nil
 }
-func (m *VerifyAuthTokenMiddleware) getSignatureKey() (jwk.Key, error, int) {
+func (m *VerifyAuthTokenMiddleware) getSignatureKey() (jwk.Key, int, error) {
 	keyset, err := m.signatureKeyCache.Get(m.ctx, m.url)
 	errorMsg := "Failed to fetch OpenAM JWKS"
 	if err != nil {
 		log.Printf("%s: %s\n", errorMsg, err)
-		return nil, errors.New(errorMsg), 502
+		return nil, 502, errors.New(errorMsg)
 	}
 	key, exists := keyset.Key(0)
 	if !exists {
 		log.Printf("%s: %s\n", errorMsg, err)
-		return nil, errors.New(errorMsg), 502
+		return nil, 502, errors.New(errorMsg)
 	}
-	return key, nil, 0
+	return key, 0, nil
 }

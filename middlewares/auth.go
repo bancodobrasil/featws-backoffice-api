@@ -12,7 +12,7 @@ import (
 // AuthenticationMiddleware is the interface that wraps the AuthenticateFunc method
 // and is used to authenticate the request
 type AuthenticationMiddleware interface {
-	Authenticate(h *http.Header) (err error, statusCode int)
+	Authenticate(h *http.Header) (statusCode int, err error)
 }
 
 // AuthMiddleware stores the authentication middlewares to be run
@@ -57,7 +57,7 @@ func (m *AuthMiddleware) Run() gin.HandlerFunc {
 		var statusCode int
 
 		for _, middleware := range m.middlewares {
-			err, statusCode = middleware.Authenticate(&c.Request.Header)
+			statusCode, err = middleware.Authenticate(&c.Request.Header)
 			if err == nil {
 				c.Next()
 				return
