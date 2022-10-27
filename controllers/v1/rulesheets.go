@@ -95,8 +95,10 @@ func (rc *rulesheets) CreateRulesheet() gin.HandlerFunc {
 		}
 
 		var response = responses.NewRulesheet(&dto)
+		//id := c.Query("id")
 		c.JSON(http.StatusCreated, response)
 	}
+
 }
 
 // GetRulesheets 	godoc
