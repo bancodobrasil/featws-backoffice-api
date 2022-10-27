@@ -10,7 +10,7 @@ import (
 // Rulesheet ...
 type Rulesheet struct {
 	gorm.Model
-	Name          string
+	Name          string `gorm:"type:varchar(255);uniqueIndex"`
 	Description   string
 	Slug          string //`gorm:"unique_index"`
 	HasStringRule bool
