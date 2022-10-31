@@ -286,7 +286,11 @@ paths:
       tags:
       - Rulesheet
 securityDefinitions:
-  Authentication:
+  AuthenticationApiKey:
+    in: header
+    name: X-Api-Authorization
+    type: apiKey
+  AuthenticationAuthToken:
     in: header
     name: Authorization
     type: apiKey

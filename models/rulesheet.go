@@ -12,7 +12,7 @@ type Rulesheet struct {
 	gorm.Model
 	Name          string `gorm:"type:varchar(255);uniqueIndex"`
 	Description   string
-	Slug          string //`gorm:"unique_index"`
+	Slug          string `gorm:"unique_index"`
 	HasStringRule bool
 	CreatedAt     *time.Time
 	UpdatedAt     *time.Time

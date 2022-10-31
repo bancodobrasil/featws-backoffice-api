@@ -446,7 +446,12 @@ const docTemplate = `{
         }
     },
     "securityDefinitions": {
-        "Authentication": {
+        "AuthenticationApiKey": {
+            "type": "apiKey",
+            "name": "X-Api-Authorization",
+            "in": "header"
+        },
+        "AuthenticationAuthToken": {
             "type": "apiKey",
             "name": "Authorization",
             "in": "header"
