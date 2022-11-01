@@ -29,7 +29,10 @@ const docTemplate = `{
             "post": {
                 "security": [
                     {
-                        "Authentication": []
+                        "Authentication Api Key": []
+                    },
+                    {
+                        "Authentication Bearer Token": []
                     }
                 ],
                 "description": "Create Rulesheet description",
@@ -95,7 +98,10 @@ const docTemplate = `{
             "get": {
                 "security": [
                     {
-                        "Authentication": []
+                        "Authentication Api Key": []
+                    },
+                    {
+                        "Authentication Bearer Token": []
                     }
                 ],
                 "description": "List Rulesheet description",
@@ -173,7 +179,10 @@ const docTemplate = `{
             "get": {
                 "security": [
                     {
-                        "Authentication": []
+                        "Authentication Api Key": []
+                    },
+                    {
+                        "Authentication Bearer Token": []
                     }
                 ],
                 "description": "Get Rulesheet by ID description",
@@ -238,7 +247,10 @@ const docTemplate = `{
             "put": {
                 "security": [
                     {
-                        "Authentication": []
+                        "Authentication Api Key": []
+                    },
+                    {
+                        "Authentication Bearer Token": []
                     }
                 ],
                 "description": "Update Rulesheet by ID description",
@@ -312,7 +324,10 @@ const docTemplate = `{
             "delete": {
                 "security": [
                     {
-                        "Authentication": []
+                        "Authentication Api Key": []
+                    },
+                    {
+                        "Authentication Bearer Token": []
                     }
                 ],
                 "description": "Delete Rulesheet by ID description",
@@ -446,12 +461,12 @@ const docTemplate = `{
         }
     },
     "securityDefinitions": {
-        "AuthenticationApiKey": {
+        "Authentication Api Key": {
             "type": "apiKey",
-            "name": "X-Api-Authorization",
+            "name": "X-API-Key",
             "in": "header"
         },
-        "AuthenticationAuthToken": {
+        "Authentication Bearer Token": {
             "type": "apiKey",
             "name": "Authorization",
             "in": "header"

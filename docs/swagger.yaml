@@ -100,7 +100,8 @@ paths:
           schema:
             $ref: '#/definitions/v1.Error'
       security:
-      - Authentication: []
+      - Authentication Api Key: []
+      - Authentication Bearer Token: []
       summary: Create Rulesheet
       tags:
       - Rulesheet
@@ -150,7 +151,8 @@ paths:
           schema:
             $ref: '#/definitions/v1.Error'
       security:
-      - Authentication: []
+      - Authentication Api Key: []
+      - Authentication Bearer Token: []
       summary: List Rulesheets
       tags:
       - Rulesheet
@@ -191,7 +193,8 @@ paths:
           schema:
             $ref: '#/definitions/v1.Error'
       security:
-      - Authentication: []
+      - Authentication Api Key: []
+      - Authentication Bearer Token: []
       summary: Delete Rulesheet by ID
       tags:
       - Rulesheet
@@ -233,7 +236,8 @@ paths:
           schema:
             $ref: '#/definitions/v1.Error'
       security:
-      - Authentication: []
+      - Authentication Api Key: []
+      - Authentication Bearer Token: []
       summary: Get Rulesheet by ID
       tags:
       - Rulesheet
@@ -281,16 +285,17 @@ paths:
           schema:
             $ref: '#/definitions/v1.Error'
       security:
-      - Authentication: []
+      - Authentication Api Key: []
+      - Authentication Bearer Token: []
       summary: Update Rulesheet by ID
       tags:
       - Rulesheet
 securityDefinitions:
-  AuthenticationApiKey:
+  Authentication Api Key:
     in: header
-    name: X-Api-Authorization
+    name: X-API-Key
     type: apiKey
-  AuthenticationAuthToken:
+  Authentication Bearer Token:
     in: header
     name: Authorization
     type: apiKey
