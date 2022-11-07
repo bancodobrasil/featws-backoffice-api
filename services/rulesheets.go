@@ -43,9 +43,11 @@ func NewRulesheets(repository repository.Rulesheets, gitlabService Gitlab) Rules
 // CreateRulesheet ...
 func (rs rulesheets) Create(ctx context.Context, rulesheetDTO *dtos.Rulesheet) (err error) {
 
-	//TODO verifica unicidade do nome
 	rulesheet, _ := models.NewRulesheetV1(*rulesheetDTO)
-	rulesheet.Slug = slug.Make(rulesheet.Slug)
+	if rulesheet.Slug == "" {
+		rulesheet.Slug = slug.Make(rulesheet.Name)
+	}
+
 	fmt.Print(rulesheet.Slug)
 
 	err = rs.repository.Create(ctx, &rulesheet)
@@ -53,7 +55,8 @@ func (rs rulesheets) Create(ctx context.Context, rulesheetDTO *dtos.Rulesheet) (
 		log.Errorf("Error on create rulesheet into repository: %v", err)
 		return
 	}
-
+	rulesheetDTO.ID = rulesheet.ID
+	rulesheetDTO.Slug = rulesheet.Slug
 	err = rs.gitlabService.Save(rulesheetDTO, "[FEATWS BOT] Create Repo")
 	if err != nil {
 		log.Errorf("Error on save rulesheet into repository: %v", err)
