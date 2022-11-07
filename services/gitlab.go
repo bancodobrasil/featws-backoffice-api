@@ -1,12 +1,10 @@
 package services
 
 import (
-	"bytes"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"reflect"
 	"sort"
 	"strconv"
 	"strings"
@@ -176,57 +174,23 @@ func (gs *gitlabService) Save(rulesheet *dtos.Rulesheet, commitMessage string) e
 	}
 	actions = append(actions, commitAction)
 
-	rulesBuffer := bytes.NewBufferString("")
-	// RULES
+	// Rules
 	if rulesheet.Rules == nil {
 		empty := make(map[string]interface{}, 0)
 		rulesheet.Rules = &empty
 	}
 
-	rules := make([]string, 0)
-
-	for k := range *rulesheet.Rules {
-		// fmt.Printf("RULE k: %s\n", k)
-		rules = append(rules, k)
-	}
-
-	sort.Strings(rules)
-
-	for _, ruleName := range rules {
-		// fmt.Printf("RULE: %s\n", ruleName)
-		switch rule := ((*rulesheet.Rules)[ruleName]).(type) {
-		case string:
-			fmt.Fprintf(rulesBuffer, "%s = %s\n", ruleName, rule)
-		case []interface{}:
-			for _, entry := range rule {
-				err := printRule(entry, rulesBuffer, ruleName, true)
-				if err != nil {
-					log.Errorf("Failed marshal rule: %v", err)
-					return err
-				}
-			}
-		case interface{}:
-			err := printRule(rule, rulesBuffer, ruleName, false)
-			if err != nil {
-				log.Errorf("Failed marshal rule: %v", err)
-				return err
-			}
-		default:
-			fmt.Fprintf(rulesBuffer, "DEFAULT %s = %s\n", ruleName, reflect.TypeOf(rule))
-		}
-	}
-
-	// fmt.Printf("RULES: %s\n", rulesBuffer.String())
-
-	commitAction, err = createOrUpdateGitlabFileCommitAction(git, proj, cfg.GitlabDefaultBranch, "rules.featws", rulesBuffer.String())
+	content, err = json.MarshalIndent(rulesheet.Rules, "", "  ")
 	if err != nil {
-		log.Errorf("Failed to commit rules: %v", err)
+		log.Errorf("Failed to marshal parameters: %v", err)
+		return err
+	}
+	commitAction, err = createOrUpdateGitlabFileCommitAction(git, proj, cfg.GitlabDefaultBranch, "rules.json", string(content))
+	if err != nil {
+		log.Errorf("Failed to commit parameters: %v", err)
 		return err
 	}
 	actions = append(actions, commitAction)
-
-	// commitActionData, _ := json.Marshal(commitAction)
-	// fmt.Println(string(commitActionData))
 
 	_, _, err = git.Commits.CreateCommit(proj.ID, &gitlab.CreateCommitOptions{
 		Branch:        &cfg.GitlabDefaultBranch,
@@ -241,39 +205,39 @@ func (gs *gitlabService) Save(rulesheet *dtos.Rulesheet, commitMessage string) e
 	return err
 }
 
-func printRule(rule interface{}, rulesBuffer *bytes.Buffer, ruleName string, isSliceItem bool) error {
-	ruleNameTag := "[%s]"
-	if isSliceItem {
-		ruleNameTag = "[" + ruleNameTag + "]"
-	}
+// func printRule(rule interface{}, rulesBuffer *bytes.Buffer, ruleName string, isSliceItem bool) error {
+// 	ruleNameTag := "[%s]"
+// 	if isSliceItem {
+// 		ruleNameTag = "[" + ruleNameTag + "]"
+// 	}
 
-	switch r := rule.(type) {
-	case *dtos.Rule:
-		value, err := json.Marshal(r.Value)
-		if err != nil {
-			log.Errorf("Failed marshal rule value: %v", err)
-			return err
-		}
-		fmt.Fprintf(rulesBuffer, ruleNameTag+"\ncondition = %s\nvalue = %s\ntype = object\n\n", ruleName, r.Condition, string(value))
-	case map[string]interface{}:
-		fmt.Fprintf(rulesBuffer, ruleNameTag+"\n", ruleName)
-		keys := make([]string, 0)
+// 	switch r := rule.(type) {
+// 	case *dtos.Rule:
+// 		value, err := json.Marshal(r.Value)
+// 		if err != nil {
+// 			log.Errorf("Failed marshal rule value: %v", err)
+// 			return err
+// 		}
+// 		fmt.Fprintf(rulesBuffer, ruleNameTag+"\ncondition = %s\nvalue = %s\ntype = object\n\n", ruleName, r.Condition, string(value))
+// 	case map[string]interface{}:
+// 		fmt.Fprintf(rulesBuffer, ruleNameTag+"\n", ruleName)
+// 		keys := make([]string, 0)
 
-		for k := range r {
-			// fmt.Printf("RULE k: %s\n", k)
-			keys = append(keys, k)
-		}
-		sort.Strings(keys)
-		for _, k := range keys {
-			v := r[k]
-			fmt.Fprintf(rulesBuffer, "%s = %s\n", k, v)
-		}
-		fmt.Fprintf(rulesBuffer, "\n")
-	default:
-		fmt.Fprintf(rulesBuffer, "DEFAULT ENTRY %s = %s\n", ruleName, reflect.TypeOf(rule))
-	}
-	return nil
-}
+// 		for k := range r {
+// 			// fmt.Printf("RULE k: %s\n", k)
+// 			keys = append(keys, k)
+// 		}
+// 		sort.Strings(keys)
+// 		for _, k := range keys {
+// 			v := r[k]
+// 			fmt.Fprintf(rulesBuffer, "%s = %s\n", k, v)
+// 		}
+// 		fmt.Fprintf(rulesBuffer, "\n")
+// 	default:
+// 		fmt.Fprintf(rulesBuffer, "DEFAULT ENTRY %s = %s\n", ruleName, reflect.TypeOf(rule))
+// 	}
+// 	return nil
+// }
 
 func createOrUpdateGitlabFileCommitAction(git *gitlab.Client, proj *gitlab.Project, ref string, filename string, content string) (*gitlab.CommitActionOptions, error) {
 	action, err := defineCreateOrUpdateGitlabFileAction(git, proj, ref, filename)
@@ -347,56 +311,70 @@ func (gs *gitlabService) Fill(rulesheet *dtos.Rulesheet) (err error) {
 		return
 	}
 
-	bRules, err := gitlabLoadString(git, proj, gs.cfg.GitlabDefaultBranch, "rules.featws")
+	bRulesJSON, err := gitlabLoadString(git, proj, gs.cfg.GitlabDefaultBranch, "rules.json")
 	if err != nil {
-		log.Errorf("Failed to fetch parameters: %v", err)
+		log.Errorf("Failed to check rules JSON: %v", err)
 		return
 	}
 
-	rulesFile, err := featws.Load(bRules)
-	if err != nil {
-		log.Errorf("Failed to load featws file: %v", err)
-		return
-	}
-
-	rules := make(map[string]interface{})
-
-	s := rulesFile.Section("")
-
-	for _, k := range s.Keys() {
-		rules[k.Name()] = k.Value()
-	}
-
-	for _, sname := range rulesFile.SectionStrings() {
-		if sname == featws.DefaultSection {
-			continue
+	if string(bRulesJSON) != "" {
+		err = gitlabLoadJSON(git, proj, gs.cfg.GitlabDefaultBranch, "rules.json", &rulesheet.Rules)
+		if err != nil {
+			log.Errorf("Failed to fetch parameters: %v", err)
+			return
 		}
-		if sname[:1] == "[" {
-			continue
+	} else {
+		bRules, err := gitlabLoadString(git, proj, gs.cfg.GitlabDefaultBranch, "rules.featws")
+		if err != nil {
+			log.Errorf("Failed to fetch parameters: %v", err)
+			return err
 		}
-		sec := make(map[string]interface{})
-		for _, k := range rulesFile.Section(sname).Keys() {
-			sec[k.Name()] = k.Value()
+
+		rulesFile, err := featws.Load(bRules)
+		if err != nil {
+			log.Errorf("Failed to load featws file: %v", err)
+			return err
 		}
-		rules[sname] = sec
-	}
 
-	for _, aname := range rulesFile.ArrayStrings() {
-		a := rulesFile.Array(aname)
+		rules := make(map[string]interface{})
 
-		arr := make([]map[string]interface{}, 0)
+		s := rulesFile.Section("")
 
-		for _, s := range a.Sections() {
+		for _, k := range s.Keys() {
+			rules[k.Name()] = k.Value()
+		}
+
+		for _, sname := range rulesFile.SectionStrings() {
+			if sname == featws.DefaultSection {
+				continue
+			}
+			if sname[:1] == "[" {
+				continue
+			}
 			sec := make(map[string]interface{})
-			for _, k := range s.Keys() {
+			for _, k := range rulesFile.Section(sname).Keys() {
 				sec[k.Name()] = k.Value()
 			}
-			arr = append(arr, sec)
+			rules[sname] = sec
 		}
-		rules[aname[1:len(aname)-1]] = arr
-	}
 
-	rulesheet.Rules = &rules
+		for _, aname := range rulesFile.ArrayStrings() {
+			a := rulesFile.Array(aname)
+
+			arr := make([]map[string]interface{}, 0)
+
+			for _, s := range a.Sections() {
+				sec := make(map[string]interface{})
+				for _, k := range s.Keys() {
+					sec[k.Name()] = k.Value()
+				}
+				arr = append(arr, sec)
+			}
+			rules[aname[1:len(aname)-1]] = arr
+		}
+
+		rulesheet.Rules = &rules
+	}
 
 	return
 }
