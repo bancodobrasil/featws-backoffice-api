@@ -751,6 +751,127 @@ func TestFill(t *testing.T) {
 	}
 }
 
+func TestFillJSON(t *testing.T) {
+
+	namespace := "test"
+
+	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/api/v4/namespaces/"+namespace {
+			w.Write([]byte(`{"id":1,"name":"teste", "path":"testpath"}`))
+			return
+		}
+
+		if r.Method == "GET" && r.URL.Path == "/api/v4/projects/testpath/prefix-Test" {
+			w.Write([]byte(`{"id":1,"description":"testeDesc","name":"teste"}`))
+			return
+		}
+
+		if r.Method == "GET" && r.URL.Path == "/api/v4/projects/1/repository/files/rules.json" {
+			content := base64.StdEncoding.EncodeToString([]byte("{\"regra\": \"$test\""))
+
+			file := gitlab.File{
+				Content: content,
+			}
+			data, _ := json.Marshal(file)
+			w.Write(data)
+			return
+		}
+
+		if r.Method == "GET" && r.URL.Path == "/api/v4/projects/1/repository/files/parameters.json" {
+			content := base64.StdEncoding.EncodeToString([]byte(`[
+				{
+					"name": "param1",
+					"type": "string"
+				},
+				{
+					"name": "param2",
+					"type": "string"
+				  }				
+			]`))
+
+			file := gitlab.File{
+				Content: content,
+			}
+			data, _ := json.Marshal(file)
+			w.Write(data)
+			return
+		}
+
+		if r.Method == "GET" && r.URL.Path == "/api/v4/projects/1/repository/files/features.json" {
+			content := base64.StdEncoding.EncodeToString([]byte(`[
+				{
+					"name": "feat1",
+					"type": "string"
+				},
+				{
+					"name": "feat2",
+					"type": "string"
+				  }				
+			]`))
+
+			file := gitlab.File{
+				Content: content,
+			}
+			data, _ := json.Marshal(file)
+			w.Write(data)
+			return
+		}
+
+		w.WriteHeader(http.StatusNotFound)
+	}))
+	defer s.Close()
+
+	cfg := SetupConfig(s)
+
+	ngl := services.NewGitlab(cfg)
+	ngl.Connect()
+	dto := SetupRulesheet()
+	err := ngl.Fill(dto)
+	if err != nil {
+		t.Errorf("unexpected error on fill: %s", err.Error())
+		return
+	}
+
+	if (*dto.Rules)["regra"].(string) != "$test" {
+		t.Error("error on unmarshalling rules")
+		return
+	}
+
+	if (dto.Parameters) == nil || len(*dto.Parameters) != 2 {
+		t.Error("error on unmarshalling parameters")
+		return
+	}
+
+	param1 := (*dto.Parameters)[0]
+	if param1["name"] != "param1" || param1["type"] != "string" {
+		t.Error("error on unmarshalling parameter 1")
+		return
+	}
+
+	param2 := (*dto.Parameters)[1]
+	if param2["name"] != "param2" || param1["type"] != "string" {
+		t.Error("error on unmarshalling parameter 2")
+		return
+	}
+
+	if (dto.Features) == nil || len(*dto.Features) != 2 {
+		t.Error("error on unmarshalling Features")
+		return
+	}
+
+	feat1 := (*dto.Features)[0]
+	if feat1["name"] != "feat1" || feat1["type"] != "string" {
+		t.Error("error on unmarshalling Feature 1")
+		return
+	}
+
+	feat2 := (*dto.Features)[1]
+	if feat2["name"] != "feat2" || param1["type"] != "string" {
+		t.Error("error on unmarshalling Feature 2")
+		return
+	}
+}
+
 // Functions to test fill function
 func TestFillRulesSlices(t *testing.T) {
 	dto := SetupRulesheet()
