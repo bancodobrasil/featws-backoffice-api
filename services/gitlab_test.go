@@ -767,7 +767,7 @@ func TestFillJSON(t *testing.T) {
 		}
 
 		if r.Method == "GET" && r.URL.Path == "/api/v4/projects/1/repository/files/rules.json" {
-			content := base64.StdEncoding.EncodeToString([]byte("{\"regra\": \"$test\""))
+			content := base64.StdEncoding.EncodeToString([]byte("{\"regra\": \"$test\"}"))
 
 			file := gitlab.File{
 				Content: content,
