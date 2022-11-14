@@ -72,6 +72,27 @@ func (_m *Rulesheets) Delete(ctx context.Context, id string) (bool, error) {
 	return r0, r1
 }
 
+// DeleteInTransaction provides a mock function with given fields: ctx, id
+func (_m *Rulesheets) DeleteInTransaction(ctx context.Context, id string) (bool, error) {
+	ret := _m.Called(ctx, id)
+
+	var r0 bool
+	if rf, ok := ret.Get(0).(func(context.Context, string) bool); ok {
+		r0 = rf(ctx, id)
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
+		r1 = rf(ctx, id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // Find provides a mock function with given fields: ctx, filter, options
 func (_m *Rulesheets) Find(ctx context.Context, filter interface{}, options *services.FindOptions) ([]*dtos.Rulesheet, error) {
 	ret := _m.Called(ctx, filter, options)
@@ -120,6 +141,29 @@ func (_m *Rulesheets) Get(ctx context.Context, id string) (*dtos.Rulesheet, erro
 
 // Update provides a mock function with given fields: ctx, entity
 func (_m *Rulesheets) Update(ctx context.Context, entity dtos.Rulesheet) (*dtos.Rulesheet, error) {
+	ret := _m.Called(ctx, entity)
+
+	var r0 *dtos.Rulesheet
+	if rf, ok := ret.Get(0).(func(context.Context, dtos.Rulesheet) *dtos.Rulesheet); ok {
+		r0 = rf(ctx, entity)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*dtos.Rulesheet)
+		}
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context, dtos.Rulesheet) error); ok {
+		r1 = rf(ctx, entity)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// UpdateInTransaction provides a mock function with given fields: ctx, entity
+func (_m *Rulesheets) UpdateInTransaction(ctx context.Context, entity dtos.Rulesheet) (*dtos.Rulesheet, error) {
 	ret := _m.Called(ctx, entity)
 
 	var r0 *dtos.Rulesheet

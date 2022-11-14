@@ -4,7 +4,7 @@ lint:
 	@make run-on-our-code-directories ARGS="golint"
 
 up-services:
-	docker-compose up -d adminer
+	docker compose up -d adminer
 
 build:generate-swagger
 	go build -o api
