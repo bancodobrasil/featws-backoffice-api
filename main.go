@@ -10,6 +10,7 @@ import (
 	_ "github.com/bancodobrasil/featws-api/docs"
 	"github.com/bancodobrasil/featws-api/routes"
 	ginMonitor "github.com/bancodobrasil/gin-monitor"
+	"github.com/bancodobrasil/goauth"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-migrate/migrate/v4"
@@ -117,6 +118,8 @@ func main() {
 	gin.DefaultErrorWriter = log.StandardLogger().WriterLevel(log.ErrorLevel)
 
 	router := gin.New()
+
+	goauth.BootstrapMiddleware()
 
 	router.Use(ginlogrus.Logger(log.StandardLogger()), gin.Recovery())
 	router.Use(monitor.Prometheus())
