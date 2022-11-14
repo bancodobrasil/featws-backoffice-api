@@ -20,12 +20,19 @@ type FindOptions struct {
 
 // Repository ...
 type Repository[T any] interface {
+	GetDB() *gorm.DB
 	Create(ctx context.Context, entity *T) error
+	CreateInTransaction(ctx context.Context, db *gorm.DB, entity *T) error
 	Find(ctx context.Context, entity interface{}, options *FindOptions) (list []*T, err error)
+	FindInTransaction(ctx context.Context, db *gorm.DB, entity interface{}, options *FindOptions) (list []*T, err error)
 	Count(ctx context.Context, entity interface{}) (count int64, err error)
+	CountInTransaction(ctx context.Context, db *gorm.DB, entity interface{}) (count int64, err error)
 	Get(ctx context.Context, id string) (entity *T, err error)
+	GetInTransaction(ctx context.Context, db *gorm.DB, id string) (entity *T, err error)
 	Update(ctx context.Context, entity T) (updated *T, err error)
+	UpdateInTransaction(ctx context.Context, db *gorm.DB, entity T) (updated *T, err error)
 	Delete(ctx context.Context, id string) (deleted bool, err error)
+	DeleteInTransaction(ctx context.Context, db *gorm.DB, id string) (deleted bool, err error)
 }
 
 // Repository ...
@@ -44,11 +51,15 @@ const (
 
 // Create ...
 func (r *repository[T]) Create(ctx context.Context, entity *T) error {
+	db := r.newSession(ctx)
+	return r.CreateInTransaction(ctx, db, entity)
+}
+
+// CreateInTransaction ...
+func (r *repository[T]) CreateInTransaction(ctx context.Context, db *gorm.DB, entity *T) error {
 	// add the span of database query on the root span of the context
 	span := utils.GenerateSpanTracer(ctx, create)
 	defer span()
-
-	db := r.newSession(ctx)
 
 	result := db.Create(&entity)
 	if result.Error != nil {
@@ -67,12 +78,16 @@ func (r *repository[T]) Create(ctx context.Context, entity *T) error {
 
 // Find ...
 func (r *repository[T]) Find(ctx context.Context, entity interface{}, options *FindOptions) (list []*T, err error) {
+	db := r.newSession(ctx)
+	return r.FindInTransaction(ctx, db, entity, options)
+}
+
+// FindInTransaction ...
+func (r *repository[T]) FindInTransaction(ctx context.Context, db *gorm.DB, entity interface{}, options *FindOptions) (list []*T, err error) {
 	// add the span of database query on the root span of the context
 	tracer := telemetry.GetTracer(ctx)
 	ctx, span := tracer.Start(ctx, "repo-find", trace.WithSpanKind(trace.SpanKindInternal))
 	defer span.End()
-
-	db := r.newSession(ctx)
 
 	if options != nil {
 		limit := 10
@@ -98,12 +113,16 @@ func (r *repository[T]) Find(ctx context.Context, entity interface{}, options *F
 
 // Count ...
 func (r *repository[T]) Count(ctx context.Context, entity interface{}) (count int64, err error) {
+	db := r.newSession(ctx)
+	return r.CountInTransaction(ctx, db, entity)
+}
+
+// CountInTransaction ...
+func (r *repository[T]) CountInTransaction(ctx context.Context, db *gorm.DB, entity interface{}) (count int64, err error) {
 	// add the span of database query on the root span of the context
 	tracer := telemetry.GetTracer(ctx)
 	ctx, span := tracer.Start(ctx, "repo-count", trace.WithSpanKind(trace.SpanKindInternal))
 	defer span.End()
-
-	db := r.newSession(ctx)
 
 	count = 0
 
@@ -120,12 +139,16 @@ func (r *repository[T]) Count(ctx context.Context, entity interface{}) (count in
 
 // Get ...
 func (r *repository[T]) Get(ctx context.Context, id string) (entity *T, err error) {
+	db := r.newSession(ctx)
+	return r.GetInTransaction(ctx, db, id)
+}
+
+// Get ...
+func (r *repository[T]) GetInTransaction(ctx context.Context, db *gorm.DB, id string) (entity *T, err error) {
 	// add the span of database query on the root span of the context
 	tracer := telemetry.GetTracer(ctx)
 	ctx, span := tracer.Start(ctx, "repo-get", trace.WithSpanKind(trace.SpanKindInternal))
 	defer span.End()
-
-	db := r.newSession(ctx)
 
 	result := db.First(&entity, id)
 
@@ -140,12 +163,16 @@ func (r *repository[T]) Get(ctx context.Context, id string) (entity *T, err erro
 
 // Update ...
 func (r *repository[T]) Update(ctx context.Context, entity T) (updated *T, err error) {
+	db := r.newSession(ctx)
+	return r.UpdateInTransaction(ctx, db, entity)
+}
+
+// UpdateInTransaction ...
+func (r *repository[T]) UpdateInTransaction(ctx context.Context, db *gorm.DB, entity T) (updated *T, err error) {
 	// add the span of database query on the root span of the context
 	tracer := telemetry.GetTracer(ctx)
 	ctx, span := tracer.Start(ctx, "repo-update", trace.WithSpanKind(trace.SpanKindInternal))
 	defer span.End()
-
-	db := r.newSession(ctx)
 
 	result := db.Model(entity).Save(&entity)
 
@@ -162,12 +189,16 @@ func (r *repository[T]) Update(ctx context.Context, entity T) (updated *T, err e
 
 // Delete ...
 func (r *repository[T]) Delete(ctx context.Context, id string) (deleted bool, err error) {
+	db := r.newSession(ctx)
+	return r.DeleteInTransaction(ctx, db, id)
+}
+
+// DeleteInTransaction ...
+func (r *repository[T]) DeleteInTransaction(ctx context.Context, db *gorm.DB, id string) (deleted bool, err error) {
 	// add the span of database query on the root span of the context
 	tracer := telemetry.GetTracer(ctx)
 	ctx, span := tracer.Start(ctx, "repo-delete", trace.WithSpanKind(trace.SpanKindInternal))
 	defer span.End()
-
-	db := r.newSession(ctx)
 
 	entity, err := r.Get(ctx, id)
 
@@ -195,5 +226,9 @@ func (r *repository[T]) Delete(ctx context.Context, id string) (deleted bool, er
 }
 
 func (r *repository[T]) newSession(ctx context.Context) *gorm.DB {
-	return r.db.Session(&gorm.Session{}).Model(new(T)).WithContext(ctx)
+	return r.GetDB().Session(&gorm.Session{}).Model(new(T)).WithContext(ctx)
+}
+
+func (r *repository[T]) GetDB() *gorm.DB {
+	return r.db
 }
