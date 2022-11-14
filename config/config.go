@@ -7,11 +7,12 @@ import (
 	"github.com/spf13/viper"
 )
 
-//Config ...
+// Config ...
 type Config struct {
 	AllowOrigins        string `mapstructure:"ALLOW_ORIGINS"`
 	Port                string `mapstructure:"PORT"`
 	MysqlURI            string `mapstructure:"FEATWS_API_MYSQL_URI"`
+	Migrate             string `mapstructure:"MIGRATE"`
 	GitlabToken         string `mapstructure:"FEATWS_API_GITLAB_TOKEN"`
 	GitlabURL           string `mapstructure:"FEATWS_API_GITLAB_URL"`
 	GitlabNamespace     string `mapstructure:"FEATWS_API_GITLAB_NAMESPACE"`
@@ -25,7 +26,7 @@ type Config struct {
 
 var config = &Config{}
 
-//LoadConfig ...
+// LoadConfig ...
 func LoadConfig() (err error) {
 	viper.AddConfigPath("./")
 	viper.SetConfigFile(".env")
@@ -43,6 +44,7 @@ func LoadConfig() (err error) {
 	viper.SetDefault("FEATWS_API_GITLAB_DEFAULT_BRANCH", "main")
 	viper.SetDefault("FEATWS_API_GITLAB_CI_SCRIPT", "")
 	viper.SetDefault("EXTERNAL_HOST", "localhost:9007")
+	viper.SetDefault("MIGRATE", "")
 	viper.SetDefault("OPENAM_URL", "")
 	viper.SetDefault("FEATWS_API_AUTH_MODE", "none")
 
