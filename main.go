@@ -8,7 +8,6 @@ import (
 	"github.com/bancodobrasil/featws-api/config"
 	"github.com/bancodobrasil/featws-api/database"
 	_ "github.com/bancodobrasil/featws-api/docs"
-	"github.com/bancodobrasil/featws-api/middlewares"
 	"github.com/bancodobrasil/featws-api/routes"
 	ginMonitor "github.com/bancodobrasil/gin-monitor"
 	"github.com/gin-contrib/cors"
@@ -118,8 +117,6 @@ func main() {
 	gin.DefaultErrorWriter = log.StandardLogger().WriterLevel(log.ErrorLevel)
 
 	router := gin.New()
-
-	middlewares.InitializeMiddlewares()
 
 	router.Use(ginlogrus.Logger(log.StandardLogger()), gin.Recovery())
 	router.Use(monitor.Prometheus())
