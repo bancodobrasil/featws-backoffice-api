@@ -8,9 +8,9 @@ import (
 	"github.com/bancodobrasil/featws-api/config"
 	"github.com/bancodobrasil/featws-api/database"
 	_ "github.com/bancodobrasil/featws-api/docs"
-	"github.com/bancodobrasil/featws-api/middlewares"
 	"github.com/bancodobrasil/featws-api/routes"
 	ginMonitor "github.com/bancodobrasil/gin-monitor"
+	"github.com/bancodobrasil/goauth"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-migrate/migrate/v4"
@@ -119,7 +119,7 @@ func main() {
 
 	router := gin.New()
 
-	middlewares.InitializeMiddlewares()
+	goauth.BootstrapMiddleware()
 
 	router.Use(ginlogrus.Logger(log.StandardLogger()), gin.Recovery())
 	router.Use(monitor.Prometheus())
