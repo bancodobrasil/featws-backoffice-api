@@ -160,11 +160,11 @@ func (rs rulesheets) Delete(ctx context.Context, id string) (bool, error) {
 	db := rs.repository.GetDB()
 
 	tx := db.Begin()
-	defer func() {
-		if r := recover(); r != nil {
-			tx.Rollback()
-		}
-	}()
+	// defer func() {
+	// 	if r := recover(); r != nil {
+	// 		tx.Rollback()
+	// 	}
+	// }()
 
 	// get the specific rulesheet
 	rulesheet, err := rs.repository.Get(ctx, id)
@@ -178,13 +178,13 @@ func (rs rulesheets) Delete(ctx context.Context, id string) (bool, error) {
 	rulesheet.Name = fmt.Sprintf("%s-deleted-%v", rulesheet.Name, rulesheet.ID)
 
 	// update the rulesheet
-	_, err = rs.repository.Update(ctx, *rulesheet)
+	_, err = rs.repository.UpdateInTransaction(ctx, tx, *rulesheet)
 	if err != nil {
 		tx.Rollback()
 		return false, err
 	}
 
-	_, err = rs.repository.DeleteInTransaction(ctx, db, id)
+	_, err = rs.repository.DeleteInTransaction(ctx, tx, id)
 	if err != nil {
 		tx.Rollback()
 		log.Errorf("Error on delete the rulesheet from repository: %v", err)
