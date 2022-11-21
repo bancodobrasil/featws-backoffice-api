@@ -38,3 +38,9 @@ generate-mocks:
 generate-swagger:
 #   Install swag on https://github.com/swaggo/swag
 	swag i
+
+migrate-up:
+	MIGRATE=up make run
+
+migrate-down:
+	MIGRATE=down make run
