@@ -34,6 +34,7 @@ func newRulesheets() (Rulesheets, error) {
 	return NewRulesheetsWithDB(db)
 }
 
+// NewRulesheetsWithDB ...
 func NewRulesheetsWithDB(db *gorm.DB) (Rulesheets, error) {
 	err := db.AutoMigrate(&models.Rulesheet{})
 	if err != nil {
