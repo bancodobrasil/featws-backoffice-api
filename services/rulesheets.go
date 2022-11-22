@@ -155,16 +155,43 @@ func (rs rulesheets) Update(ctx context.Context, rulesheetDTO dtos.Rulesheet) (r
 	return
 }
 
-// DeleteRulesheet ...
-func (rs rulesheets) Delete(ctx context.Context, id string) (deleted bool, err error) {
+func (rs rulesheets) Delete(ctx context.Context, id string) (bool, error) {
 
-	deleted, err = rs.repository.Delete(ctx, id)
+	db := rs.repository.GetDB()
+
+	tx := db.Begin()
+	// defer func() {
+	// 	if r := recover(); r != nil {
+	// 		tx.Rollback()
+	// 	}
+	// }()
+
+	// get the specific rulesheet
+	rulesheet, err := rs.repository.Get(ctx, id)
 	if err != nil {
-		log.Errorf("Error on delete the rulesheet from repository: %v", err)
-		return
+		tx.Rollback()
+		log.Errorf("Error on fetch rulesheet(get): %v", err)
+		return false, err
 	}
 
-	return
+	// update the ruleshet name to deleted
+	rulesheet.Name = fmt.Sprintf("%s-deleted-%v", rulesheet.Name, rulesheet.ID)
+
+	// update the rulesheet
+	_, err = rs.repository.UpdateInTransaction(ctx, tx, *rulesheet)
+	if err != nil {
+		tx.Rollback()
+		return false, err
+	}
+
+	_, err = rs.repository.DeleteInTransaction(ctx, tx, id)
+	if err != nil {
+		tx.Rollback()
+		log.Errorf("Error on delete the rulesheet from repository: %v", err)
+		return false, err
+	}
+
+	return true, tx.Commit().Error
 }
 
 func newRulesheetDTO(entity *models.Rulesheet) *dtos.Rulesheet {
