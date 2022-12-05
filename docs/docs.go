@@ -29,7 +29,10 @@ const docTemplate = `{
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "Authentication Api Key": []
+                    },
+                    {
+                        "Authentication Bearer Token": []
                     }
                 ],
                 "description": "Create Rulesheet description",
@@ -95,7 +98,10 @@ const docTemplate = `{
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "Authentication Api Key": []
+                    },
+                    {
+                        "Authentication Bearer Token": []
                     }
                 ],
                 "description": "List Rulesheet description",
@@ -173,7 +179,10 @@ const docTemplate = `{
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "Authentication Api Key": []
+                    },
+                    {
+                        "Authentication Bearer Token": []
                     }
                 ],
                 "description": "Get Rulesheet by ID description",
@@ -238,7 +247,10 @@ const docTemplate = `{
             "put": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "Authentication Api Key": []
+                    },
+                    {
+                        "Authentication Bearer Token": []
                     }
                 ],
                 "description": "Update Rulesheet by ID description",
@@ -312,7 +324,10 @@ const docTemplate = `{
             "delete": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "Authentication Api Key": []
+                    },
+                    {
+                        "Authentication Bearer Token": []
                     }
                 ],
                 "description": "Delete Rulesheet by ID description",
@@ -397,7 +412,10 @@ const docTemplate = `{
                 },
                 "features": {
                     "type": "array",
-                    "items": {}
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": true
+                    }
                 },
                 "hasStringRule": {
                     "type": "boolean"
@@ -410,11 +428,17 @@ const docTemplate = `{
                 },
                 "parameters": {
                     "type": "array",
-                    "items": {}
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": true
+                    }
                 },
                 "rules": {
                     "type": "object",
                     "additionalProperties": true
+                },
+                "slug": {
+                    "type": "string"
                 },
                 "version": {
                     "type": "string"
@@ -437,7 +461,12 @@ const docTemplate = `{
         }
     },
     "securityDefinitions": {
-        "ApiKeyAuth": {
+        "Authentication Api Key": {
+            "type": "apiKey",
+            "name": "X-API-Key",
+            "in": "header"
+        },
+        "Authentication Bearer Token": {
             "type": "apiKey",
             "name": "Authorization",
             "in": "header"

@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/bancodobrasil/featws-api/config"
@@ -9,8 +10,12 @@ import (
 	_ "github.com/bancodobrasil/featws-api/docs"
 	"github.com/bancodobrasil/featws-api/routes"
 	ginMonitor "github.com/bancodobrasil/gin-monitor"
+	"github.com/bancodobrasil/goauth"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/golang-migrate/migrate/v4"
+	_ "github.com/golang-migrate/migrate/v4/database/mysql"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
 	ginlogrus "github.com/toorop/gin-logrus"
@@ -39,7 +44,11 @@ func setupLog() {
 // @host localhost:9007
 // @BasePath /api/v1
 
-// @securityDefinitions.apikey ApiKeyAuth
+// @securityDefinitions.apikey Authentication Api Key
+// @in header
+// @name X-API-Key
+
+// @securityDefinitions.apikey Authentication Bearer Token
 // @in header
 // @name Authorization
 
@@ -64,6 +73,43 @@ func main() {
 
 	database.ConnectDB()
 
+	isCmd := false
+
+	if cfg.Migrate != "" {
+		isCmd = true
+		log.Debug("Migrating database...")
+		m, err := migrate.New(
+			"file://database/migrations/",
+			"mysql://"+cfg.MysqlURI,
+		)
+		if err != nil {
+			log.Fatalf("Migration failed with error: %v", err)
+			os.Exit(1)
+		}
+		if strings.ToLower(cfg.Migrate) == "up" {
+			if err := m.Up(); err != nil {
+				if err.Error() == "no change" {
+					log.Println("No change made by migration scripts")
+				} else {
+					log.Fatalf("Migration Up failed with error: %v", err)
+					os.Exit(1)
+				}
+			}
+		} else if strings.ToLower(cfg.Migrate) == "down" {
+			if err := m.Down(); err != nil {
+				log.Fatalf("Migration Down failed with error: %v", err)
+				os.Exit(1)
+			}
+		} else if steps, err := strconv.Atoi(cfg.Migrate); err == nil {
+			m.Steps(steps)
+		}
+	}
+
+	if isCmd == true {
+		log.Debug("Finished Successfully")
+		os.Exit(0)
+	}
+
 	monitor, err := ginMonitor.New("v1.0.0", ginMonitor.DefaultErrorMessageKey, ginMonitor.DefaultBuckets)
 	if err != nil {
 		log.Panic(err)
@@ -72,6 +118,8 @@ func main() {
 	gin.DefaultErrorWriter = log.StandardLogger().WriterLevel(log.ErrorLevel)
 
 	router := gin.New()
+
+	goauth.BootstrapMiddleware()
 
 	router.Use(ginlogrus.Logger(log.StandardLogger()), gin.Recovery())
 	router.Use(monitor.Prometheus())

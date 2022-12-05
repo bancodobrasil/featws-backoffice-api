@@ -3,6 +3,7 @@ package repository
 import (
 	"github.com/bancodobrasil/featws-api/database"
 	"github.com/bancodobrasil/featws-api/models"
+	"gorm.io/gorm"
 )
 
 // Rulesheets ...
@@ -30,6 +31,11 @@ func GetRulesheets() Rulesheets {
 
 func newRulesheets() (Rulesheets, error) {
 	db := database.GetConn()
+	return NewRulesheetsWithDB(db)
+}
+
+// NewRulesheetsWithDB ...
+func NewRulesheetsWithDB(db *gorm.DB) (Rulesheets, error) {
 	err := db.AutoMigrate(&models.Rulesheet{})
 	if err != nil {
 		return nil, err

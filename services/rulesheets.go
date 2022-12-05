@@ -2,10 +2,12 @@ package services
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/bancodobrasil/featws-api/dtos"
 	"github.com/bancodobrasil/featws-api/models"
 	"github.com/bancodobrasil/featws-api/repository"
+	"github.com/gosimple/slug"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -41,19 +43,20 @@ func NewRulesheets(repository repository.Rulesheets, gitlabService Gitlab) Rules
 // CreateRulesheet ...
 func (rs rulesheets) Create(ctx context.Context, rulesheetDTO *dtos.Rulesheet) (err error) {
 
-	//TODO verifica unicidade do nome
-	rulesheet, err := models.NewRulesheetV1(*rulesheetDTO)
-	if err != nil {
-		log.Errorf("Error on create rulesheet on create model: %v", err)
-		return
+	rulesheet, _ := models.NewRulesheetV1(*rulesheetDTO)
+	if rulesheet.Slug == "" {
+		rulesheet.Slug = slug.Make(rulesheet.Name)
 	}
+
+	fmt.Print(rulesheet.Slug)
 
 	err = rs.repository.Create(ctx, &rulesheet)
 	if err != nil {
 		log.Errorf("Error on create rulesheet into repository: %v", err)
 		return
 	}
-
+	rulesheetDTO.ID = rulesheet.ID
+	rulesheetDTO.Slug = rulesheet.Slug
 	err = rs.gitlabService.Save(rulesheetDTO, "[FEATWS BOT] Create Repo")
 	if err != nil {
 		log.Errorf("Error on save rulesheet into repository: %v", err)
@@ -92,13 +95,6 @@ func (rs rulesheets) Find(ctx context.Context, filter interface{}, options *Find
 	for _, entity := range entities {
 		result = append(result, newRulesheetDTO(entity))
 	}
-
-	// for _, rulesheet := range result {
-	// 	err = fillWithGitlab(rulesheet)
-	// 	if err != nil {
-	// 		return
-	// 	}
-	// }
 
 	return
 }
@@ -140,11 +136,7 @@ func (rs rulesheets) Get(ctx context.Context, id string) (result *dtos.Rulesheet
 // UpdateRulesheet ...
 func (rs rulesheets) Update(ctx context.Context, rulesheetDTO dtos.Rulesheet) (result *dtos.Rulesheet, err error) {
 
-	entity, err := models.NewRulesheetV1(rulesheetDTO)
-	if err != nil {
-		log.Errorf("Error on create rulesheet on create model: %v", err)
-		return
-	}
+	entity, _ := models.NewRulesheetV1(rulesheetDTO)
 
 	_, err = rs.repository.Update(ctx, entity)
 	if err != nil {
@@ -158,27 +150,48 @@ func (rs rulesheets) Update(ctx context.Context, rulesheetDTO dtos.Rulesheet) (r
 		return
 	}
 
-	// err = rs.gitlabService.Fill(&rulesheetDTO)
-	// if err != nil {
-	// 	log.Errorf("Error on fill rulesheet with gitlab information: %v", err)
-	// 	return
-	// }
-
 	result = &rulesheetDTO
 
 	return
 }
 
-// DeleteRulesheet ...
-func (rs rulesheets) Delete(ctx context.Context, id string) (deleted bool, err error) {
+func (rs rulesheets) Delete(ctx context.Context, id string) (bool, error) {
 
-	deleted, err = rs.repository.Delete(ctx, id)
+	db := rs.repository.GetDB()
+
+	tx := db.Begin()
+	// defer func() {
+	// 	if r := recover(); r != nil {
+	// 		tx.Rollback()
+	// 	}
+	// }()
+
+	// get the specific rulesheet
+	rulesheet, err := rs.repository.Get(ctx, id)
 	if err != nil {
-		log.Errorf("Error on delete the rulesheet from repository: %v", err)
-		return
+		tx.Rollback()
+		log.Errorf("Error on fetch rulesheet(get): %v", err)
+		return false, err
 	}
 
-	return
+	// update the ruleshet name to deleted
+	rulesheet.Name = fmt.Sprintf("%s-deleted-%v", rulesheet.Name, rulesheet.ID)
+
+	// update the rulesheet
+	_, err = rs.repository.UpdateInTransaction(ctx, tx, *rulesheet)
+	if err != nil {
+		tx.Rollback()
+		return false, err
+	}
+
+	_, err = rs.repository.DeleteInTransaction(ctx, tx, id)
+	if err != nil {
+		tx.Rollback()
+		log.Errorf("Error on delete the rulesheet from repository: %v", err)
+		return false, err
+	}
+
+	return true, tx.Commit().Error
 }
 
 func newRulesheetDTO(entity *models.Rulesheet) *dtos.Rulesheet {
@@ -186,6 +199,7 @@ func newRulesheetDTO(entity *models.Rulesheet) *dtos.Rulesheet {
 		ID:            entity.ID,
 		Name:          entity.Name,
 		Description:   entity.Description,
+		Slug:          entity.Slug,
 		HasStringRule: entity.HasStringRule,
 	}
 }

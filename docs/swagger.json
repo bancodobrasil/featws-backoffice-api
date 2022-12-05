@@ -22,7 +22,10 @@
             "post": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "Authentication Api Key": []
+                    },
+                    {
+                        "Authentication Bearer Token": []
                     }
                 ],
                 "description": "Create Rulesheet description",
@@ -88,7 +91,10 @@
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "Authentication Api Key": []
+                    },
+                    {
+                        "Authentication Bearer Token": []
                     }
                 ],
                 "description": "List Rulesheet description",
@@ -166,7 +172,10 @@
             "get": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "Authentication Api Key": []
+                    },
+                    {
+                        "Authentication Bearer Token": []
                     }
                 ],
                 "description": "Get Rulesheet by ID description",
@@ -231,7 +240,10 @@
             "put": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "Authentication Api Key": []
+                    },
+                    {
+                        "Authentication Bearer Token": []
                     }
                 ],
                 "description": "Update Rulesheet by ID description",
@@ -305,7 +317,10 @@
             "delete": {
                 "security": [
                     {
-                        "ApiKeyAuth": []
+                        "Authentication Api Key": []
+                    },
+                    {
+                        "Authentication Bearer Token": []
                     }
                 ],
                 "description": "Delete Rulesheet by ID description",
@@ -390,7 +405,10 @@
                 },
                 "features": {
                     "type": "array",
-                    "items": {}
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": true
+                    }
                 },
                 "hasStringRule": {
                     "type": "boolean"
@@ -403,11 +421,17 @@
                 },
                 "parameters": {
                     "type": "array",
-                    "items": {}
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": true
+                    }
                 },
                 "rules": {
                     "type": "object",
                     "additionalProperties": true
+                },
+                "slug": {
+                    "type": "string"
                 },
                 "version": {
                     "type": "string"
@@ -430,7 +454,12 @@
         }
     },
     "securityDefinitions": {
-        "ApiKeyAuth": {
+        "Authentication Api Key": {
+            "type": "apiKey",
+            "name": "X-API-Key",
+            "in": "header"
+        },
+        "Authentication Bearer Token": {
             "type": "apiKey",
             "name": "Authorization",
             "in": "header"

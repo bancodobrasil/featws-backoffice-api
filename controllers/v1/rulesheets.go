@@ -48,14 +48,15 @@ func NewRulesheets(service services.Rulesheets) Rulesheets {
 // @Failure 			500 {object} responses.Error "Internal Server Error"
 // @Failure 			default {object} responses.Error
 // @Response 		404 "Not Found"
-// @Security 			ApiKeyAuth
+// @Security 			Authentication Api Key
+// @Security 			Authentication Bearer Token
 // @Router 				/rulesheets [post]
 func (rc *rulesheets) CreateRulesheet() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
 
 		// Pass the context of gin Request
-		ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Second)
+		ctx, cancel := context.WithTimeout(c.Request.Context(), 1000*time.Second)
 		var payload payloads.Rulesheet
 		defer cancel()
 
@@ -95,8 +96,10 @@ func (rc *rulesheets) CreateRulesheet() gin.HandlerFunc {
 		}
 
 		var response = responses.NewRulesheet(&dto)
+		//id := c.Query("id")
 		c.JSON(http.StatusCreated, response)
 	}
+
 }
 
 // GetRulesheets 	godoc
@@ -114,7 +117,8 @@ func (rc *rulesheets) CreateRulesheet() gin.HandlerFunc {
 // @Failure 			500 {object} responses.Error "Internal Server Error"
 // @Failure 			default {object} responses.Error
 // @Response 			404 "Not Found"
-// @Security 			ApiKeyAuth
+// @Security 			Authentication Api Key
+// @Security 			Authentication Bearer Token
 // @Router 				/rulesheets/ [get]
 func (rc *rulesheets) GetRulesheets() gin.HandlerFunc {
 
@@ -217,13 +221,14 @@ func (rc *rulesheets) GetRulesheets() gin.HandlerFunc {
 // @Failure 			500 {object} responses.Error "Internal Server Error"
 // @Failure 			default {object} responses.Error
 // @Response 			404 "Not Found"
-// @Security 			ApiKeyAuth
+// @Security 			Authentication Api Key
+// @Security 			Authentication Bearer Token
 // @Router 				/rulesheets/{id} [get]
 func (rc *rulesheets) GetRulesheet() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
 
-		ctx, cancel := context.WithTimeout(c.Request.Context(), 100*time.Second)
+		ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Second)
 		defer cancel()
 		id, exists := c.Params.Get("id")
 
@@ -269,7 +274,8 @@ func (rc *rulesheets) GetRulesheet() gin.HandlerFunc {
 // @Failure 			500 {object} responses.Error "Internal Server Error"
 // @Failure 			default {object} responses.Error
 // @Response 			404 "Not Found"
-// @Security 			ApiKeyAuth
+// @Security 			Authentication Api Key
+// @Security 			Authentication Bearer Token
 // @Router 				/rulesheets/{id} [put]
 func (rc *rulesheets) UpdateRulesheet() gin.HandlerFunc {
 
@@ -288,7 +294,7 @@ func (rc *rulesheets) UpdateRulesheet() gin.HandlerFunc {
 			return
 		}
 
-		_, err := rc.service.Get(ctx, id)
+		foudedEntity, err := rc.service.Get(ctx, id)
 		if err != nil {
 			c.String(http.StatusNotFound, "")
 			log.Errorf("You are trying to update a non existing record: %v", err)
@@ -296,6 +302,7 @@ func (rc *rulesheets) UpdateRulesheet() gin.HandlerFunc {
 		}
 
 		var payload payloads.Rulesheet
+
 		// validate the request body
 		if err := c.BindJSON(&payload); err != nil {
 			c.JSON(http.StatusBadRequest, responses.Error{
@@ -313,6 +320,15 @@ func (rc *rulesheets) UpdateRulesheet() gin.HandlerFunc {
 
 		iid, _ := strconv.ParseUint(id, 10, 32)
 		payload.ID = uint(iid)
+
+		if payload.Slug != "" {
+			c.JSON(http.StatusBadRequest, responses.Error{
+				Error: "You can't update a slug already defined",
+			})
+			log.Errorf("You can't update a slug already defined: %v", err)
+			return
+		}
+		payload.Slug = foudedEntity.Slug
 
 		dto, err := dtos.NewRulesheetV1(payload)
 		if err != nil {
@@ -356,7 +372,8 @@ func (rc *rulesheets) UpdateRulesheet() gin.HandlerFunc {
 // @Failure 			500 {object} responses.Error "Internal Server Error"
 // @Failure 			default {object} responses.Error
 // @Response 			404 "Not Found"
-// @Security 			ApiKeyAuth
+// @Security 			Authentication Api Key
+// @Security 			Authentication Bearer Token
 // @Router 				/rulesheets/{id} [delete]
 func (rc *rulesheets) DeleteRulesheet() gin.HandlerFunc {
 

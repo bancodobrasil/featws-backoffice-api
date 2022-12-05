@@ -13,7 +13,9 @@ definitions:
       description:
         type: string
       features:
-        items: {}
+        items:
+          additionalProperties: true
+          type: object
         type: array
       hasStringRule:
         type: boolean
@@ -22,11 +24,15 @@ definitions:
       name:
         type: string
       parameters:
-        items: {}
+        items:
+          additionalProperties: true
+          type: object
         type: array
       rules:
         additionalProperties: true
         type: object
+      slug:
+        type: string
       version:
         type: string
     required:
@@ -94,7 +100,8 @@ paths:
           schema:
             $ref: '#/definitions/v1.Error'
       security:
-      - ApiKeyAuth: []
+      - Authentication Api Key: []
+      - Authentication Bearer Token: []
       summary: Create Rulesheet
       tags:
       - Rulesheet
@@ -144,7 +151,8 @@ paths:
           schema:
             $ref: '#/definitions/v1.Error'
       security:
-      - ApiKeyAuth: []
+      - Authentication Api Key: []
+      - Authentication Bearer Token: []
       summary: List Rulesheets
       tags:
       - Rulesheet
@@ -185,7 +193,8 @@ paths:
           schema:
             $ref: '#/definitions/v1.Error'
       security:
-      - ApiKeyAuth: []
+      - Authentication Api Key: []
+      - Authentication Bearer Token: []
       summary: Delete Rulesheet by ID
       tags:
       - Rulesheet
@@ -227,7 +236,8 @@ paths:
           schema:
             $ref: '#/definitions/v1.Error'
       security:
-      - ApiKeyAuth: []
+      - Authentication Api Key: []
+      - Authentication Bearer Token: []
       summary: Get Rulesheet by ID
       tags:
       - Rulesheet
@@ -275,12 +285,17 @@ paths:
           schema:
             $ref: '#/definitions/v1.Error'
       security:
-      - ApiKeyAuth: []
+      - Authentication Api Key: []
+      - Authentication Bearer Token: []
       summary: Update Rulesheet by ID
       tags:
       - Rulesheet
 securityDefinitions:
-  ApiKeyAuth:
+  Authentication Api Key:
+    in: header
+    name: X-API-Key
+    type: apiKey
+  Authentication Bearer Token:
     in: header
     name: Authorization
     type: apiKey

@@ -4,7 +4,7 @@ lint:
 	@make run-on-our-code-directories ARGS="golint"
 
 up-services:
-	docker-compose up -d adminer
+	docker compose up -d adminer
 
 build:generate-swagger
 	go build -o api
@@ -15,8 +15,12 @@ up:up-services
 run:build
 	./api
 
+coverage:
+	go test ./...  -coverprofile=coverage.out
+	go tool cover -html=coverage.out
+
 test:
-	@make run-on-our-code-directories ARGS="go test -v"
+	@make run-on-our-code-directories ARGS="go test -v -coverprofile=coverage.out"
 
 run-on-our-code-directories:
 	@echo "${ARGS} <our-code-directories>"
@@ -34,3 +38,9 @@ generate-mocks:
 generate-swagger:
 #   Install swag on https://github.com/swaggo/swag
 	swag i
+
+migrate-up:
+	MIGRATE=up make run
+
+migrate-down:
+	MIGRATE=down make run

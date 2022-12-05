@@ -1,193 +1,1158 @@
-package services
+package services_test
 
-// import (
-// 	"fmt"
-// 	"net/http"
-// 	"net/http/httptest"
-// 	"testing"
+import (
+	"encoding/base64"
+	"encoding/json"
+	"io"
+	"net/http"
+	"net/http/httptest"
+	"testing"
 
-// 	"github.com/bancodobrasil/featws-api/config"
-// 	log "github.com/sirupsen/logrus"
-// 	"github.com/stretchr/testify/require"
-// 	gl "github.com/xanzy/go-gitlab"
-// )
+	"github.com/bancodobrasil/featws-api/config"
+	"github.com/bancodobrasil/featws-api/dtos"
+	"github.com/bancodobrasil/featws-api/services"
+	"github.com/stretchr/testify/assert"
+	"github.com/xanzy/go-gitlab"
+)
 
-// // func setup(t *testing.T) (*gin.Engine, *httptest.Server, *gl.Client) {
-// // 	gin := gin.Default()
+func SetupConfig(url *httptest.Server) *config.Config {
+	cfg := config.Config{
+		GitlabURL:       url.URL,
+		GitlabNamespace: "test",
+		GitlabToken:     "test",
+		GitlabPrefix:    "prefix-",
+		GitlabCIScript:  "test ci-script",
+	}
+	return &cfg
+}
 
-// // 	server := httptest.NewServer(gin)
+func SetupRulesheet() *dtos.Rulesheet {
+	rulesheet := dtos.Rulesheet{
+		ID:          1,
+		Name:        "Test",
+		Description: "Test",
+	}
+	return &rulesheet
+}
 
-// // 	client, err := gl.NewClient("", gl.WithBaseURL(server.URL))
-// // 	if err != nil {
-// // 		server.Close()
-// // 		t.Fatalf("Failed to create client: %v", err)
-// // 	}
-// // 	return gin, server, client
-// // }
+// Functions for test Save function
+func TestSaveAndCreateProject(t *testing.T) {
+	dto := SetupRulesheet()
 
-// func setup(t *testing.T) (*http.ServeMux, *httptest.Server, *gl.Client) {
-// 	// mux is the HTTP request multiplexer used with the test server.
-// 	mux := http.NewServeMux()
+	namespace := "test"
 
-// 	// server is a test HTTP server used to provide mock API responses.
-// 	server := httptest.NewServer(mux)
+	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/api/v4/namespaces/"+namespace {
+			w.Write([]byte(`{"id":1,"name":"teste"}`))
+			return
+		}
+		if r.Method == "POST" && r.URL.Path == "/api/v4/projects" {
 
-// 	// client is the Gitlab client being tested.
-// 	client, err := gl.NewClient("", gl.WithBaseURL(server.URL))
-// 	if err != nil {
-// 		server.Close()
-// 		t.Fatalf("Failed to create client: %v", err)
-// 	}
+			data, _ := io.ReadAll(r.Body)
+			w.Write(data)
+			return
+		}
+		if r.Method == "POST" && r.URL.Path == "/api/v4/projects/0/repository/commits" {
+			data, _ := io.ReadAll(r.Body)
+			c := make(map[string]interface{})
+			json.Unmarshal(data, &c)
+			w.Write(data)
+			return
+		}
+		w.WriteHeader(http.StatusNotFound)
+	}))
+	defer s.Close()
 
-// 	return mux, server, client
-// }
+	cfg := SetupConfig(s)
 
-// func teardown(server *httptest.Server) {
-// 	server.Close()
-// }
+	ngl := services.NewGitlab(cfg)
+	ngl.Connect()
+	err := ngl.Save(dto, "test")
 
-// func testMethod(t *testing.T, r *http.Request, want string) {
-// 	if got := r.Method; got != want {
-// 		t.Errorf("Request method: %s, want %s", got, want)
-// 	}
-// }
+	if err != nil {
+		t.Error("unexpected error")
+	}
 
-// // func GetCommit(c *gin.Context) {
-// // 	testMethod(t, r, http.MethodGet)
-// // 	fmt.Fprintf(c.Writer, `
-// // 		{
-// // 			"file_name": "key.rb",
-// // 			"file_path": "app/models/key.rb",
-// // 			"size": 1476,
-// // 			"encoding": "base64",
-// // 			"content": "IyA9PSBTY2hlbWEgSW5mb3...",
-// // 			"content_sha256": "4c294617b60715c1d218e61164a3abd4808a4284cbc30e6728a01ad9aada4481",
-// // 			"ref": "master",
-// // 			"blob_id": "79f7bbd25901e8334750839545a9bd021f0e4c83",
-// // 			"commit_id": "d5a3ff139356ce33e37e73add446f16869741b50",
-// // 			"last_commit_id": "570e7b2abdd848b95f2f578043fc23bd6f6fd24d"
-// // 		}
-// // 	`)
-// // }
+}
 
-// func TestSaveInGitlab(t *testing.T) {
-// 	mux, server, client := setup(t)
-// 	defer teardown(server)
+func TestSaveAndUpdateProject(t *testing.T) {
+	dto := SetupRulesheet()
 
-// 	mux.HandleFunc("/api/v4/projects/13083/repository/files/app%2Fmodels%2Fkey%2Erb?ref=master", func(w http.ResponseWriter, r *http.Request) {
-// 		testMethod(t, r, http.MethodGet)
-// 		fmt.Fprintf(w, `
-// 			{
-// 			"file_name": "key.rb",
-// 			"file_path": "app/models/key.rb",
-// 			"size": 1476,
-// 			"encoding": "base64",
-// 			"content": "IyA9PSBTY2hlbWEgSW5mb3...",
-// 			"content_sha256": "4c294617b60715c1d218e61164a3abd4808a4284cbc30e6728a01ad9aada4481",
-// 			"ref": "master",
-// 			"blob_id": "79f7bbd25901e8334750839545a9bd021f0e4c83",
-// 			"commit_id": "d5a3ff139356ce33e37e73add446f16869741b50",
-// 			"last_commit_id": "570e7b2abdd848b95f2f578043fc23bd6f6fd24d"
-// 			}
-// 		`)
-// 	})
+	namespace := "test"
 
-// 	want := &gl.File{
-// 		FileName:     "key.rb",
-// 		FilePath:     "app/models/key.rb",
-// 		Size:         1476,
-// 		Encoding:     "base64",
-// 		Content:      "IyA9PSBTY2hlbWEgSW5mb3...",
-// 		Ref:          "master",
-// 		BlobID:       "79f7bbd25901e8334750839545a9bd021f0e4c83",
-// 		CommitID:     "d5a3ff139356ce33e37e73add446f16869741b50",
-// 		SHA256:       "4c294617b60715c1d218e61164a3abd4808a4284cbc30e6728a01ad9aada4481",
-// 		LastCommitID: "570e7b2abdd848b95f2f578043fc23bd6f6fd24d",
-// 	}
+	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-// 	f, resp, err := client.RepositoryFiles.GetFile(13083, "app%2Fmodels%2Fkey%2Erb?ref=master", nil)
-// 	require.NoError(t, err)
-// 	require.NotNil(t, resp)
-// 	require.Equal(t, want, f)
+		//Retrieving namespace
+		if r.URL.Path == "/api/v4/namespaces/"+namespace {
+			w.Write([]byte(`{"id":1,"name":"teste", "path":"test"}`))
+			return
+		}
 
-// 	f, resp, err = client.RepositoryFiles.GetFile(13083.01, "app%2Fmodels%2Fkey%2Erb?ref=master", nil)
-// 	require.EqualError(t, err, "invalid ID type 13083.01, the ID must be an int or a string")
-// 	require.Nil(t, resp)
-// 	require.Nil(t, f)
+		// Get project
+		if r.URL.Path == "/api/v4/projects/test%2Fprefix-Test" {
+			w.Write([]byte(`{"id":1,"description:null","name":"test"}`))
+			return
+		}
 
-// 	f, resp, err = client.RepositoryFiles.GetFile(13084, "app%2Fmodels%2Fkey%2Erb?ref=master", nil)
-// 	require.Error(t, err)
-// 	require.Nil(t, f)
-// 	require.Equal(t, http.StatusNotFound, resp.StatusCode)
-// }
+		// Create project
+		if r.Method == "POST" && r.URL.Path == "/api/v4/projects" {
 
-// func TestCreateOrUpdateGitlabFileCommitAction(t *testing.T) {
+			data, _ := io.ReadAll(r.Body)
+			w.Write(data)
+			return
+		}
 
-// }
+		//Create commits
+		if r.Method == "POST" && r.URL.Path == "/api/v4/projects/0/repository/commits" {
+			data, _ := io.ReadAll(r.Body)
+			c := make(map[string]interface{})
+			json.Unmarshal(data, &c)
+			w.Write(data)
+			return
+		}
+		w.WriteHeader(http.StatusNotFound)
+	}))
+	defer s.Close()
 
-// func TestDefineCreateOrUpdateGitlabFileAction(t *testing.T) {
+	cfg := SetupConfig(s)
 
-// }
+	ngl := services.NewGitlab(cfg)
+	ngl.Connect()
+	err := ngl.Save(dto, "test")
 
-// func TestFillWithGitlab(t *testing.T) {
+	if err != nil {
+		t.Error("unexpected error")
+	}
 
-// }
+}
 
-// func TestConnectGitlab(t *testing.T) {
-// 	err := config.LoadConfig()
-// 	if err != nil {
-// 		log.Fatalf("Não foi possível carregar as configurações: %s\n", err)
-// 	}
+func TestSaveTestFilesCreation(t *testing.T) {
+	dto := SetupRulesheet()
 
-// 	cfg := config.Config{}
+	namespace := "test"
 
-// 	c, err := ConnectGitlab(&cfg)
-// 	if err != nil {
-// 		t.Fatalf("Failed to create client: %v", err)
+	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/api/v4/namespaces/"+namespace {
+			w.Write([]byte(`{"id":1,"name":"teste"}`))
+			return
+		}
+		if r.Method == "POST" && r.URL.Path == "/api/v4/projects" {
 
-// 	}
+			data, _ := io.ReadAll(r.Body)
+			w.Write(data)
+			return
+		}
+		if r.Method == "POST" && r.URL.Path == "/api/v4/projects/0/repository/commits" {
+			data, _ := io.ReadAll(r.Body)
+			c := make(map[string]interface{})
+			json.Unmarshal(data, &c)
 
-// 	expectedBaseURL := "/api/v4/"
+			version := c["actions"].([]interface{})[0].(map[string]interface{})["content"].(string)
+			assert.Equal(t, "1\n", version)
+			gitlab_ci := c["actions"].([]interface{})[1].(map[string]interface{})["content"].(string)
+			assert.Equal(t, "test ci-script", gitlab_ci)
+			features := c["actions"].([]interface{})[2].(map[string]interface{})["content"].(string)
+			assert.Equal(t, "[]", features)
+			parameters := c["actions"].([]interface{})[3].(map[string]interface{})["content"].(string)
+			assert.Equal(t, "[]", parameters)
+			rulesFeatws := c["actions"].([]interface{})[4].(map[string]interface{})["content"].(string)
+			assert.Equal(t, "{}", rulesFeatws)
 
-// 	if c.BaseURL().String() != expectedBaseURL {
-// 		t.Errorf("NewClient BaseUrl is %s, want %s", c.BaseURL().String(), expectedBaseURL)
-// 	}
+			w.Write(data)
+			return
+		}
+		w.WriteHeader(http.StatusNotFound)
+	}))
+	defer s.Close()
 
-// }
+	cfg := SetupConfig(s)
 
-// type Config struct {
-// 	Test string `mapstructure:"TEST"`
-// }
+	ngl := services.NewGitlab(cfg)
+	ngl.Connect()
+	err := ngl.Save(dto, "test")
 
-// var config1 = &Config{}
+	if err != nil {
+		t.Error("unexpected error")
+	}
+}
 
-// func GetMockConfig() *Config {
-// 	return config1
-// }
-// func TestConnectGitlabFail(t *testing.T) {
+func TestSaveTestFilesCreationWithFeatures(t *testing.T) {
+	dto := SetupRulesheet()
 
-// 	mockCfg := config1
+	features := make([]map[string]interface{}, 0)
 
-// 	c, err := ConnectGitlab(mockCfg)
-// 	got := err
-// 	expected := ""
+	features = append(features, map[string]interface{}{
+		"name": "test1",
+	})
 
-// 	if got.Error() != expected {
+	features = append(features, map[string]interface{}{
+		"name": "test2",
+	})
 
-// 	}
+	features = append(features, map[string]interface{}{
+		"name": "test3",
+	})
 
-// 	expectedBaseURL := "/api/v4/"
+	dto.Features = &features
 
-// 	if c.BaseURL().String() != expectedBaseURL {
-// 		t.Errorf("NewClient BaseUrl is %s, want %s", c.BaseURL().String(), expectedBaseURL)
-// 	}
+	namespace := "test"
 
-// }
+	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/api/v4/namespaces/"+namespace {
+			w.Write([]byte(`{"id":1,"name":"teste"}`))
+			return
+		}
+		if r.Method == "POST" && r.URL.Path == "/api/v4/projects" {
 
-// func TestGitlabLoadJSON(t *testing.T) {
+			data, _ := io.ReadAll(r.Body)
+			w.Write(data)
+			return
+		}
+		if r.Method == "POST" && r.URL.Path == "/api/v4/projects/0/repository/commits" {
+			data, _ := io.ReadAll(r.Body)
+			c := make(map[string]interface{})
+			json.Unmarshal(data, &c)
 
-// }
+			version := c["actions"].([]interface{})[0].(map[string]interface{})["content"].(string)
+			assert.Equal(t, "1\n", version)
+			gitlab_ci := c["actions"].([]interface{})[1].(map[string]interface{})["content"].(string)
+			assert.Equal(t, "test ci-script", gitlab_ci)
+			features := c["actions"].([]interface{})[2].(map[string]interface{})["content"].(string)
+			assert.Equal(t, "[\n  {\n    \"name\": \"test1\"\n  },\n  {\n    \"name\": \"test2\"\n  },\n  {\n    \"name\": \"test3\"\n  }\n]", features)
+			parameters := c["actions"].([]interface{})[3].(map[string]interface{})["content"].(string)
+			assert.Equal(t, "[]", parameters)
+			rulesFeatws := c["actions"].([]interface{})[4].(map[string]interface{})["content"].(string)
+			assert.Equal(t, "{}", rulesFeatws)
 
-// func TestGitlabLoadString(t *testing.T) {
+			w.Write(data)
+			return
+		}
+		w.WriteHeader(http.StatusNotFound)
+	}))
+	defer s.Close()
 
-// }
+	cfg := SetupConfig(s)
+
+	ngl := services.NewGitlab(cfg)
+	ngl.Connect()
+	err := ngl.Save(dto, "test")
+
+	if err != nil {
+		t.Error("unexpected error")
+	}
+}
+
+func TestSaveTestFilesCreationWithParameters(t *testing.T) {
+	dto := SetupRulesheet()
+
+	parameters := make([]map[string]interface{}, 0)
+
+	parameters = append(parameters, map[string]interface{}{
+		"name": "test1",
+	})
+
+	parameters = append(parameters, map[string]interface{}{
+		"name": "test2",
+	})
+
+	parameters = append(parameters, map[string]interface{}{
+		"name": "test3",
+	})
+
+	dto.Parameters = &parameters
+
+	namespace := "test"
+
+	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/api/v4/namespaces/"+namespace {
+			w.Write([]byte(`{"id":1,"name":"teste"}`))
+			return
+		}
+		if r.Method == "POST" && r.URL.Path == "/api/v4/projects" {
+
+			data, _ := io.ReadAll(r.Body)
+			w.Write(data)
+			return
+		}
+		if r.Method == "POST" && r.URL.Path == "/api/v4/projects/0/repository/commits" {
+			data, _ := io.ReadAll(r.Body)
+			c := make(map[string]interface{})
+			json.Unmarshal(data, &c)
+
+			version := c["actions"].([]interface{})[0].(map[string]interface{})["content"].(string)
+			assert.Equal(t, "1\n", version)
+			gitlab_ci := c["actions"].([]interface{})[1].(map[string]interface{})["content"].(string)
+			assert.Equal(t, "test ci-script", gitlab_ci)
+			features := c["actions"].([]interface{})[2].(map[string]interface{})["content"].(string)
+			assert.Equal(t, "[]", features)
+			parameters := c["actions"].([]interface{})[3].(map[string]interface{})["content"].(string)
+			assert.Equal(t, "[\n  {\n    \"name\": \"test1\"\n  },\n  {\n    \"name\": \"test2\"\n  },\n  {\n    \"name\": \"test3\"\n  }\n]", parameters)
+			rulesFeatws := c["actions"].([]interface{})[4].(map[string]interface{})["content"].(string)
+			assert.Equal(t, "{}", rulesFeatws)
+
+			w.Write(data)
+			return
+		}
+		w.WriteHeader(http.StatusNotFound)
+	}))
+	defer s.Close()
+
+	cfg := SetupConfig(s)
+
+	ngl := services.NewGitlab(cfg)
+	ngl.Connect()
+	err := ngl.Save(dto, "test")
+
+	if err != nil {
+		t.Error("unexpected error")
+	}
+}
+
+func TestSaveTestFilesCreationWithRuleInterface(t *testing.T) {
+	dto := SetupRulesheet()
+
+	rules := []interface{}{
+		&dtos.Rule{
+			Condition: "test",
+			Value: map[string]string{
+				"nomeAplicativo": "testAplicativo",
+				"textoUrlPadrao": "testURLpadrao",
+				"textoUrlDesvio": "testURLdesvio",
+			},
+			Type: "testType",
+		},
+	}
+
+	mappedRules := map[string]interface{}{
+		"tags": rules,
+	}
+
+	dto.Rules = &mappedRules
+
+	namespace := "test"
+
+	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/api/v4/namespaces/"+namespace {
+			w.Write([]byte(`{"id":1,"name":"teste"}`))
+			return
+		}
+		if r.Method == "POST" && r.URL.Path == "/api/v4/projects" {
+
+			data, _ := io.ReadAll(r.Body)
+			w.Write(data)
+			return
+		}
+		if r.Method == "POST" && r.URL.Path == "/api/v4/projects/0/repository/commits" {
+			data, _ := io.ReadAll(r.Body)
+			c := make(map[string]interface{})
+			json.Unmarshal(data, &c)
+
+			version := c["actions"].([]interface{})[0].(map[string]interface{})["content"].(string)
+			assert.Equal(t, "1\n", version)
+			gitlab_ci := c["actions"].([]interface{})[1].(map[string]interface{})["content"].(string)
+			assert.Equal(t, "test ci-script", gitlab_ci)
+			features := c["actions"].([]interface{})[2].(map[string]interface{})["content"].(string)
+			assert.Equal(t, "[]", features)
+			parameters := c["actions"].([]interface{})[3].(map[string]interface{})["content"].(string)
+			assert.Equal(t, "[]", parameters)
+			rulesFeatws := c["actions"].([]interface{})[4].(map[string]interface{})["content"].(string)
+			assert.Equal(t, "{\n  \"tags\": [\n    {\n      \"condition\": \"test\",\n      \"value\": {\n        \"nomeAplicativo\": \"testAplicativo\",\n        \"textoUrlDesvio\": \"testURLdesvio\",\n        \"textoUrlPadrao\": \"testURLpadrao\"\n      },\n      \"type\": \"testType\"\n    }\n  ]\n}", rulesFeatws)
+
+			w.Write(data)
+			return
+		}
+		w.WriteHeader(http.StatusNotFound)
+	}))
+	defer s.Close()
+
+	cfg := SetupConfig(s)
+
+	ngl := services.NewGitlab(cfg)
+	ngl.Connect()
+	err := ngl.Save(dto, "test")
+
+	if err != nil {
+		t.Error("unexpected error")
+	}
+}
+
+func TestSaveTestFilesCreationWithRuleString(t *testing.T) {
+	dto := SetupRulesheet()
+
+	mappedRules := map[string]interface{}{
+		"rule1": true,
+		"rule2": "test",
+	}
+	dto.Rules = &mappedRules
+
+	namespace := "test"
+
+	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/api/v4/namespaces/"+namespace {
+			w.Write([]byte(`{"id":1,"name":"teste"}`))
+			return
+		}
+		if r.Method == "POST" && r.URL.Path == "/api/v4/projects" {
+
+			data, _ := io.ReadAll(r.Body)
+			w.Write(data)
+			return
+		}
+		if r.Method == "POST" && r.URL.Path == "/api/v4/projects/0/repository/commits" {
+			data, _ := io.ReadAll(r.Body)
+			c := make(map[string]interface{})
+			json.Unmarshal(data, &c)
+
+			version := c["actions"].([]interface{})[0].(map[string]interface{})["content"].(string)
+			assert.Equal(t, "1\n", version)
+			gitlab_ci := c["actions"].([]interface{})[1].(map[string]interface{})["content"].(string)
+			assert.Equal(t, "test ci-script", gitlab_ci)
+			features := c["actions"].([]interface{})[2].(map[string]interface{})["content"].(string)
+			assert.Equal(t, "[]", features)
+			parameters := c["actions"].([]interface{})[3].(map[string]interface{})["content"].(string)
+			assert.Equal(t, "[]", parameters)
+			rulesFeatws := c["actions"].([]interface{})[4].(map[string]interface{})["content"].(string)
+			assert.Equal(t, "{\n  \"rule1\": true,\n  \"rule2\": \"test\"\n}", rulesFeatws)
+
+			w.Write(data)
+			return
+		}
+		w.WriteHeader(http.StatusNotFound)
+	}))
+	defer s.Close()
+
+	cfg := SetupConfig(s)
+
+	ngl := services.NewGitlab(cfg)
+	ngl.Connect()
+	err := ngl.Save(dto, "test")
+
+	if err != nil {
+		t.Error("unexpected error")
+	}
+}
+
+func TestSaveTestFilesCreationWithStringRule(t *testing.T) {
+	dto := SetupRulesheet()
+
+	rules := make(map[string]interface{})
+
+	rules["test1"] = "test1"
+	rules["test2"] = "test2"
+	rules["test3"] = "test3"
+
+	dto.Rules = &rules
+
+	namespace := "test"
+
+	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/api/v4/namespaces/"+namespace {
+			w.Write([]byte(`{"id":1,"name":"teste"}`))
+			return
+		}
+		if r.Method == "POST" && r.URL.Path == "/api/v4/projects" {
+
+			data, _ := io.ReadAll(r.Body)
+			w.Write(data)
+			return
+		}
+		if r.Method == "POST" && r.URL.Path == "/api/v4/projects/0/repository/commits" {
+			data, _ := io.ReadAll(r.Body)
+			c := make(map[string]interface{})
+			json.Unmarshal(data, &c)
+
+			version := c["actions"].([]interface{})[0].(map[string]interface{})["content"].(string)
+			assert.Equal(t, "1\n", version)
+			gitlab_ci := c["actions"].([]interface{})[1].(map[string]interface{})["content"].(string)
+			assert.Equal(t, "test ci-script", gitlab_ci)
+			features := c["actions"].([]interface{})[2].(map[string]interface{})["content"].(string)
+			assert.Equal(t, "[]", features)
+			parameters := c["actions"].([]interface{})[3].(map[string]interface{})["content"].(string)
+			assert.Equal(t, "[]", parameters)
+			rulesFeatws := c["actions"].([]interface{})[4].(map[string]interface{})["content"].(string)
+			assert.Equal(t, "{\n  \"test1\": \"test1\",\n  \"test2\": \"test2\",\n  \"test3\": \"test3\"\n}", rulesFeatws)
+
+			w.Write(data)
+			return
+		}
+		w.WriteHeader(http.StatusNotFound)
+	}))
+	defer s.Close()
+
+	cfg := SetupConfig(s)
+
+	ngl := services.NewGitlab(cfg)
+	ngl.Connect()
+	err := ngl.Save(dto, "test")
+
+	if err != nil {
+		t.Error("unexpected error")
+	}
+}
+
+func TestSaveTestFilesCreationWithDefaultRule(t *testing.T) {
+	dto := SetupRulesheet()
+
+	rules := []interface{}{
+		&dtos.Rule{
+			Condition: "test",
+			Value: map[string]string{
+				"NomeAplicativo": "testAplicativo",
+				"TextoURLPadrao": "testURLpadrao",
+				"TextoURLDesvio": "testURLdesvio",
+			},
+			Type: "testType",
+		},
+	}
+
+	mappedRules := map[string]interface{}{
+		// "mystring": "teste",
+		"tags": rules,
+		// "mycomplexrule": &dtos.Rule{
+		// 	Condition: "true",
+		// 	Value: map[string]string{
+		// 		"field1": "value1",
+		// 		"field2": "value2",
+		// 	},
+		// 	Type: "testType",
+		// },
+	}
+
+	dto.Rules = &mappedRules
+
+	namespace := "test"
+
+	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/api/v4/namespaces/"+namespace {
+			w.Write([]byte(`{"id":1,"name":"teste"}`))
+			return
+		}
+		if r.Method == "POST" && r.URL.Path == "/api/v4/projects" {
+
+			data, _ := io.ReadAll(r.Body)
+			w.Write(data)
+			return
+		}
+		if r.Method == "POST" && r.URL.Path == "/api/v4/projects/0/repository/commits" {
+			data, _ := io.ReadAll(r.Body)
+			c := make(map[string]interface{})
+			json.Unmarshal(data, &c)
+
+			version := c["actions"].([]interface{})[0].(map[string]interface{})["content"].(string)
+			assert.Equal(t, "1\n", version)
+			gitlab_ci := c["actions"].([]interface{})[1].(map[string]interface{})["content"].(string)
+			assert.Equal(t, "test ci-script", gitlab_ci)
+			features := c["actions"].([]interface{})[2].(map[string]interface{})["content"].(string)
+			assert.Equal(t, "[]", features)
+			parameters := c["actions"].([]interface{})[3].(map[string]interface{})["content"].(string)
+			assert.Equal(t, "[]", parameters)
+			rulesFeatws := c["actions"].([]interface{})[4].(map[string]interface{})["content"].(string)
+			assert.Equal(t, "{\n  \"tags\": [\n    {\n      \"condition\": \"test\",\n      \"value\": {\n        \"NomeAplicativo\": \"testAplicativo\",\n        \"TextoURLDesvio\": \"testURLdesvio\",\n        \"TextoURLPadrao\": \"testURLpadrao\"\n      },\n      \"type\": \"testType\"\n    }\n  ]\n}", rulesFeatws)
+
+			w.Write(data)
+			return
+		}
+		w.WriteHeader(http.StatusNotFound)
+	}))
+	defer s.Close()
+
+	cfg := SetupConfig(s)
+
+	ngl := services.NewGitlab(cfg)
+	ngl.Connect()
+	err := ngl.Save(dto, "test")
+
+	if err != nil {
+		t.Error("unexpected error")
+	}
+}
+
+func TestSaveTestFilesUpdate(t *testing.T) {
+	dto := SetupRulesheet()
+
+	namespace := "test"
+
+	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/api/v4/namespaces/"+namespace {
+			w.Write([]byte(`{"id":1,"name":"teste", "path":"testpath"}`))
+			return
+		}
+		if r.Method == "POST" && r.URL.Path == "/api/v4/projects" {
+
+			data, _ := io.ReadAll(r.Body)
+			w.Write(data)
+			return
+		}
+
+		if r.Method == "GET" && r.URL.Path == "/api/v4/projects/0/repository/files/VERSION" {
+			content := base64.StdEncoding.EncodeToString([]byte("1\n"))
+
+			file := gitlab.File{
+				Content: content,
+			}
+			data, _ := json.Marshal(file)
+			w.Write(data)
+			return
+		}
+
+		if r.Method == "POST" && r.URL.Path == "/api/v4/projects/0/repository/commits" {
+			data, _ := io.ReadAll(r.Body)
+			c := make(map[string]interface{})
+			json.Unmarshal(data, &c)
+
+			version := c["actions"].([]interface{})[0].(map[string]interface{})["content"].(string)
+			assert.Equal(t, "2\n", version)
+			gitlab_ci := c["actions"].([]interface{})[1].(map[string]interface{})["content"].(string)
+			assert.Equal(t, "test ci-script", gitlab_ci)
+			features := c["actions"].([]interface{})[2].(map[string]interface{})["content"].(string)
+			assert.Equal(t, "[]", features)
+			parameters := c["actions"].([]interface{})[3].(map[string]interface{})["content"].(string)
+			assert.Equal(t, "[]", parameters)
+			rulesFeatws := c["actions"].([]interface{})[4].(map[string]interface{})["content"].(string)
+			assert.Equal(t, "{}", rulesFeatws)
+
+			w.Write(data)
+			return
+		}
+		w.WriteHeader(http.StatusNotFound)
+	}))
+	defer s.Close()
+
+	cfg := SetupConfig(s)
+
+	ngl := services.NewGitlab(cfg)
+	ngl.Connect()
+	err := ngl.Save(dto, "test")
+
+	if err != nil {
+		t.Error("unexpected error")
+	}
+}
+
+// Functions to test fill function
+func TestFill(t *testing.T) {
+
+	namespace := "test"
+
+	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/api/v4/namespaces/"+namespace {
+			w.Write([]byte(`{"id":1,"name":"teste", "path":"testpath"}`))
+			return
+		}
+
+		if r.Method == "GET" && r.URL.Path == "/api/v4/projects/testpath/prefix-Test" {
+			w.Write([]byte(`{"id":1,"description":"testeDesc","name":"teste"}`))
+			return
+		}
+
+		if r.Method == "GET" && r.URL.Path == "/api/v4/projects/1/repository/files/rules.featws" {
+			content := base64.StdEncoding.EncodeToString([]byte("regra = $test"))
+
+			file := gitlab.File{
+				Content: content,
+			}
+			data, _ := json.Marshal(file)
+			w.Write(data)
+			return
+		}
+
+		if r.Method == "GET" && r.URL.Path == "/api/v4/projects/1/repository/files/parameters.json" {
+			content := base64.StdEncoding.EncodeToString([]byte(`[
+				{
+					"name": "param1",
+					"type": "string"
+				},
+				{
+					"name": "param2",
+					"type": "string"
+				  }				
+			]`))
+
+			file := gitlab.File{
+				Content: content,
+			}
+			data, _ := json.Marshal(file)
+			w.Write(data)
+			return
+		}
+
+		if r.Method == "GET" && r.URL.Path == "/api/v4/projects/1/repository/files/features.json" {
+			content := base64.StdEncoding.EncodeToString([]byte(`[
+				{
+					"name": "feat1",
+					"type": "string"
+				},
+				{
+					"name": "feat2",
+					"type": "string"
+				  }				
+			]`))
+
+			file := gitlab.File{
+				Content: content,
+			}
+			data, _ := json.Marshal(file)
+			w.Write(data)
+			return
+		}
+
+		w.WriteHeader(http.StatusNotFound)
+	}))
+	defer s.Close()
+
+	cfg := SetupConfig(s)
+
+	ngl := services.NewGitlab(cfg)
+	ngl.Connect()
+	dto := SetupRulesheet()
+	err := ngl.Fill(dto)
+	if err != nil {
+		t.Errorf("unexpected error on fill: %s", err.Error())
+		return
+	}
+
+	if (*dto.Rules)["regra"].(string) != "$test" {
+		t.Error("error on unmarshalling rules")
+		return
+	}
+
+	if (dto.Parameters) == nil || len(*dto.Parameters) != 2 {
+		t.Error("error on unmarshalling parameters")
+		return
+	}
+
+	param1 := (*dto.Parameters)[0]
+	if param1["name"] != "param1" || param1["type"] != "string" {
+		t.Error("error on unmarshalling parameter 1")
+		return
+	}
+
+	param2 := (*dto.Parameters)[1]
+	if param2["name"] != "param2" || param1["type"] != "string" {
+		t.Error("error on unmarshalling parameter 2")
+		return
+	}
+
+	if (dto.Features) == nil || len(*dto.Features) != 2 {
+		t.Error("error on unmarshalling Features")
+		return
+	}
+
+	feat1 := (*dto.Features)[0]
+	if feat1["name"] != "feat1" || feat1["type"] != "string" {
+		t.Error("error on unmarshalling Feature 1")
+		return
+	}
+
+	feat2 := (*dto.Features)[1]
+	if feat2["name"] != "feat2" || param1["type"] != "string" {
+		t.Error("error on unmarshalling Feature 2")
+		return
+	}
+}
+
+func TestFillJSON(t *testing.T) {
+
+	namespace := "test"
+
+	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/api/v4/namespaces/"+namespace {
+			w.Write([]byte(`{"id":1,"name":"teste", "path":"testpath"}`))
+			return
+		}
+
+		if r.Method == "GET" && r.URL.Path == "/api/v4/projects/testpath/prefix-Test" {
+			w.Write([]byte(`{"id":1,"description":"testeDesc","name":"teste"}`))
+			return
+		}
+
+		if r.Method == "GET" && r.URL.Path == "/api/v4/projects/1/repository/files/rules.json" {
+			content := base64.StdEncoding.EncodeToString([]byte("{\"regra\": \"$test\"}"))
+
+			file := gitlab.File{
+				Content: content,
+			}
+			data, _ := json.Marshal(file)
+			w.Write(data)
+			return
+		}
+
+		if r.Method == "GET" && r.URL.Path == "/api/v4/projects/1/repository/files/parameters.json" {
+			content := base64.StdEncoding.EncodeToString([]byte(`[
+				{
+					"name": "param1",
+					"type": "string"
+				},
+				{
+					"name": "param2",
+					"type": "string"
+				  }				
+			]`))
+
+			file := gitlab.File{
+				Content: content,
+			}
+			data, _ := json.Marshal(file)
+			w.Write(data)
+			return
+		}
+
+		if r.Method == "GET" && r.URL.Path == "/api/v4/projects/1/repository/files/features.json" {
+			content := base64.StdEncoding.EncodeToString([]byte(`[
+				{
+					"name": "feat1",
+					"type": "string"
+				},
+				{
+					"name": "feat2",
+					"type": "string"
+				  }				
+			]`))
+
+			file := gitlab.File{
+				Content: content,
+			}
+			data, _ := json.Marshal(file)
+			w.Write(data)
+			return
+		}
+
+		w.WriteHeader(http.StatusNotFound)
+	}))
+	defer s.Close()
+
+	cfg := SetupConfig(s)
+
+	ngl := services.NewGitlab(cfg)
+	ngl.Connect()
+	dto := SetupRulesheet()
+	err := ngl.Fill(dto)
+	if err != nil {
+		t.Errorf("unexpected error on fill: %s", err.Error())
+		return
+	}
+
+	if (*dto.Rules)["regra"].(string) != "$test" {
+		t.Error("error on unmarshalling rules")
+		return
+	}
+
+	if (dto.Parameters) == nil || len(*dto.Parameters) != 2 {
+		t.Error("error on unmarshalling parameters")
+		return
+	}
+
+	param1 := (*dto.Parameters)[0]
+	if param1["name"] != "param1" || param1["type"] != "string" {
+		t.Error("error on unmarshalling parameter 1")
+		return
+	}
+
+	param2 := (*dto.Parameters)[1]
+	if param2["name"] != "param2" || param1["type"] != "string" {
+		t.Error("error on unmarshalling parameter 2")
+		return
+	}
+
+	if (dto.Features) == nil || len(*dto.Features) != 2 {
+		t.Error("error on unmarshalling Features")
+		return
+	}
+
+	feat1 := (*dto.Features)[0]
+	if feat1["name"] != "feat1" || feat1["type"] != "string" {
+		t.Error("error on unmarshalling Feature 1")
+		return
+	}
+
+	feat2 := (*dto.Features)[1]
+	if feat2["name"] != "feat2" || param1["type"] != "string" {
+		t.Error("error on unmarshalling Feature 2")
+		return
+	}
+}
+
+// Functions to test fill function
+func TestFillRulesSlices(t *testing.T) {
+	dto := SetupRulesheet()
+
+	namespace := "test"
+
+	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/api/v4/namespaces/"+namespace {
+			w.Write([]byte(`{"id":1,"name":"teste", "path":"testpath"}`))
+			return
+		}
+
+		if r.Method == "GET" && r.URL.Path == "/api/v4/projects/testpath/prefix-Test" {
+			w.Write([]byte(`{"id":1,"description":"testeDesc","name":"teste"}`))
+			return
+		}
+
+		if r.Method == "GET" && r.URL.Path == "/api/v4/projects/1/repository/files/rules.featws" {
+			content := base64.StdEncoding.EncodeToString([]byte("[feat]\n condition = $test\n[[tags]]\n condition = $test"))
+
+			file := gitlab.File{
+				Content: content,
+			}
+			data, _ := json.Marshal(file)
+			w.Write(data)
+			return
+		}
+
+		if r.Method == "GET" && r.URL.Path == "/api/v4/projects/1/repository/files/parameters.json" {
+			content := base64.StdEncoding.EncodeToString([]byte("[]"))
+
+			file := gitlab.File{
+				Content: content,
+			}
+			data, _ := json.Marshal(file)
+			w.Write(data)
+			return
+		}
+
+		w.WriteHeader(http.StatusNotFound)
+	}))
+	defer s.Close()
+
+	cfg := SetupConfig(s)
+
+	ngl := services.NewGitlab(cfg)
+	ngl.Connect()
+	err := ngl.Fill(dto)
+
+	feat, ok := (*dto.Rules)["feat"]
+	if !ok {
+		t.Error("error on unmarshalling rules: not found feat")
+		return
+	}
+
+	featMap, ok := feat.(map[string]interface{})
+	if !ok {
+		t.Error("error on unmarshalling rules: feat is no map")
+		return
+	}
+
+	if featMap["condition"].(string) != "$test" {
+		t.Error("error on unmarshalling rules")
+		return
+	}
+
+	tags, ok := (*dto.Rules)["tags"]
+	if !ok {
+		t.Error("error on unmarshalling rules: not found tags array")
+		return
+	}
+
+	arr, ok := tags.([]map[string]interface{})
+	if !ok {
+		t.Error("error on unmarshalling rules: tags is no array")
+		return
+	}
+
+	if arr[0]["condition"].(string) != "$test" {
+		t.Error("error on unmarshalling rules")
+		return
+	}
+
+	if err != nil {
+		t.Error("unexpected error")
+		return
+	}
+}
+
+// Testing Errors
+func TestSaveGitlabTokenNil(t *testing.T) {
+	dto := SetupRulesheet()
+
+	cfg := config.Config{
+		GitlabURL:       "test",
+		GitlabNamespace: "test",
+	}
+
+	ngl := services.NewGitlab(&cfg)
+	err := ngl.Save(dto, "test")
+	if err != nil {
+		t.Error("expected nil return if gitlab token is nil")
+	}
+
+}
+
+func TestSaveErrorOnFetchNameSpace(t *testing.T) {
+	dto := SetupRulesheet()
+
+	namespace := "test"
+
+	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/api/v4/namespaces/"+namespace {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+	}))
+	defer s.Close()
+
+	cfg := config.Config{
+		GitlabURL:       s.URL,
+		GitlabNamespace: namespace,
+		GitlabToken:     "test",
+	}
+
+	ngl := services.NewGitlab(&cfg)
+	ngl.Connect()
+	err := ngl.Save(dto, "test")
+	if err == nil {
+		t.Error("expected error on fetch namespace")
+	}
+
+}
+
+func TestSaveErrorOnFetchProject(t *testing.T) {
+	dto := SetupRulesheet()
+
+	namespace := "test"
+
+	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/api/v4/namespaces/"+namespace {
+			w.Write([]byte(`{"id":1,"name":"teste"}`))
+			return
+		}
+		if r.Method == "POST" && r.URL.Path == "/api/v4/projects" {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+	}))
+	defer s.Close()
+
+	cfg := config.Config{
+		GitlabURL:       s.URL,
+		GitlabNamespace: namespace,
+		GitlabToken:     "test",
+	}
+
+	ngl := services.NewGitlab(&cfg)
+	ngl.Connect()
+	err := ngl.Save(dto, "test")
+	if err == nil {
+		t.Error("expected error on fetch project")
+	}
+
+}
+
+func TestSaveErrorOnCreateProject(t *testing.T) {
+	dto := SetupRulesheet()
+
+	namespace := "test"
+
+	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/api/v4/namespaces/"+namespace {
+			w.Write([]byte(`{"id":1,"name":"teste"}`))
+			return
+		}
+		if r.Method == "POST" && r.URL.Path == "/api/v4/projects" {
+
+			w.Write(nil)
+			return
+		}
+		if r.Method == "POST" && r.URL.Path == "/api/v4/projects/0/repository/commits" {
+			data, _ := io.ReadAll(r.Body)
+			c := make(map[string]interface{})
+			json.Unmarshal(data, &c)
+			w.Write(data)
+			return
+		}
+		w.WriteHeader(http.StatusNotFound)
+	}))
+	defer s.Close()
+
+	cfg := SetupConfig(s)
+
+	ngl := services.NewGitlab(cfg)
+	ngl.Connect()
+	err := ngl.Save(dto, "test")
+
+	if err == nil {
+		t.Error("expected error on create project")
+	}
+
+}
+
+func TestSaveErrorOnResolveVersion(t *testing.T) {
+	dto := SetupRulesheet()
+
+	namespace := "test"
+
+	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/api/v4/namespaces/"+namespace {
+			w.Write([]byte(`{"id":1,"name":"teste"}`))
+			return
+		}
+		if r.Method == "POST" && r.URL.Path == "/api/v4/projects" {
+			data, _ := io.ReadAll(r.Body)
+			w.Write(data)
+			return
+		}
+
+		if r.Method == "GET" && r.URL.Path == "/api/v4/projects/0/repository/files/VERSION" {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+		if r.Method == "POST" && r.URL.Path == "/api/v4/projects/0/repository/commits" {
+			data, _ := io.ReadAll(r.Body)
+			c := make(map[string]interface{})
+			json.Unmarshal(data, &c)
+			w.Write(data)
+			return
+		}
+		w.WriteHeader(http.StatusNotFound)
+	}))
+	defer s.Close()
+
+	cfg := SetupConfig(s)
+
+	ngl := services.NewGitlab(cfg)
+	ngl.Connect()
+	err := ngl.Save(dto, "test")
+
+	if err == nil {
+		t.Error("expected error on resolve version")
+	}
+
+}
+
+func TestSaveErrorOnParseVersion(t *testing.T) {
+	dto := SetupRulesheet()
+
+	namespace := "test"
+
+	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/api/v4/namespaces/"+namespace {
+			w.Write([]byte(`{"id":1,"name":"teste"}`))
+			return
+		}
+		if r.Method == "POST" && r.URL.Path == "/api/v4/projects" {
+
+			data, _ := io.ReadAll(r.Body)
+			w.Write(data)
+			return
+		}
+		if r.Method == "POST" && r.URL.Path == "/api/v4/projects/0/repository/commits" {
+			data, _ := io.ReadAll(r.Body)
+			c := make(map[string]interface{})
+			json.Unmarshal(data, &c)
+			w.Write(data)
+			return
+		}
+		w.WriteHeader(http.StatusNotFound)
+	}))
+	defer s.Close()
+
+	cfg := SetupConfig(s)
+
+	ngl := services.NewGitlab(cfg)
+	ngl.Connect()
+	err := ngl.Save(dto, "test")
+
+	if err != nil {
+		t.Error("unexpected error")
+	}
+}

@@ -1,12 +1,10 @@
 package services
 
 import (
-	"bytes"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"reflect"
 	"sort"
 	"strconv"
 	"strings"
@@ -15,6 +13,7 @@ import (
 	"github.com/bancodobrasil/featws-api/dtos"
 	"github.com/xanzy/go-gitlab"
 
+	"github.com/bancodobrasil/go-featws"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -22,6 +21,7 @@ import (
 type Gitlab interface {
 	Save(rulesheet *dtos.Rulesheet, commitMessage string) error
 	Fill(rulesheet *dtos.Rulesheet) error
+	Connect() (*gitlab.Client, error)
 }
 
 type gitlabService struct {
@@ -43,7 +43,7 @@ func (gs *gitlabService) Save(rulesheet *dtos.Rulesheet, commitMessage string) e
 		return nil
 	}
 
-	git, err := connectGitlab(gs.cfg)
+	git, err := gs.Connect()
 	if err != nil {
 		log.Errorf("Error on connect the gitlab client: %v", err)
 		return err
@@ -123,21 +123,17 @@ func (gs *gitlabService) Save(rulesheet *dtos.Rulesheet, commitMessage string) e
 
 	// FEATURES
 	if rulesheet.Features == nil {
-		empty := make([]interface{}, 0)
+		empty := make([]map[string]interface{}, 0)
 		rulesheet.Features = &empty
 	}
 
 	sort.Slice(*rulesheet.Features, func(i, j int) bool {
-		a := reflect.ValueOf((*rulesheet.Features)[i])
-		b := reflect.ValueOf((*rulesheet.Features)[j])
-		aKind := a.Kind()
-		bKind := b.Kind()
-		if aKind == reflect.Map && bKind == reflect.Map {
-			aValue := a.MapIndex(reflect.ValueOf("name")).Interface().(string)
-			bValue := b.MapIndex(reflect.ValueOf("name")).Interface().(string)
-			return aValue < bValue
-		}
-		return false
+		a := (*rulesheet.Features)[i]
+		b := (*rulesheet.Features)[j]
+		aValue := a["name"].(string)
+		bValue := b["name"].(string)
+		return aValue < bValue
+
 	})
 
 	content, err = json.MarshalIndent(rulesheet.Features, "", "  ")
@@ -154,21 +150,16 @@ func (gs *gitlabService) Save(rulesheet *dtos.Rulesheet, commitMessage string) e
 
 	// PARAMETERS
 	if rulesheet.Parameters == nil {
-		empty := make([]interface{}, 0)
+		empty := make([]map[string]interface{}, 0)
 		rulesheet.Parameters = &empty
 	}
 
 	sort.Slice(*rulesheet.Parameters, func(i, j int) bool {
-		a := reflect.ValueOf((*rulesheet.Parameters)[i])
-		b := reflect.ValueOf((*rulesheet.Parameters)[j])
-		aKind := a.Kind()
-		bKind := b.Kind()
-		if aKind == reflect.Map && bKind == reflect.Map {
-			aValue := a.MapIndex(reflect.ValueOf("name")).Interface().(string)
-			bValue := b.MapIndex(reflect.ValueOf("name")).Interface().(string)
-			return aValue < bValue
-		}
-		return false
+		a := (*rulesheet.Parameters)[i]
+		b := (*rulesheet.Parameters)[j]
+		aValue := a["name"].(string)
+		bValue := b["name"].(string)
+		return aValue < bValue
 	})
 
 	content, err = json.MarshalIndent(rulesheet.Parameters, "", "  ")
@@ -183,61 +174,23 @@ func (gs *gitlabService) Save(rulesheet *dtos.Rulesheet, commitMessage string) e
 	}
 	actions = append(actions, commitAction)
 
-	rulesBuffer := bytes.NewBufferString("")
-	// RULES
+	// Rules
 	if rulesheet.Rules == nil {
 		empty := make(map[string]interface{}, 0)
 		rulesheet.Rules = &empty
 	}
 
-	rules := make([]string, 0)
-
-	for k := range *rulesheet.Rules {
-		// fmt.Printf("RULE k: %s\n", k)
-		rules = append(rules, k)
-	}
-
-	sort.Strings(rules)
-
-	for _, ruleName := range rules {
-		// fmt.Printf("RULE: %s\n", ruleName)
-		switch rule := ((*rulesheet.Rules)[ruleName]).(type) {
-		case string:
-			fmt.Fprintf(rulesBuffer, "%s = %s\n", ruleName, rule)
-		case []interface{}:
-			for _, entry := range rule {
-				switch r := entry.(type) {
-				case *dtos.Rule:
-					r.Value.NomeAplicativo = strings.Trim(r.Value.NomeAplicativo, " ")
-					r.Value.TextoURLDesvio = strings.Trim(r.Value.TextoURLDesvio, " ")
-					r.Value.TextoURLPadrao = strings.Trim(r.Value.TextoURLPadrao, " ")
-					value, err := json.Marshal(r.Value)
-					if err != nil {
-						log.Errorf("Failed marshal rule value: %v", err)
-						return err
-					}
-					fmt.Fprintf(rulesBuffer, "[[%s]]\ncondition = %s\nvalue = %s\ntype = object\n\n", ruleName, r.Condition, string(value))
-				default:
-					fmt.Fprintf(rulesBuffer, "DEFAULT ENTRY %s = %s\n", ruleName, reflect.TypeOf(rule))
-				}
-
-			}
-		default:
-			fmt.Fprintf(rulesBuffer, "DEFAULT %s = %s\n", ruleName, reflect.TypeOf(rule))
-		}
-	}
-
-	// fmt.Printf("RULES: %s\n", rulesBuffer.String())
-
-	commitAction, err = createOrUpdateGitlabFileCommitAction(git, proj, cfg.GitlabDefaultBranch, "rules.featws", rulesBuffer.String())
+	content, err = json.MarshalIndent(rulesheet.Rules, "", "  ")
 	if err != nil {
-		log.Errorf("Failed to commit rules: %v", err)
+		log.Errorf("Failed to marshal parameters: %v", err)
+		return err
+	}
+	commitAction, err = createOrUpdateGitlabFileCommitAction(git, proj, cfg.GitlabDefaultBranch, "rules.json", string(content))
+	if err != nil {
+		log.Errorf("Failed to commit parameters: %v", err)
 		return err
 	}
 	actions = append(actions, commitAction)
-
-	// commitActionData, _ := json.Marshal(commitAction)
-	// fmt.Println(string(commitActionData))
 
 	_, _, err = git.Commits.CreateCommit(proj.ID, &gitlab.CreateCommitOptions{
 		Branch:        &cfg.GitlabDefaultBranch,
@@ -251,6 +204,40 @@ func (gs *gitlabService) Save(rulesheet *dtos.Rulesheet, commitMessage string) e
 
 	return err
 }
+
+// func printRule(rule interface{}, rulesBuffer *bytes.Buffer, ruleName string, isSliceItem bool) error {
+// 	ruleNameTag := "[%s]"
+// 	if isSliceItem {
+// 		ruleNameTag = "[" + ruleNameTag + "]"
+// 	}
+
+// 	switch r := rule.(type) {
+// 	case *dtos.Rule:
+// 		value, err := json.Marshal(r.Value)
+// 		if err != nil {
+// 			log.Errorf("Failed marshal rule value: %v", err)
+// 			return err
+// 		}
+// 		fmt.Fprintf(rulesBuffer, ruleNameTag+"\ncondition = %s\nvalue = %s\ntype = object\n\n", ruleName, r.Condition, string(value))
+// 	case map[string]interface{}:
+// 		fmt.Fprintf(rulesBuffer, ruleNameTag+"\n", ruleName)
+// 		keys := make([]string, 0)
+
+// 		for k := range r {
+// 			// fmt.Printf("RULE k: %s\n", k)
+// 			keys = append(keys, k)
+// 		}
+// 		sort.Strings(keys)
+// 		for _, k := range keys {
+// 			v := r[k]
+// 			fmt.Fprintf(rulesBuffer, "%s = %s\n", k, v)
+// 		}
+// 		fmt.Fprintf(rulesBuffer, "\n")
+// 	default:
+// 		fmt.Fprintf(rulesBuffer, "DEFAULT ENTRY %s = %s\n", ruleName, reflect.TypeOf(rule))
+// 	}
+// 	return nil
+// }
 
 func createOrUpdateGitlabFileCommitAction(git *gitlab.Client, proj *gitlab.Project, ref string, filename string, content string) (*gitlab.CommitActionOptions, error) {
 	action, err := defineCreateOrUpdateGitlabFileAction(git, proj, ref, filename)
@@ -286,7 +273,7 @@ func (gs *gitlabService) Fill(rulesheet *dtos.Rulesheet) (err error) {
 		return nil
 	}
 
-	git, err := connectGitlab(gs.cfg)
+	git, err := gs.Connect()
 	if err != nil {
 		log.Errorf("Error on connect the gitlab client: %v", err)
 		return
@@ -312,42 +299,88 @@ func (gs *gitlabService) Fill(rulesheet *dtos.Rulesheet) (err error) {
 
 	rulesheet.Version = strings.Replace(string(bVersion), "\n", "", -1)
 
-	rulesheet.Features, err = gitlabLoadJSON(git, proj, gs.cfg.GitlabDefaultBranch, "features.json")
+	err = gitlabLoadJSON(git, proj, gs.cfg.GitlabDefaultBranch, "features.json", &rulesheet.Features)
 	if err != nil {
 		log.Errorf("Failed to fetch features: %v", err)
 		return
 	}
 
-	rulesheet.Parameters, err = gitlabLoadJSON(git, proj, gs.cfg.GitlabDefaultBranch, "parameters.json")
+	err = gitlabLoadJSON(git, proj, gs.cfg.GitlabDefaultBranch, "parameters.json", &rulesheet.Parameters)
 	if err != nil {
 		log.Errorf("Failed to fetch parameters: %v", err)
 		return
 	}
 
-	bRules, err := gitlabLoadString(git, proj, gs.cfg.GitlabDefaultBranch, "rules.featws")
+	bRulesJSON, err := gitlabLoadString(git, proj, gs.cfg.GitlabDefaultBranch, "rules.json")
 	if err != nil {
-		log.Errorf("Failed to fetch parameters: %v", err)
+		log.Errorf("Failed to check rules JSON: %v", err)
 		return
 	}
 
-	rulesArr := strings.Split(string(bRules), "\n")
-
-	rules := make(map[string]interface{})
-
-	for _, line := range rulesArr {
-		if line != "" {
-			parts := strings.SplitN(line, "=", 2)
-			rules[strings.Trim(parts[0], " ")] = strings.Trim(parts[1], " ")
+	if string(bRulesJSON) != "" {
+		err = gitlabLoadJSON(git, proj, gs.cfg.GitlabDefaultBranch, "rules.json", &rulesheet.Rules)
+		if err != nil {
+			log.Errorf("Failed to fetch parameters: %v", err)
+			return
 		}
-	}
+	} else {
+		bRules, err := gitlabLoadString(git, proj, gs.cfg.GitlabDefaultBranch, "rules.featws")
+		if err != nil {
+			log.Errorf("Failed to fetch parameters: %v", err)
+			return err
+		}
 
-	rulesheet.Rules = &rules
+		rulesFile, err := featws.Load(bRules)
+		if err != nil {
+			log.Errorf("Failed to load featws file: %v", err)
+			return err
+		}
+
+		rules := make(map[string]interface{})
+
+		s := rulesFile.Section("")
+
+		for _, k := range s.Keys() {
+			rules[k.Name()] = k.Value()
+		}
+
+		for _, sname := range rulesFile.SectionStrings() {
+			if sname == featws.DefaultSection {
+				continue
+			}
+			if sname[:1] == "[" {
+				continue
+			}
+			sec := make(map[string]interface{})
+			for _, k := range rulesFile.Section(sname).Keys() {
+				sec[k.Name()] = k.Value()
+			}
+			rules[sname] = sec
+		}
+
+		for _, aname := range rulesFile.ArrayStrings() {
+			a := rulesFile.Array(aname)
+
+			arr := make([]map[string]interface{}, 0)
+
+			for _, s := range a.Sections() {
+				sec := make(map[string]interface{})
+				for _, k := range s.Keys() {
+					sec[k.Name()] = k.Value()
+				}
+				arr = append(arr, sec)
+			}
+			rules[aname[1:len(aname)-1]] = arr
+		}
+
+		rulesheet.Rules = &rules
+	}
 
 	return
 }
 
-func connectGitlab(cfg *config.Config) (*gitlab.Client, error) {
-	git, err := gitlab.NewClient(cfg.GitlabToken, gitlab.WithBaseURL(cfg.GitlabURL))
+func (gs *gitlabService) Connect() (*gitlab.Client, error) {
+	git, err := gitlab.NewClient(gs.cfg.GitlabToken, gitlab.WithBaseURL(gs.cfg.GitlabURL))
 
 	if err != nil {
 		log.Errorf("Failed to create client: %v", err)
@@ -356,20 +389,18 @@ func connectGitlab(cfg *config.Config) (*gitlab.Client, error) {
 	return git, nil
 }
 
-func gitlabLoadJSON(git *gitlab.Client, proj *gitlab.Project, ref string, fileName string) (*[]interface{}, error) {
+func gitlabLoadJSON(git *gitlab.Client, proj *gitlab.Project, ref string, fileName string, result interface{}) error {
 	rawDecodedText, err := gitlabLoadString(git, proj, ref, fileName)
 	if err != nil {
 		log.Errorf("Error on load the JSON structure: %v", err)
-		return nil, err
+		return err
 	}
-
-	result := &[]interface{}{}
 
 	if len(rawDecodedText) > 0 {
 		json.Unmarshal(rawDecodedText, result)
 	}
 
-	return result, nil
+	return nil
 }
 
 func gitlabLoadString(git *gitlab.Client, proj *gitlab.Project, ref string, fileName string) ([]byte, error) {
