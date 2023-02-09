@@ -2,7 +2,6 @@ package dtos
 
 import (
 	"encoding/json"
-	"fmt"
 
 	v1 "github.com/bancodobrasil/featws-api/payloads/v1"
 )
@@ -114,8 +113,10 @@ func buildRule(v interface{}) (interface{}, error) {
 		}
 
 		return regra, nil
+
 	default:
-		//fmt.Errorf("DEFAULT [%v] {%t}", value, value)
-		return value, fmt.Errorf("DEFAULT [%v] {%t}", value, value)
+		// fmt.Errorf("DEFAULT [%v] {%t}", value, value)
+		// return value, fmt.Errorf("DEFAULT [%v] {%t}", value, value)
+		return value, nil
 	}
 }
