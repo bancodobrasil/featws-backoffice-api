@@ -31,7 +31,16 @@ func setupLog() {
 
 // @title FeatWS API
 // @version 1.0
-// @description API Project to provide operations to manage FeatWS knowledge repositories rules
+// @Description Este projeto consiste em uma API cujo objetivo é fornecer operações para gerenciamento de repositórios e folhas de regra do sistema FeatWS. Através da API, é possível interagir entre a interface de usuário (UI) e o banco de dados, permitindo diversas interações, como as seguintes:
+// @Description - [Post] Criação da Folha de Regra;
+// @Description - [Get] Listar das Folhas de Regra;
+// @Description - [Get] Obter folha de regra por ID;
+// @Description - [Put] Atualizar uma folha de regra por ID;
+// @Description - [Delete] Deletar uma folha de regra por ID.
+// @Description
+// @Description Antes de realizar as requisições no Swagger, é necessário autorizar o acesso clicando no botão **Authorize**, ao lado, e inserindo a senha correspondente. Após inserir o campo **value** e clicar no botão **Authorize**, o Swagger estará disponível para ser utilizado.
+// @Description
+
 // @termsOfService http://swagger.io/terms/
 
 // @contact.name API Support

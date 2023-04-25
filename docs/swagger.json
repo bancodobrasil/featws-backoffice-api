@@ -1,7 +1,7 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "API Project to provide operations to manage FeatWS knowledge repositories rules",
+        "description": "Este projeto consiste em uma API cujo objetivo é fornecer operações para gerenciamento de repositórios e folhas de regra do sistema FeatWS. Através da API, é possível interagir entre a interface de usuário (UI) e o banco de dados, permitindo diversas interações, como as seguintes:\n- [Post] Criação da Folha de Regra;\n- [Get] Listar das Folhas de Regra;\n- [Get] Obter folha de regra por ID;\n- [Put] Atualizar uma folha de regra por ID;\n- [Delete] Deletar uma folha de regra por ID.\n\nAntes de realizar as requisições no Swagger, é necessário autorizar o acesso clicando no botão **Authorize**, ao lado, e inserindo a senha correspondente. Após inserir o campo **value** e clicar no botão **Authorize**, o Swagger estará disponível para ser utilizado.\n",
         "title": "FeatWS API",
         "termsOfService": "http://swagger.io/terms/",
         "contact": {
@@ -28,7 +28,7 @@
                         "Authentication Bearer Token": []
                     }
                 ],
-                "description": "Create Rulesheet description",
+                "description": "Nessa operação cria uma folha de regra no banco de dados do FeatWS. Para realizar a criação é necessário completar a folha de regra, com no mínimo:\n- **nome** no parâmetro *name*;\n- **slug** no parâmetro *slug*;\n- **descrição** no parâmetro *description*.\n\n```\n{\n\"description\": \"teste no Swagger da API do FeatWS\",\n\"name\": \"teste Swagger API\",\n\"slug\": \"teste_Swagger_API\"\n}\n```\nAmbos esses parâmetros devem ser uma string, ou seja, deve estar entre \"aspas\". Não é possível ter uma folha de regra com o mesmo nome de outra.",
                 "consumes": [
                     "application/json"
                 ],
@@ -38,7 +38,7 @@
                 "tags": [
                     "Rulesheet"
                 ],
-                "summary": "Create Rulesheet",
+                "summary": "Criação de Folha de Regra",
                 "parameters": [
                     {
                         "description": "Rulesheet body",
@@ -46,7 +46,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/v1.Rulesheet"
+                            "$ref": "#/definitions/github_com_bancodobrasil_featws-api_payloads_v1.Rulesheet"
                         }
                     }
                 ],
@@ -54,7 +54,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/v1.Rulesheet"
+                            "$ref": "#/definitions/github_com_bancodobrasil_featws-api_payloads_v1.Rulesheet"
                         },
                         "headers": {
                             "Authorization": {
@@ -97,7 +97,7 @@
                         "Authentication Bearer Token": []
                     }
                 ],
-                "description": "List Rulesheet description",
+                "description": "É possível listar as folhas de regra de algumas maneiras como veremos a seguir:\n\n- **Sem nenhum parâmetro:** Ao realizar a chamada do endpoint sem a passagem de parâmetros, todas as folhas de regra existentes serão retornadas, contendo informações como nome, ID, e caso estejam disponíveis, descrição e slug.\n- **Usando o *count*:** Ao habilitar o *count* para *True* será retornado do endpoint o número de Folhas de Regras existentes.\n- **Usando o *limit*:** Ao utilizar o parâmetro *limit* deve-se especificar o número máximo de respostas desejadas que serão retornadas pela array.\n- **Usando o *page*:** Ao utilizar o parâmetro *page*, serão retornadas as folhas de regra correspondentes a essa página, onde as folhas são ordenadas em ordem crescente pelo seu ID.",
                 "consumes": [
                     "application/json"
                 ],
@@ -107,7 +107,7 @@
                 "tags": [
                     "Rulesheet"
                 ],
-                "summary": "List Rulesheets",
+                "summary": "Listar as Folhas de Regra",
                 "parameters": [
                     {
                         "type": "boolean",
@@ -134,7 +134,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/v1.Rulesheet"
+                                "$ref": "#/definitions/github_com_bancodobrasil_featws-api_payloads_v1.Rulesheet"
                             }
                         },
                         "headers": {
@@ -204,7 +204,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/v1.Rulesheet"
+                                "$ref": "#/definitions/github_com_bancodobrasil_featws-api_payloads_v1.Rulesheet"
                             }
                         },
                         "headers": {
@@ -271,7 +271,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/v1.Rulesheet"
+                            "$ref": "#/definitions/github_com_bancodobrasil_featws-api_payloads_v1.Rulesheet"
                         }
                     }
                 ],
@@ -281,7 +281,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/v1.Rulesheet"
+                                "$ref": "#/definitions/github_com_bancodobrasil_featws-api_payloads_v1.Rulesheet"
                             }
                         },
                         "headers": {
@@ -382,19 +382,7 @@
         }
     },
     "definitions": {
-        "v1.Error": {
-            "type": "object",
-            "properties": {
-                "error": {},
-                "validation_errors": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/v1.ValidationError"
-                    }
-                }
-            }
-        },
-        "v1.Rulesheet": {
+        "github_com_bancodobrasil_featws-api_payloads_v1.Rulesheet": {
             "type": "object",
             "required": [
                 "name"
@@ -435,6 +423,18 @@
                 },
                 "version": {
                     "type": "string"
+                }
+            }
+        },
+        "v1.Error": {
+            "type": "object",
+            "properties": {
+                "error": {},
+                "validation_errors": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/v1.ValidationError"
+                    }
                 }
             }
         },

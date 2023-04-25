@@ -36,18 +36,30 @@ func NewRulesheets(service services.Rulesheets) Rulesheets {
 }
 
 // CreateRulesheet 	  	godoc
-// @Summary 			Create Rulesheet
-// @Description 		Create Rulesheet description
-// @Tags 			Rulesheet
-// @Accept  		json
+// @Summary 			Criação de Folha de Regra
+// @Description         Nessa operação cria uma folha de regra no banco de dados do FeatWS. Para realizar a criação é necessário completar a folha de regra, com no mínimo:
+// @Description  		- **nome** no parâmetro *name*;
+// @Description   		- **slug** no parâmetro *slug*;
+// @Description  		- **descrição** no parâmetro *description*.
+// @Description
+// @Description  		```
+// @Description  		{
+// @Description  			"description": "teste no Swagger da API do FeatWS",
+// @Description  			"name": "teste Swagger API",
+// @Description  			"slug": "teste_Swagger_API"
+// @Description  		}
+// @Description  		```
+// @Description 		Ambos esses parâmetros devem ser uma string, ou seja, deve estar entre "aspas". Não é possível ter uma folha de regra com o mesmo nome de outra.
+// @Tags 				Rulesheet
+// @Accept  			json
 // @Produce  			json
-// @Param			Rulesheet body payloads.Rulesheet true "Rulesheet body"
+// @Param				Rulesheet body payloads.Rulesheet true "Rulesheet body"
 // @Success 			200 {object} payloads.Rulesheet
 // @Header 				200 {string} Authorization "token access"
 // @Failure 			400 {object} responses.Error "Bad Format"
 // @Failure 			500 {object} responses.Error "Internal Server Error"
 // @Failure 			default {object} responses.Error
-// @Response 		404 "Not Found"
+// @Response 			404 "Not Found"
 // @Security 			Authentication Api Key
 // @Security 			Authentication Bearer Token
 // @Router 				/rulesheets [post]
@@ -102,15 +114,20 @@ func (rc *rulesheets) CreateRulesheet() gin.HandlerFunc {
 
 }
 
-// GetRulesheets 	godoc
-// @Summary 			List Rulesheets
-// @Description   List Rulesheet description
-// @Tags 				  Rulesheet
+// GetRulesheets 		godoc
+// @Summary 			Listar as Folhas de Regra
+// @Description			É possível listar as folhas de regra de algumas maneiras como veremos a seguir:
+// @Description
+// @Description			- **Sem nenhum parâmetro:** Ao realizar a chamada do endpoint sem a passagem de parâmetros, todas as folhas de regra existentes serão retornadas, contendo informações como nome, ID, e caso estejam disponíveis, descrição e slug.
+// @Description			- **Usando o *count*:** Ao habilitar o *count* para *True* será retornado do endpoint o número de Folhas de Regras existentes.
+// @Description			- **Usando o *limit*:** Ao utilizar o parâmetro *limit* deve-se especificar o número máximo de respostas desejadas que serão retornadas pela array.
+// @Description			- **Usando o *page*:** Ao utilizar o parâmetro *page*, serão retornadas as folhas de regra correspondentes a essa página, onde as folhas são ordenadas em ordem crescente pelo seu ID.
+// @Tags 				Rulesheet
 // @Accept  			json
 // @Produce  			json
-// @Param				  count query boolean false "Total of results"
-// @Param					limit query integer false "Max length of the array returned"
-// @Param				  page query integer false "Page number that is multiplied by 'limit' to calculate the offset"
+// @Param				count query boolean false "Total of results"
+// @Param				limit query integer false "Max length of the array returned"
+// @Param				page query integer false "Page number that is multiplied by 'limit' to calculate the offset"
 // @Success 			200 {array} payloads.Rulesheet
 // @Header 				200 {string} Authorization "token access"
 // @Failure 			400 {object} responses.Error "Bad Format"
@@ -130,13 +147,14 @@ func (rc *rulesheets) GetRulesheets() gin.HandlerFunc {
 		query := c.Request.URL.Query()
 		filter := make(map[string]interface{})
 		// TODO: Implement filters correctly
-		// for param, value := range query {
-		// 	if len(value) == 1 {
-		// 		filter[param] = value[0]
-		// 		continue
-		// 	}
-		// 	filter[param] = value
-		// }
+
+		for param, value := range query {
+			if len(value) == 1 {
+				filter[param] = value[0]
+				continue
+			}
+			filter[param] = value
+		}
 
 		opts := &services.FindOptions{}
 
