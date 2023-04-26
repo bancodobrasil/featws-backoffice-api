@@ -50,6 +50,7 @@ func NewRulesheets(service services.Rulesheets) Rulesheets {
 // @Description  		}
 // @Description  		```
 // @Description 		Ambos esses parâmetros devem ser uma string, ou seja, deve estar entre "aspas". Não é possível ter uma folha de regra com o mesmo nome de outra.
+// @Description			Para criar uma folha de regra basta clicar em **Try it out** , complete a folha de regra com os dados desejados, em seguida, clique em **Execute**.
 // @Tags 				Rulesheet
 // @Accept  			json
 // @Produce  			json
@@ -122,6 +123,8 @@ func (rc *rulesheets) CreateRulesheet() gin.HandlerFunc {
 // @Description			- **Usando o *count*:** Ao habilitar o *count* para *True* será retornado do endpoint o número de Folhas de Regras existentes.
 // @Description			- **Usando o *limit*:** Ao utilizar o parâmetro *limit* deve-se especificar o número máximo de respostas desejadas que serão retornadas pela array.
 // @Description			- **Usando o *page*:** Ao utilizar o parâmetro *page*, serão retornadas as folhas de regra correspondentes a essa página, onde as folhas são ordenadas em ordem crescente pelo seu ID.
+// @Description
+// @Description			Para listar as folhas de regra basta clicar em **Try it out** , complete com o formado desejados, em seguida, clique em **Execute**.
 // @Tags 				Rulesheet
 // @Accept  			json
 // @Produce  			json
@@ -227,8 +230,8 @@ func (rc *rulesheets) GetRulesheets() gin.HandlerFunc {
 }
 
 // GetRulesheet 		godoc
-// @Summary 			Get Rulesheet by ID
-// @Description 		Get Rulesheet by ID description
+// @Summary 			Obter Folha de Regra por ID
+// @Description 		Para se obter a folha de regra por ID, basta clicar em **Try it out** e colocar o ID desejado em *id*. Em seguida, clique em **Execute** e caso o ID exista retornará a folha de regra com o número de ID desejado.
 // @Tags 				Rulesheet
 // @Accept  			json
 // @Produce  			json
@@ -279,8 +282,8 @@ func (rc *rulesheets) GetRulesheet() gin.HandlerFunc {
 }
 
 // UpdateRulesheet 		godoc
-// @Summary 			Update Rulesheet by ID
-// @Description 		Update Rulesheet by ID description
+// @Summary 			Atualizar Folha de Regra por ID
+// @Description			Para atualizar ou editar uma folha de regra, é necessário enviar o ID da folha desejada no campo *id*, juntamente com os parâmetros da regra no corpo da solicitação no parâmetro *rulesheet*. Para realizar essa atualização clique no botão **Try it out** e preencher os campos com os dados desejados, em seguida, clicar em **Execute** para enviar a solicitação de atualização.
 // @Tags 				Rulesheet
 // @Accept  			json
 // @Produce  			json
@@ -378,8 +381,8 @@ func (rc *rulesheets) UpdateRulesheet() gin.HandlerFunc {
 }
 
 // DeleteRulesheet 		godoc
-// @Summary 			Delete Rulesheet by ID
-// @Description 		Delete Rulesheet by ID description
+// @Summary 			Deletar Folha de Regra por ID
+// @Description 		Para excluir uma folha de regra, é necessário clicar no botão **Try it out** e preencher o campo *id* com o ID da folha de regra que se deseja excluir. Em seguida, clique em **Execute** para enviar a solicitação de exclusão.
 // @Tags 				Rulesheet
 // @Accept  			json
 // @Produce  			json

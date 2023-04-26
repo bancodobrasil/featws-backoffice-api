@@ -35,7 +35,7 @@ const docTemplate = `{
                         "Authentication Bearer Token": []
                     }
                 ],
-                "description": "Nessa operação cria uma folha de regra no banco de dados do FeatWS. Para realizar a criação é necessário completar a folha de regra, com no mínimo:\n- **nome** no parâmetro *name*;\n- **slug** no parâmetro *slug*;\n- **descrição** no parâmetro *description*.\n\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"description\": \"teste no Swagger da API do FeatWS\",\n\"name\": \"teste Swagger API\",\n\"slug\": \"teste_Swagger_API\"\n}\n` + "`" + `` + "`" + `` + "`" + `\nAmbos esses parâmetros devem ser uma string, ou seja, deve estar entre \"aspas\". Não é possível ter uma folha de regra com o mesmo nome de outra.",
+                "description": "Nessa operação cria uma folha de regra no banco de dados do FeatWS. Para realizar a criação é necessário completar a folha de regra, com no mínimo:\n- **nome** no parâmetro *name*;\n- **slug** no parâmetro *slug*;\n- **descrição** no parâmetro *description*.\n\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"description\": \"teste no Swagger da API do FeatWS\",\n\"name\": \"teste Swagger API\",\n\"slug\": \"teste_Swagger_API\"\n}\n` + "`" + `` + "`" + `` + "`" + `\nAmbos esses parâmetros devem ser uma string, ou seja, deve estar entre \"aspas\". Não é possível ter uma folha de regra com o mesmo nome de outra.\nPara criar uma folha de regra basta clicar em **Try it out** , complete a folha de regra com os dados desejados, em seguida, clique em **Execute**.",
                 "consumes": [
                     "application/json"
                 ],
@@ -104,7 +104,7 @@ const docTemplate = `{
                         "Authentication Bearer Token": []
                     }
                 ],
-                "description": "É possível listar as folhas de regra de algumas maneiras como veremos a seguir:\n\n- **Sem nenhum parâmetro:** Ao realizar a chamada do endpoint sem a passagem de parâmetros, todas as folhas de regra existentes serão retornadas, contendo informações como nome, ID, e caso estejam disponíveis, descrição e slug.\n- **Usando o *count*:** Ao habilitar o *count* para *True* será retornado do endpoint o número de Folhas de Regras existentes.\n- **Usando o *limit*:** Ao utilizar o parâmetro *limit* deve-se especificar o número máximo de respostas desejadas que serão retornadas pela array.\n- **Usando o *page*:** Ao utilizar o parâmetro *page*, serão retornadas as folhas de regra correspondentes a essa página, onde as folhas são ordenadas em ordem crescente pelo seu ID.",
+                "description": "É possível listar as folhas de regra de algumas maneiras como veremos a seguir:\n\n- **Sem nenhum parâmetro:** Ao realizar a chamada do endpoint sem a passagem de parâmetros, todas as folhas de regra existentes serão retornadas, contendo informações como nome, ID, e caso estejam disponíveis, descrição e slug.\n- **Usando o *count*:** Ao habilitar o *count* para *True* será retornado do endpoint o número de Folhas de Regras existentes.\n- **Usando o *limit*:** Ao utilizar o parâmetro *limit* deve-se especificar o número máximo de respostas desejadas que serão retornadas pela array.\n- **Usando o *page*:** Ao utilizar o parâmetro *page*, serão retornadas as folhas de regra correspondentes a essa página, onde as folhas são ordenadas em ordem crescente pelo seu ID.\n\nPara listar as folhas de regra basta clicar em **Try it out** , complete com o formado desejados, em seguida, clique em **Execute**.",
                 "consumes": [
                     "application/json"
                 ],
@@ -185,7 +185,7 @@ const docTemplate = `{
                         "Authentication Bearer Token": []
                     }
                 ],
-                "description": "Get Rulesheet by ID description",
+                "description": "Para se obter a folha de regra por ID, basta clicar em **Try it out** e colocar o ID desejado em *id*. Em seguida, clique em **Execute** e caso o ID exista retornará a folha de regra com o número de ID desejado.",
                 "consumes": [
                     "application/json"
                 ],
@@ -195,7 +195,7 @@ const docTemplate = `{
                 "tags": [
                     "Rulesheet"
                 ],
-                "summary": "Get Rulesheet by ID",
+                "summary": "Obter Folha de Regra por ID",
                 "parameters": [
                     {
                         "type": "string",
@@ -253,7 +253,7 @@ const docTemplate = `{
                         "Authentication Bearer Token": []
                     }
                 ],
-                "description": "Update Rulesheet by ID description",
+                "description": "Para atualizar ou editar uma folha de regra, é necessário enviar o ID da folha desejada no campo *id*, juntamente com os parâmetros da regra no corpo da solicitação no parâmetro *rulesheet*. Para realizar essa atualização clique no botão **Try it out** e preencher os campos com os dados desejados, em seguida, clicar em **Execute** para enviar a solicitação de atualização.",
                 "consumes": [
                     "application/json"
                 ],
@@ -263,7 +263,7 @@ const docTemplate = `{
                 "tags": [
                     "Rulesheet"
                 ],
-                "summary": "Update Rulesheet by ID",
+                "summary": "Atualizar Folha de Regra por ID",
                 "parameters": [
                     {
                         "type": "string",
@@ -330,7 +330,7 @@ const docTemplate = `{
                         "Authentication Bearer Token": []
                     }
                 ],
-                "description": "Delete Rulesheet by ID description",
+                "description": "Para excluir uma folha de regra, é necessário clicar no botão **Try it out** e preencher o campo *id* com o ID da folha de regra que se deseja excluir. Em seguida, clique em **Execute** para enviar a solicitação de exclusão.",
                 "consumes": [
                     "application/json"
                 ],
@@ -340,7 +340,7 @@ const docTemplate = `{
                 "tags": [
                     "Rulesheet"
                 ],
-                "summary": "Delete Rulesheet by ID",
+                "summary": "Deletar Folha de Regra por ID",
                 "parameters": [
                     {
                         "type": "string",

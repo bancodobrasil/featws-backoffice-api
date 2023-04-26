@@ -19,7 +19,7 @@ _data/
 .env.local
 .json
 .vscode
-
+.DS_Store
 data/
 
 __debug_bin
