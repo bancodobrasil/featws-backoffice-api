@@ -29,6 +29,7 @@ func SetupConfig(url *httptest.Server) *config.Config {
 func SetupRulesheet() *dtos.Rulesheet {
 	rulesheet := dtos.Rulesheet{
 		ID:          1,
+		Slug: 		 "test",
 		Name:        "Test",
 		Description: "Test",
 	}
@@ -89,7 +90,7 @@ func TestSaveAndUpdateProject(t *testing.T) {
 		}
 
 		// Get project
-		if r.URL.Path == "/api/v4/projects/test%2Fprefix-Test" {
+		if r.URL.Path == "/api/v4/projects/test%2Fprefix-test" {
 			w.Write([]byte(`{"id":1,"description:null","name":"test"}`))
 			return
 		}
@@ -640,7 +641,7 @@ func TestFill(t *testing.T) {
 			return
 		}
 
-		if r.Method == "GET" && r.URL.Path == "/api/v4/projects/testpath/prefix-Test" {
+		if r.Method == "GET" && r.URL.Path == "/api/v4/projects/testpath/prefix-test" {
 			w.Write([]byte(`{"id":1,"description":"testeDesc","name":"teste"}`))
 			return
 		}
@@ -761,7 +762,7 @@ func TestFillJSON(t *testing.T) {
 			return
 		}
 
-		if r.Method == "GET" && r.URL.Path == "/api/v4/projects/testpath/prefix-Test" {
+		if r.Method == "GET" && r.URL.Path == "/api/v4/projects/testpath/prefix-test" {
 			w.Write([]byte(`{"id":1,"description":"testeDesc","name":"teste"}`))
 			return
 		}
@@ -884,7 +885,7 @@ func TestFillRulesSlices(t *testing.T) {
 			return
 		}
 
-		if r.Method == "GET" && r.URL.Path == "/api/v4/projects/testpath/prefix-Test" {
+		if r.Method == "GET" && r.URL.Path == "/api/v4/projects/testpath/prefix-test" {
 			w.Write([]byte(`{"id":1,"description":"testeDesc","name":"teste"}`))
 			return
 		}
