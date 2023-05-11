@@ -29,7 +29,7 @@ func SetupConfig(url *httptest.Server) *config.Config {
 func SetupRulesheet() *dtos.Rulesheet {
 	rulesheet := dtos.Rulesheet{
 		ID:          1,
-		Slug: 		 "test",
+		Slug:        "test",
 		Name:        "Test",
 		Description: "Test",
 	}
