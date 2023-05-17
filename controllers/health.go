@@ -21,7 +21,7 @@ type HealthController struct {
 	health healthcheck.Handler
 }
 
-// NewHealthController ...
+// The function returns a new instance of the HealthController struct with a newHandler.
 func NewHealthController() *HealthController {
 	return &HealthController{
 		health: newHandler(),
