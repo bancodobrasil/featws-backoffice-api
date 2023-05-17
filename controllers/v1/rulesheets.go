@@ -151,13 +151,13 @@ func (rc *rulesheets) GetRulesheets() gin.HandlerFunc {
 		filter := make(map[string]interface{})
 		// TODO: Implement filters correctly
 
-		for param, value := range query {
-			if len(value) == 1 {
-				filter[param] = value[0]
-				continue
-			}
-			filter[param] = value
-		}
+		// for param, value := range query {
+		// 	if len(value) == 1 {
+		// 		filter[param] = value[0]
+		// 		continue
+		// 	}
+		// 	filter[param] = value
+		// }
 
 		opts := &services.FindOptions{}
 
