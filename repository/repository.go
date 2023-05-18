@@ -12,13 +12,34 @@ import (
 	"gorm.io/gorm"
 )
 
-// FindOptions ...
+// FindOptions type defines options for limiting and paging search results.
+//
+// Property:
+//
+//   - Limit: an integer that specifies the maximum number of results to be returned by a search or query. It's often used in conjunction with the Page property to implement pagination.
+//   - Page:  an integer that represents the current page number in a paginated result set. It's often used in combination with the Limit property to determine which subset of data to return.
 type FindOptions struct {
 	Limit int
 	Page  int
 }
 
-// Repository ...
+// Repository defines a set of methods for interacting with a database using GORM in Go.
+//
+// Property:
+//
+//   - GetDB: returns a pointer to a gorm.DB instance that allows performing database operations.
+//   - Create: creates a new entity of type T in the database.
+//   - CreateInTransaction: creates a new entity in the database within a transaction. It takes a context.Context and a *gorm.DB as parameters, along with a pointer to the entity to be created. It returns an error if the creation fails.
+//   - Find: retrieves a list of entities from the repository based on specified criteria in the FindOptions parameter. It returns a slice of pointers to the type T and an error if any occurred during the operation.
+//   - FindInTransaction: finds multiple entities in a transactional context. It takes a context.Context object, a *gorm.DB object representing the transaction, an interface object representing the entity to be found, and a *FindOptions object representing the options for the find operation. It returns a slice of pointers to the found entities.
+//   - Count: returns the number of entities in the repository.
+//   - CountInTransaction: : counts the number of entities in the database within a transaction. It takes a context.Context and a *gorm.DB as parameters, along with an entity interface representing the type of entity to count. It returns the count as an int64 and an error if any occurred.
+//   - Get: retrieves a single entity of type T from the repository based on the provided ID. It returns the retrieved entity and an error if any occurred during the retrieval process.
+//   - GetInTransaction: retrieves a single entity of type T from the database within a transaction. It takes a context.Context and a *gorm.DB as parameters and returns a pointer to the retrieved entity of type T and an error if any.
+//   - Update: updates an existing entity in the repository. It takes a context.Context object and an entity of type T as input and returns the updated entity of type T and an error. If the update is successful, the updated entity is returned; otherwise, an error is returned.
+//   - UpdateInTransaction: updates an entity of type T in a transactional context. It takes a context.Context and a *gorm.DB as parameters, along with the entity to be updated. It returns the updated entity of type *T and an error if any occurred during the update process.
+//   - Delete: deletes an entity from the repository based on its ID. It takes a context.Context object and the ID of the entity to be deleted as input parameters. It returns a boolean value indicating whether the entity was successfully deleted or not, along with an error object if any.
+//   - DeleteInTransaction:deletes an entity with the given ID from the database within a transaction. It takes a context.Context object, a *gorm.DB object representing the transaction, and the ID of the entity to be deleted. It returns a boolean indicating whether the entity was successfully deleted and an error.
 type Repository[T any] interface {
 	GetDB() *gorm.DB
 	Create(ctx context.Context, entity *T) error
@@ -35,7 +56,10 @@ type Repository[T any] interface {
 	DeleteInTransaction(ctx context.Context, db *gorm.DB, id string) (deleted bool, err error)
 }
 
-// Repository ...
+// Repository creates a generic repository struct that contains a pointer to a GORM database.
+//
+// Property:
+//   - db: it's a pointer to a gorm.DB object, which is a database ORM library for Go. It is used to interact with a database and perform CRUD operations on the data.
 type repository[T any] struct {
 	db *gorm.DB
 }
