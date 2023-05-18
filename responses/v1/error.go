@@ -4,7 +4,7 @@ package v1
 //
 // Property:
 //
-//   - Error: Error: an interface type that can hold any value, such as error messages or objects, to describe the occurred error. It allows for providing detailed information about the error to users or developers.
+//   - Error: an interface type that can hold any value, such as error messages or objects, to describe the occurred error. It allows for providing detailed information about the error to users or developers.
 //
 //   - ValidationErrors: is a slice of ValidationError structs that holds validation errors encountered during request processing. The omitempty tag indicates that it will only appear in the JSON response if there are actual validation errors.
 type Error struct {
