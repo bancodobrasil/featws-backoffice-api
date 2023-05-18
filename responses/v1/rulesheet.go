@@ -28,7 +28,7 @@ type Rulesheet struct {
 	Rules       *map[string]interface{}   `json:"rules,omitempty"`
 }
 
-// NewRulesheet ...
+// NewRulesheet creates a new Rulesheet object by copying data from a DTO object.
 func NewRulesheet(dto *dtos.Rulesheet) Rulesheet {
 	return Rulesheet{
 		ID:          dto.ID,
