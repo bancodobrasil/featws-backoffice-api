@@ -27,3 +27,17 @@ Para executar o projeto, siga estes passos:
 O projeto será executado em `localhost:9007`. Para acessar a documentação do Swagger, [clique aqui](http://localhost:9007/swagger/index.html#/).
 
 Seguindo estes passos, o projeto estará em execução e você poderá acessar a documentação da API através do Swagger.
+
+
+## Documentação do Projeto
+
+Para uma melhor visualização da documentação do projeto é possivel ve-lo pelo GoDoc. Para isso, é necessário baixar o GoDoc na sua máquina, para isso, abra um terminal e digite o seguinte comando:
+
+````
+go get golang.org/x/tools/cmd/godoc
+````
+
+Após a instalação, abra o terminal no diretório do projeto e execute o comando `godoc -http=:6060`. Logo, abra o navegador e digite `localhost:6060/pkg/github.com/bancodobrasil/featws-api/` para acessar a documentação do projeto.
+
+Além disso, você também pode visualizar a documentação de bibliotecas utilizadas no projeto em `localhost:6060/pkg`. Dessa forma, você poderá acessar e explorar facilmente a documentação do projeto usando o GoDoc.
+

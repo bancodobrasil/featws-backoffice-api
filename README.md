@@ -24,3 +24,15 @@ To run the project, follow these steps:
 The project will run on `localhost:9007`. To access the Swagger documentation [click here](http://localhost:9007/swagger/index.html#/).
 
 By following these steps, the project will be up and running, and you will be able to access the API documentation through Swagger.
+
+## Project Documentation
+
+To have a better view of the project documentation, you can use GoDoc. To do this, you need to download GoDoc on your machine. Open a terminal and enter the following command:
+
+````
+go get golang.org/x/tools/cmd/godoc
+````
+
+After the installation, open the terminal in the project directory and run the command `godoc -http=:6060`. Then, open your browser and type `localhost:6060/pkg/github.com/bancodobrasil/featws-api/` to access the project documentation.
+
+Additionally, you can also view the documentation of libraries used in the project at `localhost:6060/pkg`. This way, you can easily access and explore the project documentation using GoDoc.
