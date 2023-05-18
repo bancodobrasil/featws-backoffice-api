@@ -8,7 +8,7 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-// GenerateSpanTracer ...
+// GenerateSpanTracer generates a span tracer for telemetry purposes, but only if middleware is enable.
 func GenerateSpanTracer(ctx context.Context, name string) func() {
 	MiddlewareDisabled := viper.GetViper().GetBool("TELEMETRY_DISABLED")
 	if !MiddlewareDisabled {
