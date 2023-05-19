@@ -267,7 +267,10 @@ func (r *repository[T]) Delete(ctx context.Context, id string) (deleted bool, er
 	return r.DeleteInTransaction(ctx, db, id)
 }
 
-// DeleteInTransaction ...
+// DeleteInTransaction is method takes a context, a GORM database instance, and an ID as input parameters. It starts a new
+// span on the root span of the context using OpenTelemetry tracing. It then calls the `Get` method of
+// the repository to retrieve the entity with the given ID. If the entity is not found, it returns
+// `deleted=true`. If the entity is found, it deletes it using the GORM `Delete` method.
 func (r *repository[T]) DeleteInTransaction(ctx context.Context, db *gorm.DB, id string) (deleted bool, err error) {
 	// add the span of database query on the root span of the context
 	tracer := telemetry.GetTracer(ctx)
@@ -299,10 +302,15 @@ func (r *repository[T]) DeleteInTransaction(ctx context.Context, db *gorm.DB, id
 	return
 }
 
+// newSession is a method that returns a new GORM db session with a context that is passed
+// as an argument. The session is created using the `Session` method of the `gorm.DB` type and a new
+// instance of the generic type `T` is used as the model for the session.
 func (r *repository[T]) newSession(ctx context.Context) *gorm.DB {
 	return r.GetDB().Session(&gorm.Session{}).Model(new(T)).WithContext(ctx)
 }
 
+// GetDB is a method that returns a pointer to a `gorm.DB` object, which is a db handle used
+// to interact with a db. The `r.db` field is assumed to be a `gorm.DB` object that was previously set on the repository instance.
 func (r *repository[T]) GetDB() *gorm.DB {
 	return r.db
 }
