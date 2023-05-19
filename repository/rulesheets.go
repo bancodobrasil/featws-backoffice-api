@@ -39,8 +39,7 @@ func newRulesheets() (Rulesheets, error) {
 	return NewRulesheetsWithDB(db)
 }
 
-// NewRulesheetsWithDB creates a new instance of Rulesheets with a given db connection and performs
-// db migration.
+// NewRulesheetsWithDB creates a new instance of Rulesheets with a given db connection and performs db migration.
 func NewRulesheetsWithDB(db *gorm.DB) (Rulesheets, error) {
 	err := db.AutoMigrate(&models.Rulesheet{})
 	if err != nil {
