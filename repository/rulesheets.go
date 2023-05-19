@@ -6,18 +6,22 @@ import (
 	"gorm.io/gorm"
 )
 
-// Rulesheets ...
+// Rulesheets is defining an interface that has a single method signature `Repository[models.Rulesheet]` that is defined in repository.go.
 type Rulesheets interface {
 	Repository[models.Rulesheet]
 }
 
+// rulesheets contains an array of "Rulesheet" objects within a "repository" field.
+//
+// Property:
+//   - repository: is a field of the `rulesheets` struct which is an array of `models.Rulesheet`. It's used to store multiple rulesheets in a single instance of the `rulesheets` struct.
 type rulesheets struct {
 	repository[models.Rulesheet]
 }
 
 var instanceRulesheets Rulesheets
 
-// GetRulesheets ...
+// GetRulesheets returns an instance of the Rulesheets struct, creating it if it doesn't already exist.
 func GetRulesheets() Rulesheets {
 	if instanceRulesheets == nil {
 		i, err := newRulesheets()
@@ -29,12 +33,14 @@ func GetRulesheets() Rulesheets {
 	return instanceRulesheets
 }
 
+// newRulesheets creates a new instance of Rulesheets and returns it along with any errors encountered.
 func newRulesheets() (Rulesheets, error) {
 	db := database.GetConn()
 	return NewRulesheetsWithDB(db)
 }
 
-// NewRulesheetsWithDB ...
+// NewRulesheetsWithDB creates a new instance of Rulesheets with a given db connection and performs
+// db migration.
 func NewRulesheetsWithDB(db *gorm.DB) (Rulesheets, error) {
 	err := db.AutoMigrate(&models.Rulesheet{})
 	if err != nil {
