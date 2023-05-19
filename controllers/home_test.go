@@ -34,6 +34,7 @@ import (
 // 	assert.Equal(t, mockUserResp, string(responseData))
 
 // }
+// TestUnitHomeHandler is a unit test for the HomeHandler function in a Go web application.
 func TestUnitHomeHandler(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
@@ -42,5 +43,4 @@ func TestUnitHomeHandler(t *testing.T) {
 
 	controllers.HomeHandler(c)
 	assert.Equal(t, http.StatusOK, w.Code)
-
 }
