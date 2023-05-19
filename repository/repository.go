@@ -203,13 +203,18 @@ func (r *repository[T]) Get(ctx context.Context, id string) (entity *T, err erro
 	return r.GetInTransaction(ctx, db, id)
 }
 
-// Get ...
+// GetInTransaction is a method that retrieves a single entity of type T from a database based on the provided
+// ID within a transaction. The GORM library is used to execute the query in the database transaction and return
+// the retrieved entity along with any errors encountered during the query. OpenTelemetry is used to add a span
+// to the root span of the context, enabling tracing of the database query.
 func (r *repository[T]) GetInTransaction(ctx context.Context, db *gorm.DB, id string) (entity *T, err error) {
 	// add the span of database query on the root span of the context
 	tracer := telemetry.GetTracer(ctx)
 	ctx, span := tracer.Start(ctx, "repo-get", trace.WithSpanKind(trace.SpanKindInternal))
 	defer span.End()
 
+	// Using the "db" object to query the database and retrieve the first record that matches the given "id".
+	// The result of the query is stored in the "entity" variable.
 	result := db.First(&entity, id)
 
 	err = result.Error
