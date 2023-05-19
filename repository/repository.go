@@ -226,19 +226,25 @@ func (r *repository[T]) GetInTransaction(ctx context.Context, db *gorm.DB, id st
 	return
 }
 
-// Update ...
+// Update is a method for a generic repository type `T`. This method takes a context and an entity `T` as input parameters and returns a pointer to the updated
+// entity of type `T` and an error.
 func (r *repository[T]) Update(ctx context.Context, entity T) (updated *T, err error) {
 	db := r.newSession(ctx)
 	return r.UpdateInTransaction(ctx, db, entity)
 }
 
-// UpdateInTransaction ...
+// UpdateInTransaction is a generic repository type `T`. This method takes in a context, a GORM db instance, and an entity of type `T`.
+// It updates the entity in the db using the `Save` method of GORM and returns the updated entity along with any
+// error encountered during the update. It also adds a span to the root span of the context for tracing purposes.
 func (r *repository[T]) UpdateInTransaction(ctx context.Context, db *gorm.DB, entity T) (updated *T, err error) {
 	// add the span of database query on the root span of the context
 	tracer := telemetry.GetTracer(ctx)
 	ctx, span := tracer.Start(ctx, "repo-update", trace.WithSpanKind(trace.SpanKindInternal))
 	defer span.End()
 
+	// This is a entity to a db using the GORM library called "db". The "Save" method is being called on the "Model"
+	// object with a reference to the entity being saved passed as a pointer. The result of the save
+	// operation is being stored in the "result" variable.
 	result := db.Model(entity).Save(&entity)
 
 	err = result.Error
@@ -252,7 +258,10 @@ func (r *repository[T]) UpdateInTransaction(ctx context.Context, db *gorm.DB, en
 	return
 }
 
-// Delete ...
+// Delete is a method for deleting a record from a db using a given ID. It creates a new db session using the context provided, and then calls the
+// `DeleteInTransaction` method with the same context and the session to perform the actual deletion.
+// The method returns a boolean value indicating whether the deletion was successful or not, and an
+// error if any occurred during the process.
 func (r *repository[T]) Delete(ctx context.Context, id string) (deleted bool, err error) {
 	db := r.newSession(ctx)
 	return r.DeleteInTransaction(ctx, db, id)
