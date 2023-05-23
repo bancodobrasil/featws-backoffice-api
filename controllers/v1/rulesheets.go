@@ -36,18 +36,31 @@ func NewRulesheets(service services.Rulesheets) Rulesheets {
 }
 
 // CreateRulesheet 	  	godoc
-// @Summary 			Create Rulesheet
-// @Description 		Create Rulesheet description
-// @Tags 			Rulesheet
-// @Accept  		json
+// @Summary 			Criação de Folha de Regra
+// @Description         Nessa operação cria uma folha de regra no banco de dados do FeatWS. Para realizar a criação é necessário completar a folha de regra, com no mínimo:
+// @Description  		- **nome** no parâmetro *name*;
+// @Description   		- **slug** no parâmetro *slug*;
+// @Description  		- **descrição** no parâmetro *description*.
+// @Description
+// @Description  		```
+// @Description  		{
+// @Description  			"description": "teste no Swagger da API do FeatWS",
+// @Description  			"name": "teste Swagger API",
+// @Description  			"slug": "teste_Swagger_API"
+// @Description  		}
+// @Description  		```
+// @Description 		Ambos esses parâmetros devem ser uma string, ou seja, deve estar entre "aspas". Não é possível ter uma folha de regra com o mesmo nome de outra.
+// @Description			Para criar uma folha de regra basta clicar em **Try it out** , complete a folha de regra com os dados desejados, em seguida, clique em **Execute**.
+// @Tags 				Rulesheet
+// @Accept  			json
 // @Produce  			json
-// @Param			Rulesheet body payloads.Rulesheet true "Rulesheet body"
+// @Param				Rulesheet body payloads.Rulesheet true "Rulesheet body"
 // @Success 			200 {object} payloads.Rulesheet
 // @Header 				200 {string} Authorization "token access"
 // @Failure 			400 {object} responses.Error "Bad Format"
 // @Failure 			500 {object} responses.Error "Internal Server Error"
 // @Failure 			default {object} responses.Error
-// @Response 		404 "Not Found"
+// @Response 			404 "Not Found"
 // @Security 			Authentication Api Key
 // @Security 			Authentication Bearer Token
 // @Router 				/rulesheets [post]
@@ -102,15 +115,22 @@ func (rc *rulesheets) CreateRulesheet() gin.HandlerFunc {
 
 }
 
-// GetRulesheets 	godoc
-// @Summary 			List Rulesheets
-// @Description   List Rulesheet description
-// @Tags 				  Rulesheet
+// GetRulesheets 		godoc
+// @Summary 			Listar as Folhas de Regra
+// @Description			É possível listar as folhas de regra de algumas maneiras como veremos a seguir:
+// @Description
+// @Description			- **Sem nenhum parâmetro:** Ao realizar a chamada do endpoint sem a passagem de parâmetros, todas as folhas de regra existentes serão retornadas, contendo informações como nome, ID, e caso estejam disponíveis, descrição e slug.
+// @Description			- **Usando o *count*:** Ao habilitar o *count* para *True* será retornado do endpoint o número de Folhas de Regras existentes.
+// @Description			- **Usando o *limit*:** Ao utilizar o parâmetro *limit* deve-se especificar o número máximo de respostas desejadas que serão retornadas pela array.
+// @Description			- **Usando o *page*:** Ao utilizar o parâmetro *page*, serão retornadas as folhas de regra correspondentes a essa página, onde as folhas são ordenadas em ordem crescente pelo seu ID.
+// @Description
+// @Description			Para listar as folhas de regra basta clicar em **Try it out** , complete com o formado desejados, em seguida, clique em **Execute**.
+// @Tags 				Rulesheet
 // @Accept  			json
 // @Produce  			json
-// @Param				  count query boolean false "Total of results"
-// @Param					limit query integer false "Max length of the array returned"
-// @Param				  page query integer false "Page number that is multiplied by 'limit' to calculate the offset"
+// @Param				count query boolean false "Total of results"
+// @Param				limit query integer false "Max length of the array returned"
+// @Param				page query integer false "Page number that is multiplied by 'limit' to calculate the offset"
 // @Success 			200 {array} payloads.Rulesheet
 // @Header 				200 {string} Authorization "token access"
 // @Failure 			400 {object} responses.Error "Bad Format"
@@ -130,6 +150,7 @@ func (rc *rulesheets) GetRulesheets() gin.HandlerFunc {
 		query := c.Request.URL.Query()
 		filter := make(map[string]interface{})
 		// TODO: Implement filters correctly
+
 		// for param, value := range query {
 		// 	if len(value) == 1 {
 		// 		filter[param] = value[0]
@@ -209,8 +230,8 @@ func (rc *rulesheets) GetRulesheets() gin.HandlerFunc {
 }
 
 // GetRulesheet 		godoc
-// @Summary 			Get Rulesheet by ID
-// @Description 		Get Rulesheet by ID description
+// @Summary 			Obter Folha de Regra por ID
+// @Description 		Para se obter a folha de regra por ID, basta clicar em **Try it out** e colocar o ID desejado em *id*. Em seguida, clique em **Execute** e caso o ID exista retornará a folha de regra com o número de ID desejado.
 // @Tags 				Rulesheet
 // @Accept  			json
 // @Produce  			json
@@ -261,8 +282,8 @@ func (rc *rulesheets) GetRulesheet() gin.HandlerFunc {
 }
 
 // UpdateRulesheet 		godoc
-// @Summary 			Update Rulesheet by ID
-// @Description 		Update Rulesheet by ID description
+// @Summary 			Atualizar Folha de Regra por ID
+// @Description			Para atualizar ou editar uma folha de regra, é necessário enviar o ID da folha desejada no campo *id*, juntamente com os parâmetros da regra no corpo da solicitação no parâmetro *rulesheet*. Para realizar essa atualização clique no botão **Try it out** e preencher os campos com os dados desejados, em seguida, clicar em **Execute** para enviar a solicitação de atualização.
 // @Tags 				Rulesheet
 // @Accept  			json
 // @Produce  			json
@@ -360,8 +381,8 @@ func (rc *rulesheets) UpdateRulesheet() gin.HandlerFunc {
 }
 
 // DeleteRulesheet 		godoc
-// @Summary 			Delete Rulesheet by ID
-// @Description 		Delete Rulesheet by ID description
+// @Summary 			Deletar Folha de Regra por ID
+// @Description 		Para excluir uma folha de regra, é necessário clicar no botão **Try it out** e preencher o campo *id* com o ID da folha de regra que se deseja excluir. Em seguida, clique em **Execute** para enviar a solicitação de exclusão.
 // @Tags 				Rulesheet
 // @Accept  			json
 // @Produce  			json
