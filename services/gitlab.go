@@ -55,7 +55,7 @@ func (gs *gitlabService) Save(rulesheet *dtos.Rulesheet, commitMessage string) e
 		return err
 	}
 
-	proj, resp, err := git.Projects.GetProject(fmt.Sprintf("%s/%s%s", ns.Path, gs.cfg.GitlabPrefix, rulesheet.Slug), &gitlab.GetProjectOptions{})
+	proj, resp, err := git.Projects.GetProject(fmt.Sprintf("%s/%s%s", ns.FullPath, gs.cfg.GitlabPrefix, rulesheet.Slug), &gitlab.GetProjectOptions{})
 	if err != nil {
 		if resp.StatusCode != http.StatusNotFound {
 			log.Errorf("Failed to fetch project: %v", err)
@@ -285,7 +285,7 @@ func (gs *gitlabService) Fill(rulesheet *dtos.Rulesheet) (err error) {
 		return
 	}
 
-	proj, _, err := git.Projects.GetProject(fmt.Sprintf("%s/%s%s", ns.Path, gs.cfg.GitlabPrefix, rulesheet.Slug), &gitlab.GetProjectOptions{})
+	proj, _, err := git.Projects.GetProject(fmt.Sprintf("%s/%s%s", ns.FullPath, gs.cfg.GitlabPrefix, rulesheet.Slug), &gitlab.GetProjectOptions{})
 	if err != nil {
 		log.Errorf("Failed to fetch project: %v", err)
 		return
