@@ -11,9 +11,7 @@ import (
 // and GitLab API credentials, authentication mode, and external host information.
 //
 // Property:
-//   - AllowOrigins: This property specifies the allowed origins for CORS requests. It is a string value
-//
-// that can contain multiple origins separated by commas.
+//   - AllowOrigins: This property specifies the allowed origins for CORS requests. It is a string value that can contain multiple origins separated by commas.
 //   - Port: The port number on which the server will listen for incoming requests.
 //   - MysqlURI: The URI for connecting to the MySQL database used by the API.
 //   - Migrate: it's used to specify whether to run database migrations or not. If the value is set to "true", the application will run database migrations on startup. If the value is set to "false", the application will not run database migrations.
