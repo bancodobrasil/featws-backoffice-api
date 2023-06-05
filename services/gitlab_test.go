@@ -88,7 +88,7 @@ func TestSaveAndUpdateProject(t *testing.T) {
 
 		//Retrieving namespace
 		if r.URL.Path == "/api/v4/namespaces/"+namespace {
-			w.Write([]byte(`{"id":1,"name":"teste", "path":"test"}`))
+			w.Write([]byte(`{"id":1,"name":"teste", "full_path":"test"}`))
 			return
 		}
 
@@ -587,7 +587,7 @@ func TestSaveTestFilesUpdate(t *testing.T) {
 
 	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == "/api/v4/namespaces/"+namespace {
-			w.Write([]byte(`{"id":1,"name":"teste", "path":"testpath"}`))
+			w.Write([]byte(`{"id":1,"name":"teste", "full_path":"testpath"}`))
 			return
 		}
 		if r.Method == "POST" && r.URL.Path == "/api/v4/projects" {
@@ -650,7 +650,7 @@ func TestFill(t *testing.T) {
 
 	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == "/api/v4/namespaces/"+namespace {
-			w.Write([]byte(`{"id":1,"name":"teste", "path":"testpath"}`))
+			w.Write([]byte(`{"id":1,"name":"teste", "full_path":"testpath"}`))
 			return
 		}
 
@@ -771,7 +771,7 @@ func TestFillJSON(t *testing.T) {
 
 	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == "/api/v4/namespaces/"+namespace {
-			w.Write([]byte(`{"id":1,"name":"teste", "path":"testpath"}`))
+			w.Write([]byte(`{"id":1,"name":"teste", "full_path":"testpath"}`))
 			return
 		}
 
@@ -894,7 +894,7 @@ func TestFillRulesSlices(t *testing.T) {
 
 	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == "/api/v4/namespaces/"+namespace {
-			w.Write([]byte(`{"id":1,"name":"teste", "path":"testpath"}`))
+			w.Write([]byte(`{"id":1,"name":"teste", "full_path":"testpath"}`))
 			return
 		}
 
