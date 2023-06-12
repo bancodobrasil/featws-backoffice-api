@@ -15,7 +15,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Rulesheets ...
+// Rulesheets defines a set of methods for handling CRUD operations on rulesheets in a Gin web framework.
+//
+// Property:
+//   - CreateRulesheet: A function that handles the creation of a new rulesheet. It should receive data from the client and store it in a db or other storage system.
+//   - GetRulesheets: is a function that handles the HTTP GET request to retrieve a list of all rulesheets. It returns a gin.HandlerFunc which is a function that handles the request and sends the response.
+//   - GetRulesheet: is a function that handles the HTTP GET request to retrieve a specific rulesheet from a database or other data source. It takes in a gin.Context object as a parameter and returns a gin.HandlerFunc that can be used as a middleware to handle the request. The function should typically extract the ID
+//   - UpdateRulesheet: is a function that handles the updating of a specific rulesheet. It takes in a gin context object and returns a gin handler function. This handler function should retrieve the updated rulesheet data from the request body, validate it, and update the corresponding rulesheet in the database. The handler
+//   - DeleteRulesheet: is a function that handles the deletion of a specific
+//
+// rulesheet. It is a gin.HandlerFunc, which means it is a function that takes in a gin.Context object
+// as its parameter and returns nothing. The function should retrieve the ID of the rulesheet to be
+// deleted from the request parameters or
 type Rulesheets interface {
 	CreateRulesheet() gin.HandlerFunc
 	GetRulesheets() gin.HandlerFunc
@@ -24,11 +35,13 @@ type Rulesheets interface {
 	DeleteRulesheet() gin.HandlerFunc
 }
 
+// The type "rulesheets" contains a service called "services.Rulesheets". The "service" property is a variable of type "services.Rulesheets". It is likely
+// that this variable is used to access or manipulate data related to rulesheets in some way within the code.
 type rulesheets struct {
 	service services.Rulesheets
 }
 
-// NewRulesheets ...
+// NewRulesheets creates a new instance of the Rulesheets struct with a given service.
 func NewRulesheets(service services.Rulesheets) Rulesheets {
 	return &rulesheets{
 		service: service,
@@ -64,6 +77,11 @@ func NewRulesheets(service services.Rulesheets) Rulesheets {
 // @Security 			Authentication Api Key
 // @Security 			Authentication Bearer Token
 // @Router 				/rulesheets [post]
+// The above code is defining a function that creates a new rulesheet. It receives a gin context and
+// returns a gin handler function. The function first validates the request body and required fields
+// using the validator library. It then creates a new rulesheet DTO using the payload received in the
+// request. Finally, it calls the service to create the rulesheet and returns a JSON response with the
+// created rulesheet data.
 func (rc *rulesheets) CreateRulesheet() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
@@ -140,6 +158,11 @@ func (rc *rulesheets) CreateRulesheet() gin.HandlerFunc {
 // @Security 			Authentication Api Key
 // @Security 			Authentication Bearer Token
 // @Router 				/rulesheets/ [get]
+// GetRulesheets returns a `gin.HandlerFunc`, this function handles HTTP requests to retrieve rulesheets
+// from a database. It first extracts any query parameters from the request URL and uses them to set options
+// for the database query. If the `count` parameter is present, it returns the count of rulesheets that match
+// the query. Otherwise, it retrieves the rulesheets from the database and returns them as a JSON response.
+// The response is formatted using a `responses.Rulesheet` struct.
 func (rc *rulesheets) GetRulesheets() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
@@ -245,6 +268,12 @@ func (rc *rulesheets) GetRulesheets() gin.HandlerFunc {
 // @Security 			Authentication Api Key
 // @Security 			Authentication Bearer Token
 // @Router 				/rulesheets/{id} [get]
+// GetRulesheet is defining a function that returns a Gin middleware function
+// that retrieves a rulesheet entity from a service based on the ID parameter passed in the
+// request. If the entity is found, it is returned as a JSON response with a 200 status code. If the
+// entity is not found, a 404 status code is returned. If there is an error during the retrieval
+// process, a 500 status code is returned with an error message. The function uses a context with a
+// timeout of 10 seconds to ensure that the request does not take too long to complete.
 func (rc *rulesheets) GetRulesheet() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
@@ -298,6 +327,11 @@ func (rc *rulesheets) GetRulesheet() gin.HandlerFunc {
 // @Security 			Authentication Api Key
 // @Security 			Authentication Bearer Token
 // @Router 				/rulesheets/{id} [put]
+// UpdateRulesheet is defining a function that handles the update of a rulesheet entity. It receives a
+// request with a JSON payload containing the updated information for the entity, validates the
+// payload, and updates the entity in the database using a service. If the update is successful, it
+// returns a JSON response with the updated entity information. If the entity is not found, it returns
+// a 404 status code.
 func (rc *rulesheets) UpdateRulesheet() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
@@ -396,6 +430,12 @@ func (rc *rulesheets) UpdateRulesheet() gin.HandlerFunc {
 // @Security 			Authentication Api Key
 // @Security 			Authentication Bearer Token
 // @Router 				/rulesheets/{id} [delete]
+// DeleteRulesheet is defining a function that handles HTTP requests to delete a rulesheet. It first
+// extracts the ID of the rulesheet to be deleted from the request parameters. It then uses a service
+// to attempt to delete the rulesheet with the given ID. If the deletion is successful, it returns a
+// 204 No Content response. If the rulesheet is not found, it returns a 404 Not Found response. If
+// there is an error during the deletion process, it returns a 500 Internal Server Error response with
+// an error message.
 func (rc *rulesheets) DeleteRulesheet() gin.HandlerFunc {
 
 	return func(c *gin.Context) {

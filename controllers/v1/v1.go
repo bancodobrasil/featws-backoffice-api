@@ -7,6 +7,8 @@ import (
 
 var validate = validator.New()
 
+// validatePayload validates a payload using a validator library and returns any validation errors as a
+// custom error response.
 func validatePayload(payload interface{}) *responses.Error {
 	if validationErr := validate.Struct(payload); validationErr != nil {
 		err2, ok := validationErr.(validator.ValidationErrors)

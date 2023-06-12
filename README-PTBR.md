@@ -27,3 +27,19 @@ Para executar o projeto, siga estes passos:
 O projeto será executado em `localhost:9007`. Para acessar a documentação do Swagger, [clique aqui](http://localhost:9007/swagger/index.html#/).
 
 Seguindo estes passos, o projeto estará em execução e você poderá acessar a documentação da API através do Swagger.
+
+## GoDoc
+
+Para acessar a documentação do GoDoc, primeiro instale o GoDoc na sua máquina. Abra um terminal e digite:
+
+````
+go get golang.org/x/tools/cmd/godoc
+````
+
+Em seguida rode no terminal do repositório o comando a seguir:
+
+````
+godoc -http=:6060
+````
+
+O GoDoc será executado em `localhost:6060`. Para acessar a documentação do GoDoc, basta [clicar aqui](http://localhost:6060/pkg/).
