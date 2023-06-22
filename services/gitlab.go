@@ -111,11 +111,12 @@ func (gs *gitlabService) Save(rulesheet *dtos.Rulesheet, commitMessage string) e
 
 	// VERSION
 	version, err := strconv.Atoi(rulesheet.Version)
+	rulesheet.Version = fmt.Sprintf("%d", version+1)
 	if err != nil {
 		log.Errorf("Failed to parse version: %v", err)
 		return err
 	}
-	commitAction, err = createOrUpdateGitlabFileCommitAction(git, proj, cfg.GitlabDefaultBranch, "VERSION", fmt.Sprintf("%d\n", version+1))
+	commitAction, err = createOrUpdateGitlabFileCommitAction(git, proj, cfg.GitlabDefaultBranch, "VERSION", rulesheet.Version+"\n")
 	if err != nil {
 		log.Errorf("Failed to commit version: %v", err)
 		return err

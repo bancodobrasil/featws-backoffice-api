@@ -46,7 +46,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_bancodobrasil_featws-api_payloads_v1.Rulesheet"
+                            "$ref": "#/definitions/v1.Rulesheet"
                         }
                     }
                 ],
@@ -54,7 +54,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_bancodobrasil_featws-api_payloads_v1.Rulesheet"
+                            "$ref": "#/definitions/v1.Rulesheet"
                         },
                         "headers": {
                             "Authorization": {
@@ -134,7 +134,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/github_com_bancodobrasil_featws-api_payloads_v1.Rulesheet"
+                                "$ref": "#/definitions/v1.Rulesheet"
                             }
                         },
                         "headers": {
@@ -204,7 +204,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/github_com_bancodobrasil_featws-api_payloads_v1.Rulesheet"
+                                "$ref": "#/definitions/v1.Rulesheet"
                             }
                         },
                         "headers": {
@@ -271,7 +271,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_bancodobrasil_featws-api_payloads_v1.Rulesheet"
+                            "$ref": "#/definitions/v1.Rulesheet"
                         }
                     }
                 ],
@@ -281,7 +281,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/github_com_bancodobrasil_featws-api_payloads_v1.Rulesheet"
+                                "$ref": "#/definitions/v1.Rulesheet"
                             }
                         },
                         "headers": {
@@ -382,7 +382,19 @@
         }
     },
     "definitions": {
-        "github_com_bancodobrasil_featws-api_payloads_v1.Rulesheet": {
+        "v1.Error": {
+            "type": "object",
+            "properties": {
+                "error": {},
+                "validation_errors": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/v1.ValidationError"
+                    }
+                }
+            }
+        },
+        "v1.Rulesheet": {
             "type": "object",
             "required": [
                 "name"
@@ -423,18 +435,6 @@
                 },
                 "version": {
                     "type": "string"
-                }
-            }
-        },
-        "v1.Error": {
-            "type": "object",
-            "properties": {
-                "error": {},
-                "validation_errors": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/v1.ValidationError"
-                    }
                 }
             }
         },
