@@ -7,7 +7,23 @@ import (
 	"github.com/spf13/viper"
 )
 
-// Config ...
+// Config type contains various configuration parameters for a Go application, including database
+// and GitLab API credentials, authentication mode, and external host information.
+//
+// Property:
+//   - AllowOrigins: This property specifies the allowed origins for CORS requests. It is a string value that can contain multiple origins separated by commas.
+//   - Port: The port number on which the server will listen for incoming requests.
+//   - MysqlURI: The URI for connecting to the MySQL database used by the API.
+//   - Migrate: it's used to specify whether to run database migrations or not. If the value is set to "true", the application will run database migrations on startup. If the value is set to "false", the application will not run database migrations.
+//   - GitlabToken: This's a token used for authentication with GitLab API. It allows the application to access GitLab resources on behalf of a user or a bot account.
+//   - GitlabURL: The URL of the GitLab instance that the API will interact with.
+//   - GitlabNamespace: The namespace or group name in GitLab where the project is located.
+//   - GitlabPrefix: The GitlabPrefix property is a string that represents the prefix to be used for all GitLab API requests. It is used to specify the namespace or group where the project's located. For example, if the GitlabPrefix is set to "mygroup/myproject", all API requests will be made.
+//   - GitlabDefaultBranch: This property represents the default branch name for a GitLab repository. When creating a new repository, GitLab will use this branch as the default branch.
+//   - GitlabCIScript - GitlabCIScript is a property in the Config struct that represents the GitLab CI script that will be used for building and testing the project. It is specified in the configuration file using the key "FEATWS_API_GITLAB_CI_SCRIPT".
+//   - ExternalHost - This property represents the external host name or IP address of the server where the application is running. It is used to configure the application to listen on a specific network interface or to generate URLs that can be accessed from outside the server.
+//   - OpenAMURL: The URL of the OpenAM server used for authentication.
+//   - AuthMode - This property specifies the authentication mode used by the API. It can have values like "jwt", "oauth2", "basic", etc.
 type Config struct {
 	AllowOrigins        string `mapstructure:"ALLOW_ORIGINS"`
 	Port                string `mapstructure:"PORT"`
@@ -26,7 +42,7 @@ type Config struct {
 
 var config = &Config{}
 
-// LoadConfig ...
+// LoadConfig loads configuration settings from a file and sets default values if they are no present.
 func LoadConfig() (err error) {
 	viper.AddConfigPath("./")
 	viper.SetConfigFile(".env")
@@ -62,7 +78,7 @@ func LoadConfig() (err error) {
 	return
 }
 
-// GetConfig ...
+// GetConfig returns a pointer to a Config object.
 func GetConfig() *Config {
 	return config
 }

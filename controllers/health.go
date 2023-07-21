@@ -21,7 +21,7 @@ type HealthController struct {
 	health healthcheck.Handler
 }
 
-// NewHealthController ...
+// NewHealthController returns a new instance of the HealthController struct with a newHandler.
 func NewHealthController() *HealthController {
 	return &HealthController{
 		health: newHandler(),
@@ -30,6 +30,8 @@ func NewHealthController() *HealthController {
 
 var health = healthcheck.NewHandler()
 
+// newHandler creates a new healthcheck handler and adds liveness and readiness checks for goroutine
+// count, Gitlab URL, and database connection.
 func newHandler() healthcheck.Handler {
 	cfg := config.GetConfig()
 	health.AddLivenessCheck("goroutine-threshold", goroutine.Count(100))
@@ -58,7 +60,8 @@ func newHandler() healthcheck.Handler {
 	return health
 }
 
-// Get was the function that allow follow the url
+// Get returns a check function that performs an HTTP GET request to a specified URL with a
+// specified timeout and returns an error if the response status code is not 200.
 func Get(url string, timeout time.Duration) checks.Check {
 	client := http.Client{
 		Timeout: timeout,
@@ -80,12 +83,20 @@ func Get(url string, timeout time.Duration) checks.Check {
 	}
 }
 
-// HealthLiveHandler ...
+// HealthLiveHandler is returning a Gin middleware function that wraps the `LiveEndpoint` method of the
+// `health` handler of the `HealthController` struct. The `LiveEndpoint` method is used to check if the
+// application is alive and responding to requests. The `gin.WrapH` function is used to convert the
+// `http.HandlerFunc` returned by `LiveEndpoint` into a `gin.HandlerFunc` that can be used as
+// middleware in a Gin router.
 func (c *HealthController) HealthLiveHandler() gin.HandlerFunc {
 	return gin.WrapH(http.HandlerFunc(c.health.LiveEndpoint))
 }
 
-// HealthReadyHandler ...
+// HealthReadyHandler is returning a Gin middleware function that wraps the `ReadyEndpoint` method of the
+// `health` handler of the `HealthController` struct. The `ReadyEndpoint` method is used to check if
+// the application is ready to receive requests. The `gin.WrapH` function is used to convert the
+// `http.HandlerFunc` returned by `ReadyEndpoint` into a `gin.HandlerFunc` that can be used as
+// middleware in a Gin router.
 func (c *HealthController) HealthReadyHandler() gin.HandlerFunc {
 	return gin.WrapH(http.HandlerFunc(c.health.ReadyEndpoint))
 }

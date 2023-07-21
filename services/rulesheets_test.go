@@ -20,6 +20,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// This's a unit test that checks if an error is returned when a Gitlab service fails to fill a rulesheet entity.
 func TestGetWithErrorOnFill(t *testing.T) {
 	ctx := context.Background()
 
@@ -46,6 +47,8 @@ func TestGetWithErrorOnFill(t *testing.T) {
 	}
 }
 
+// This test function tests the successful retrieval of a rulesheet entity from a
+// repository and its filling with data from a Gitlab service.
 func TestGetSucess(t *testing.T) {
 
 	ctx := context.Background()
@@ -67,6 +70,8 @@ func TestGetSucess(t *testing.T) {
 	}
 }
 
+// This's a Get function of a Rulesheets service, which tests for an error on
+// model creation.
 func TestGetWithErrorOnCreateModel(t *testing.T) {
 
 	ctx := context.Background()
@@ -89,6 +94,7 @@ func TestGetWithErrorOnCreateModel(t *testing.T) {
 	}
 }
 
+// The function tests the Create method of the Rulesheets service with an error on fill.
 func TestCreateWithErrorOnFill(t *testing.T) {
 
 	ctx := context.Background()
@@ -111,6 +117,8 @@ func TestCreateWithErrorOnFill(t *testing.T) {
 	}
 }
 
+// TestCreateSuccess is a function that tests the successful creation of a rulesheet entity and its
+// corresponding GitLab repository.
 func TestCreateSuccess(t *testing.T) {
 	ctx := context.Background()
 	dto := &dtos.Rulesheet{
@@ -133,6 +141,7 @@ func TestCreateSuccess(t *testing.T) {
 
 }
 
+// This tests the Create method of a Rulesheets service with an expected error.
 func TestCreateWithError(t *testing.T) {
 	ctx := context.Background()
 	dto := &dtos.Rulesheet{
@@ -155,6 +164,7 @@ func TestCreateWithError(t *testing.T) {
 	}
 }
 
+// This checks if an error is returned when attempting to save a new rulesheet entity.
 func TestCreateWithErroOnSave(t *testing.T) {
 	ctx := context.Background()
 	dto := &dtos.Rulesheet{
@@ -177,6 +187,7 @@ func TestCreateWithErroOnSave(t *testing.T) {
 	}
 }
 
+// This test Update method of a Rulesheets service, checking if an error is returned when there is an error on saving the data to Gitlab.
 func TestUpdateWithErrorOnSave(t *testing.T) {
 
 	ctx := context.Background()
@@ -199,6 +210,7 @@ func TestUpdateWithErrorOnSave(t *testing.T) {
 	}
 }
 
+// This is a tests the successful finding of a rulesheet entity using mocked repository and service objects.
 func TestFindSuccess(t *testing.T) {
 	ctx := context.Background()
 	dto := &dtos.Rulesheet{
@@ -220,6 +232,7 @@ func TestFindSuccess(t *testing.T) {
 	}
 }
 
+// This tests the error handling of the Find method in a Rulesheets service.
 func TestFindWithError(t *testing.T) {
 	ctx := context.Background()
 	dto := &dtos.Rulesheet{
@@ -242,6 +255,7 @@ func TestFindWithError(t *testing.T) {
 
 }
 
+// This tests the Count method of a Rulesheets service.
 func TestCountSuccess(t *testing.T) {
 	ctx := context.Background()
 	dto := &dtos.Rulesheet{
@@ -260,6 +274,7 @@ func TestCountSuccess(t *testing.T) {
 	}
 }
 
+// This tests the error handling of the Count method in a Rulesheets service.
 func TestCountWithError(t *testing.T) {
 	ctx := context.Background()
 	dto := &dtos.Rulesheet{
@@ -278,6 +293,7 @@ func TestCountWithError(t *testing.T) {
 	}
 }
 
+// This tests the successful update of a rulesheet entity using mocked repository and Gitlab services.
 func TestUpdateSuccess(t *testing.T) {
 	ctx := context.Background()
 	dto := &dtos.Rulesheet{
@@ -299,6 +315,7 @@ func TestUpdateSuccess(t *testing.T) {
 	}
 }
 
+// The function tests the update method of a Rulesheets service with an error scenario.
 func TestUpdateWithError(t *testing.T) {
 	ctx := context.Background()
 	dto := &dtos.Rulesheet{
@@ -349,6 +366,8 @@ func TestUpdateWithError(t *testing.T) {
 
 // }
 
+// This is a test for testing the successful deletion of a rulesheet entity using GORM
+// and a mock database connection.
 func TestDeleteSuccess(t *testing.T) {
 	// Init fake db connection
 	conn, mocks, err := sqlmock.New()
@@ -393,6 +412,8 @@ func TestDeleteSuccess(t *testing.T) {
 	}
 }
 
+// This is a test function for the Delete method of a Rulesheets service, which tests for an error
+// during the update of a Rulesheet entity.
 func TestDeleteWithError(t *testing.T) {
 	// Init fake db connection
 	conn, mocks, err := sqlmock.New()
@@ -437,6 +458,8 @@ func TestDeleteWithError(t *testing.T) {
 	}
 }
 
+// This is a test function for the Delete method of a Rulesheets service, which tests the rollback
+// behavior when an error occurs during a database Get operation.
 func TestDeleteWithRollBackOnGet(t *testing.T) {
 	// Init fake db connection
 	conn, mocks, err := sqlmock.New()
@@ -478,6 +501,8 @@ func TestDeleteWithRollBackOnGet(t *testing.T) {
 	}
 }
 
+// This is a test function for the Delete method in the Rulesheets service, which tests the
+// rollback behavior in case of an error during the delete operation.
 func TestDeleteWithRollBackOnDeleteInTransaction(t *testing.T) {
 	// Init fake db connection
 	conn, mocks, err := sqlmock.New()

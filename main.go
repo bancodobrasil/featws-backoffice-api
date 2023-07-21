@@ -21,6 +21,7 @@ import (
 	ginlogrus "github.com/toorop/gin-logrus"
 )
 
+// This function sets up the logging configuration for a Go program.
 func setupLog() {
 	log.SetFormatter(&log.TextFormatter{FullTimestamp: true})
 
@@ -29,9 +30,22 @@ func setupLog() {
 	log.SetLevel(log.DebugLevel)
 }
 
+// The following lines provide instructions for generating Swagger documentation.
+
+// ------------------------------
+
 // @title FeatWS API
 // @version 1.0
-// @description API Project to provide operations to manage FeatWS knowledge repositories rules
+// @Description Este projeto consiste em uma API cujo objetivo é fornecer operações para gerenciamento de repositórios e folhas de regra do sistema FeatWS. Através da API, é possível interagir entre a interface de usuário (UI) e o banco de dados, permitindo diversas interações, como as seguintes:
+// @Description - [Post] Criação da Folha de Regra;
+// @Description - [Get] Listar das Folhas de Regra;
+// @Description - [Get] Obter folha de regra por ID;
+// @Description - [Put] Atualizar uma folha de regra por ID;
+// @Description - [Delete] Deletar uma folha de regra por ID.
+// @Description
+// @Description Antes de realizar as requisições no Swagger, é necessário autorizar o acesso clicando no botão **Authorize**, ao lado, e inserindo a senha correspondente. Após inserir o campo **value** e clicar no botão **Authorize**, o Swagger estará disponível para ser utilizado.
+// @Description
+
 // @termsOfService http://swagger.io/terms/
 
 // @contact.name API Support
@@ -54,7 +68,11 @@ func setupLog() {
 
 // @x-extension-openapi {"example": "value on a json format"}
 
-// Run start the resolver server with resolverFunc
+// end Swagger
+// ------------------------------
+
+// This is the main function of a Go program that sets up the configuration, database connection, and
+// API routes using the Gin framework.
 func main() {
 
 	setupLog()
@@ -71,10 +89,12 @@ func main() {
 		return
 	}
 
+	// Connection with the DataBase containing the Rules and Rulesheets
 	database.ConnectDB()
 
 	isCmd := false
 
+	// Perform the database migration
 	if cfg.Migrate != "" {
 		isCmd = true
 		log.Debug("Migrating database...")
@@ -105,11 +125,13 @@ func main() {
 		}
 	}
 
+	// Successful migration
 	if isCmd == true {
 		log.Debug("Finished Successfully")
 		os.Exit(0)
 	}
 
+	// This code block is setting up monitoring and logging for the Go API using the Gin framework.
 	monitor, err := ginMonitor.New("v1.0.0", ginMonitor.DefaultErrorMessageKey, ginMonitor.DefaultBuckets)
 	if err != nil {
 		log.Panic(err)
@@ -124,6 +146,7 @@ func main() {
 	router.Use(ginlogrus.Logger(log.StandardLogger()), gin.Recovery())
 	router.Use(monitor.Prometheus())
 	router.GET("metrics", gin.WrapH(promhttp.Handler()))
+
 	// Setup Routers of health resources, swagger and home endpoint
 	routes.SetupRoutes(router)
 	configCors := cors.DefaultConfig()

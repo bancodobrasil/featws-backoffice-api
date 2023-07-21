@@ -17,18 +17,27 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// Gitlab ...
+// Gitlab interface defines methods for saving, filling, and connecting to a Gitlab client.
+//
+// Property:
+//   - Save: A method that takes a pointer to a Rulesheet DTO (Data Transfer Object) and a commit message as input parameters and returns an error. This method is responsible for saving the Rulesheet to Gitlab repository with the provided commit message.
+//   - Fill: The method is a function that takes a pointer to a `Rulesheet` DTO and fills it with data from a GitLab repository. It returns an error if there's any issue while filling the `Rulesheet`.
+//   - Connect: Connect is a method that returns a pointer to a gitlab.Client and an error. It's used to establish a connection to the GitLab server.
 type Gitlab interface {
 	Save(rulesheet *dtos.Rulesheet, commitMessage string) error
 	Fill(rulesheet *dtos.Rulesheet) error
 	Connect() (*gitlab.Client, error)
 }
 
+// gitlabService struct holds a pointer to a config.Config object.
+//
+// Property:
+//   - cfg: The `cfg` property is a pointer to a `config.Config` struct, which likely contains configuration settings for a GitLab service.
 type gitlabService struct {
 	cfg *config.Config
 }
 
-// NewGitlab ...
+// NewGitlab creates a new instance of the Gitlab service using the provided configuration.
 func NewGitlab(cfg *config.Config) Gitlab {
 	return &gitlabService{
 		cfg: cfg,
@@ -55,7 +64,7 @@ func (gs *gitlabService) Save(rulesheet *dtos.Rulesheet, commitMessage string) e
 		return err
 	}
 
-	proj, resp, err := git.Projects.GetProject(fmt.Sprintf("%s/%s%s", ns.Path, gs.cfg.GitlabPrefix, rulesheet.Name), &gitlab.GetProjectOptions{})
+	proj, resp, err := git.Projects.GetProject(fmt.Sprintf("%s/%s%s", ns.FullPath, gs.cfg.GitlabPrefix, rulesheet.Slug), &gitlab.GetProjectOptions{})
 	if err != nil {
 		if resp.StatusCode != http.StatusNotFound {
 			log.Errorf("Failed to fetch project: %v", err)
@@ -63,7 +72,7 @@ func (gs *gitlabService) Save(rulesheet *dtos.Rulesheet, commitMessage string) e
 		}
 
 		proj, _, err = git.Projects.CreateProject(&gitlab.CreateProjectOptions{
-			Name:        gitlab.String(fmt.Sprintf("%s%s", cfg.GitlabPrefix, rulesheet.Name)),
+			Name:        gitlab.String(fmt.Sprintf("%s%s", cfg.GitlabPrefix, rulesheet.Slug)),
 			NamespaceID: &ns.ID,
 		})
 		if err != nil {
@@ -239,6 +248,7 @@ func (gs *gitlabService) Save(rulesheet *dtos.Rulesheet, commitMessage string) e
 // 	return nil
 // }
 
+// createOrUpdateGitlabFileCommitAction this function creates or updates a GitLab file commit action with the specified content.
 func createOrUpdateGitlabFileCommitAction(git *gitlab.Client, proj *gitlab.Project, ref string, filename string, content string) (*gitlab.CommitActionOptions, error) {
 	action, err := defineCreateOrUpdateGitlabFileAction(git, proj, ref, filename)
 	if err != nil {
@@ -252,6 +262,8 @@ func createOrUpdateGitlabFileCommitAction(git *gitlab.Client, proj *gitlab.Proje
 	}, nil
 }
 
+// defineCreateOrUpdateGitlabFileAction this function determines whether to create or update a GitLab file based on whether it already
+// exists or not.
 func defineCreateOrUpdateGitlabFileAction(git *gitlab.Client, proj *gitlab.Project, ref string, fileName string) (*gitlab.FileActionValue, error) {
 	_, resp, err := git.RepositoryFiles.GetFile(proj.ID, fileName, &gitlab.GetFileOptions{
 		Ref: gitlab.String(ref),
@@ -268,6 +280,11 @@ func defineCreateOrUpdateGitlabFileAction(git *gitlab.Client, proj *gitlab.Proje
 	return gitlab.FileAction(gitlab.FileUpdate), nil
 }
 
+// Fill is a method in a GitLab service that fills a `Rulesheet` struct with data from GitLab. It first
+// checks if a GitLab token is provided, and if not, it returns nil. It then connects to GitLab using the
+// provided token and fetches the namespace and project associated with the provided GitLab namespace and
+// prefix. It fetches the version, features, parameters, and rules data from the project's default branch
+// and populates the corresponding fields in the `Rulesheet` struct.
 func (gs *gitlabService) Fill(rulesheet *dtos.Rulesheet) (err error) {
 	if gs.cfg.GitlabToken == "" {
 		return nil
@@ -285,7 +302,7 @@ func (gs *gitlabService) Fill(rulesheet *dtos.Rulesheet) (err error) {
 		return
 	}
 
-	proj, _, err := git.Projects.GetProject(fmt.Sprintf("%s/%s%s", ns.Path, gs.cfg.GitlabPrefix, rulesheet.Name), &gitlab.GetProjectOptions{})
+	proj, _, err := git.Projects.GetProject(fmt.Sprintf("%s/%s%s", ns.FullPath, gs.cfg.GitlabPrefix, rulesheet.Slug), &gitlab.GetProjectOptions{})
 	if err != nil {
 		log.Errorf("Failed to fetch project: %v", err)
 		return
@@ -379,6 +396,9 @@ func (gs *gitlabService) Fill(rulesheet *dtos.Rulesheet) (err error) {
 	return
 }
 
+// Connect this method creates a new GitLab client using the GitLab API token and URL provided in the `gs.cfg`
+// configuration object. If the client creation is successful, it returns the GitLab client object,
+// otherwise it returns an error.
 func (gs *gitlabService) Connect() (*gitlab.Client, error) {
 	git, err := gitlab.NewClient(gs.cfg.GitlabToken, gitlab.WithBaseURL(gs.cfg.GitlabURL))
 
@@ -389,6 +409,7 @@ func (gs *gitlabService) Connect() (*gitlab.Client, error) {
 	return git, nil
 }
 
+// gitlabLoadJSON loads a JSON file from a GitLab project and decodes it into a given Go struct.
 func gitlabLoadJSON(git *gitlab.Client, proj *gitlab.Project, ref string, fileName string, result interface{}) error {
 	rawDecodedText, err := gitlabLoadString(git, proj, ref, fileName)
 	if err != nil {
@@ -403,6 +424,11 @@ func gitlabLoadJSON(git *gitlab.Client, proj *gitlab.Project, ref string, fileNa
 	return nil
 }
 
+// gitlabLoadString that takes in a `gitlab.Client` object, a `gitlab.Project` object, a `ref` string,
+// and a `fileName` string as parameters. The function uses the `gitlab` package to fetch a file from a
+// GitLab repository using the provided `git` and `proj` objects, with the specified `ref` and `fileName`.
+// If the file is not found, an empty byte slice is returned. If the file is found, it is decoded from base64
+// and returned as a byte slice.
 func gitlabLoadString(git *gitlab.Client, proj *gitlab.Project, ref string, fileName string) ([]byte, error) {
 	file, resp, err := git.RepositoryFiles.GetFile(proj.ID, fileName, &gitlab.GetFileOptions{
 		Ref: gitlab.String(ref),

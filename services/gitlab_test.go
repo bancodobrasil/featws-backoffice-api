@@ -15,6 +15,7 @@ import (
 	"github.com/xanzy/go-gitlab"
 )
 
+// The function returns a pointer to a configuration object with predefined values for a Gitlab server.
 func SetupConfig(url *httptest.Server) *config.Config {
 	cfg := config.Config{
 		GitlabURL:       url.URL,
@@ -26,16 +27,18 @@ func SetupConfig(url *httptest.Server) *config.Config {
 	return &cfg
 }
 
+// The function returns a pointer to a Rulesheet struct with predefined values.
 func SetupRulesheet() *dtos.Rulesheet {
 	rulesheet := dtos.Rulesheet{
 		ID:          1,
+		Slug:        "test",
 		Name:        "Test",
 		Description: "Test",
 	}
 	return &rulesheet
 }
 
-// Functions for test Save function
+// This is a test function for saving and creating a project using Gitlab API.
 func TestSaveAndCreateProject(t *testing.T) {
 	dto := SetupRulesheet()
 
@@ -75,6 +78,7 @@ func TestSaveAndCreateProject(t *testing.T) {
 
 }
 
+// This is a test function for saving and updating a project using Gitlab API.
 func TestSaveAndUpdateProject(t *testing.T) {
 	dto := SetupRulesheet()
 
@@ -84,12 +88,12 @@ func TestSaveAndUpdateProject(t *testing.T) {
 
 		//Retrieving namespace
 		if r.URL.Path == "/api/v4/namespaces/"+namespace {
-			w.Write([]byte(`{"id":1,"name":"teste", "path":"test"}`))
+			w.Write([]byte(`{"id":1,"name":"teste", "full_path":"test"}`))
 			return
 		}
 
 		// Get project
-		if r.URL.Path == "/api/v4/projects/test%2Fprefix-Test" {
+		if r.URL.Path == "/api/v4/projects/test%2Fprefix-test" {
 			w.Write([]byte(`{"id":1,"description:null","name":"test"}`))
 			return
 		}
@@ -126,6 +130,7 @@ func TestSaveAndUpdateProject(t *testing.T) {
 
 }
 
+// This is a test function that tests the creation of test files in GitLab using Go.
 func TestSaveTestFilesCreation(t *testing.T) {
 	dto := SetupRulesheet()
 
@@ -176,6 +181,7 @@ func TestSaveTestFilesCreation(t *testing.T) {
 	}
 }
 
+// This is a test function that checks if a GitLab API call saves test files with features correctly.
 func TestSaveTestFilesCreationWithFeatures(t *testing.T) {
 	dto := SetupRulesheet()
 
@@ -308,6 +314,7 @@ func TestSaveTestFilesCreationWithParameters(t *testing.T) {
 	}
 }
 
+// This is test function that tests the creation of test files with a rule interface using Gitlab API.
 func TestSaveTestFilesCreationWithRuleInterface(t *testing.T) {
 	dto := SetupRulesheet()
 
@@ -376,6 +383,8 @@ func TestSaveTestFilesCreationWithRuleInterface(t *testing.T) {
 	}
 }
 
+// This is a test function that tests the saving of test files creation with a rule string in a GitLab
+// repository.
 func TestSaveTestFilesCreationWithRuleString(t *testing.T) {
 	dto := SetupRulesheet()
 
@@ -432,6 +441,7 @@ func TestSaveTestFilesCreationWithRuleString(t *testing.T) {
 	}
 }
 
+// This test function that tests the saving of test files with a string rule in a GitLab repository.
 func TestSaveTestFilesCreationWithStringRule(t *testing.T) {
 	dto := SetupRulesheet()
 
@@ -490,6 +500,7 @@ func TestSaveTestFilesCreationWithStringRule(t *testing.T) {
 	}
 }
 
+// This function tests the creation of test files with default rules in Gitlab.
 func TestSaveTestFilesCreationWithDefaultRule(t *testing.T) {
 	dto := SetupRulesheet()
 
@@ -567,6 +578,8 @@ func TestSaveTestFilesCreationWithDefaultRule(t *testing.T) {
 	}
 }
 
+// This test function that tests the Save method of a Gitlab service by setting up a mock server
+// and asserting that the correct data is sent in the HTTP requests.
 func TestSaveTestFilesUpdate(t *testing.T) {
 	dto := SetupRulesheet()
 
@@ -574,7 +587,7 @@ func TestSaveTestFilesUpdate(t *testing.T) {
 
 	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == "/api/v4/namespaces/"+namespace {
-			w.Write([]byte(`{"id":1,"name":"teste", "path":"testpath"}`))
+			w.Write([]byte(`{"id":1,"name":"teste", "full_path":"testpath"}`))
 			return
 		}
 		if r.Method == "POST" && r.URL.Path == "/api/v4/projects" {
@@ -629,18 +642,19 @@ func TestSaveTestFilesUpdate(t *testing.T) {
 	}
 }
 
-// Functions to test fill function
+// This is a test function that tests the functionality of filling a data transfer object with data
+// from GitLab API.
 func TestFill(t *testing.T) {
 
 	namespace := "test"
 
 	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == "/api/v4/namespaces/"+namespace {
-			w.Write([]byte(`{"id":1,"name":"teste", "path":"testpath"}`))
+			w.Write([]byte(`{"id":1,"name":"teste", "full_path":"testpath"}`))
 			return
 		}
 
-		if r.Method == "GET" && r.URL.Path == "/api/v4/projects/testpath/prefix-Test" {
+		if r.Method == "GET" && r.URL.Path == "/api/v4/projects/testpath/prefix-test" {
 			w.Write([]byte(`{"id":1,"description":"testeDesc","name":"teste"}`))
 			return
 		}
@@ -757,11 +771,11 @@ func TestFillJSON(t *testing.T) {
 
 	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == "/api/v4/namespaces/"+namespace {
-			w.Write([]byte(`{"id":1,"name":"teste", "path":"testpath"}`))
+			w.Write([]byte(`{"id":1,"name":"teste", "full_path":"testpath"}`))
 			return
 		}
 
-		if r.Method == "GET" && r.URL.Path == "/api/v4/projects/testpath/prefix-Test" {
+		if r.Method == "GET" && r.URL.Path == "/api/v4/projects/testpath/prefix-test" {
 			w.Write([]byte(`{"id":1,"description":"testeDesc","name":"teste"}`))
 			return
 		}
@@ -872,7 +886,7 @@ func TestFillJSON(t *testing.T) {
 	}
 }
 
-// Functions to test fill function
+// This is a unit test function that tests the FillRulesSlices function.
 func TestFillRulesSlices(t *testing.T) {
 	dto := SetupRulesheet()
 
@@ -880,11 +894,11 @@ func TestFillRulesSlices(t *testing.T) {
 
 	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == "/api/v4/namespaces/"+namespace {
-			w.Write([]byte(`{"id":1,"name":"teste", "path":"testpath"}`))
+			w.Write([]byte(`{"id":1,"name":"teste", "full_path":"testpath"}`))
 			return
 		}
 
-		if r.Method == "GET" && r.URL.Path == "/api/v4/projects/testpath/prefix-Test" {
+		if r.Method == "GET" && r.URL.Path == "/api/v4/projects/testpath/prefix-test" {
 			w.Write([]byte(`{"id":1,"description":"testeDesc","name":"teste"}`))
 			return
 		}
@@ -961,7 +975,8 @@ func TestFillRulesSlices(t *testing.T) {
 	}
 }
 
-// Testing Errors
+// This is a test function that checks if an error is returned when attempting to save a Gitlab
+// token that is nil.
 func TestSaveGitlabTokenNil(t *testing.T) {
 	dto := SetupRulesheet()
 
@@ -978,6 +993,7 @@ func TestSaveGitlabTokenNil(t *testing.T) {
 
 }
 
+// This is a function that tests for an error when fetching a namespace in Gitlab.
 func TestSaveErrorOnFetchNameSpace(t *testing.T) {
 	dto := SetupRulesheet()
 
@@ -1006,6 +1022,7 @@ func TestSaveErrorOnFetchNameSpace(t *testing.T) {
 
 }
 
+// This is a test function that checks if an error is returned when attempting to fetch a project.
 func TestSaveErrorOnFetchProject(t *testing.T) {
 	dto := SetupRulesheet()
 
@@ -1038,6 +1055,7 @@ func TestSaveErrorOnFetchProject(t *testing.T) {
 
 }
 
+// This is a function that tests for an error when creating a project using Gitlab API.
 func TestSaveErrorOnCreateProject(t *testing.T) {
 	dto := SetupRulesheet()
 
@@ -1076,6 +1094,7 @@ func TestSaveErrorOnCreateProject(t *testing.T) {
 
 }
 
+// This is a Go function that tests for an error when resolving a version in a Gitlab project.
 func TestSaveErrorOnResolveVersion(t *testing.T) {
 	dto := SetupRulesheet()
 
@@ -1119,6 +1138,8 @@ func TestSaveErrorOnResolveVersion(t *testing.T) {
 
 }
 
+// This's a test function for saving a rulesheet to GitLab and checking for errors related to parsing
+// the version.
 func TestSaveErrorOnParseVersion(t *testing.T) {
 	dto := SetupRulesheet()
 
