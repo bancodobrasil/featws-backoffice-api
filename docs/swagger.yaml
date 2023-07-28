@@ -1,6 +1,14 @@
 basePath: /api/v1
 definitions:
-  github_com_bancodobrasil_featws-api_payloads_v1.Rulesheet:
+  v1.Error:
+    properties:
+      error: {}
+      validation_errors:
+        items:
+          $ref: '#/definitions/v1.ValidationError'
+        type: array
+    type: object
+  v1.Rulesheet:
     properties:
       description:
         type: string
@@ -29,14 +37,6 @@ definitions:
         type: string
     required:
     - name
-    type: object
-  v1.Error:
-    properties:
-      error: {}
-      validation_errors:
-        items:
-          $ref: '#/definitions/v1.ValidationError'
-        type: array
     type: object
   v1.ValidationError:
     properties:
@@ -94,7 +94,7 @@ paths:
         name: Rulesheet
         required: true
         schema:
-          $ref: '#/definitions/github_com_bancodobrasil_featws-api_payloads_v1.Rulesheet'
+          $ref: '#/definitions/v1.Rulesheet'
       produces:
       - application/json
       responses:
@@ -105,7 +105,7 @@ paths:
               description: token access
               type: string
           schema:
-            $ref: '#/definitions/github_com_bancodobrasil_featws-api_payloads_v1.Rulesheet'
+            $ref: '#/definitions/v1.Rulesheet'
         "400":
           description: Bad Format
           schema:
@@ -163,7 +163,7 @@ paths:
               type: string
           schema:
             items:
-              $ref: '#/definitions/github_com_bancodobrasil_featws-api_payloads_v1.Rulesheet'
+              $ref: '#/definitions/v1.Rulesheet'
             type: array
         "400":
           description: Bad Format
@@ -252,7 +252,7 @@ paths:
               type: string
           schema:
             items:
-              $ref: '#/definitions/github_com_bancodobrasil_featws-api_payloads_v1.Rulesheet'
+              $ref: '#/definitions/v1.Rulesheet'
             type: array
         "400":
           description: Bad Format
@@ -293,7 +293,7 @@ paths:
         name: rulesheet
         required: true
         schema:
-          $ref: '#/definitions/github_com_bancodobrasil_featws-api_payloads_v1.Rulesheet'
+          $ref: '#/definitions/v1.Rulesheet'
       produces:
       - application/json
       responses:
@@ -305,7 +305,7 @@ paths:
               type: string
           schema:
             items:
-              $ref: '#/definitions/github_com_bancodobrasil_featws-api_payloads_v1.Rulesheet'
+              $ref: '#/definitions/v1.Rulesheet'
             type: array
         "400":
           description: Bad Format

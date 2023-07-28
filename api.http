@@ -1,0 +1,24 @@
+GET {{url}}/api/v1/rulesheets
+X-API-Key: 123
+
+###
+
+GET {{url}}/api/v1/rulesheets/3
+X-API-Key: 123
+
+###
+
+DELETE {{url}}/api/v1/rulesheets/2
+X-API-Key: 123
+
+###
+
+POST {{url}}/api/v1/rulesheets
+Content-Type: application/json
+X-API-Key: 123
+
+{
+  "description": "teste no Swagger da API do FeatWS no Dokku",
+  "name": "teste Swagger Dokku",
+  "slug": "teste_Swagger_dokku"
+}
