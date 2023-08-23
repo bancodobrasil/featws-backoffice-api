@@ -38,6 +38,8 @@ type Rulesheet struct {
 	Slug          string
 	HasStringRule bool
 	Version       string
+	Status        string
+	WebURL        string
 	Features      *[]map[string]interface{}
 	Parameters    *[]map[string]interface{}
 	Rules         *map[string]interface{}
