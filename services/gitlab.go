@@ -398,7 +398,7 @@ func (gs *gitlabService) Fill(rulesheet *dtos.Rulesheet) (err error) {
 	if err != nil {
 		log.Errorf("Failed to fetch pipeline: %v", err)
 	} else {
-		rulesheet.Status = pipeline.Status
+		rulesheet.PipelineStatus = pipeline.Status
 		rulesheet.WebURL = pipeline.WebURL
 		log.Infof("Pipeline Status: %v", response.StatusCode)
 	}
