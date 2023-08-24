@@ -1,4 +1,4 @@
-GET {{url}}/api/v1/rulesheets
+GET {{localhost:9007}}/api/v1/rulesheets
 X-API-Key: 123
 
 ###
@@ -21,4 +21,13 @@ X-API-Key: 123
   "description": "teste no Swagger da API do FeatWS no Dokku",
   "name": "teste Swagger Dokku",
   "slug": "teste_Swagger_dokku"
+}
+
+###
+POST http://localhost:9007/api/v1/eval/rules-jamie-menu-64623317-d00c-4508-8db3-613d1ed24638/
+Content-Type: application/json
+X-API-Key: 123
+
+{
+    "idade":13
 }

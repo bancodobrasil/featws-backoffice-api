@@ -394,7 +394,7 @@ func (gs *gitlabService) Fill(rulesheet *dtos.Rulesheet) (err error) {
 		rulesheet.Rules = &rules
 	}
 
-	pipeline, response, err := git.Pipelines.GetPipeline(proj.ID, 1)
+	pipeline, response, err := git.Pipelines.GetLatestPipeline(proj.ID, nil, nil)
 	if err != nil {
 		log.Errorf("Failed to fetch pipeline: %v", err)
 	} else {
