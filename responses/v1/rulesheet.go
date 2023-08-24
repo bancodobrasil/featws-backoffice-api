@@ -23,6 +23,8 @@ type Rulesheet struct {
 	Description string                    `json:"description,omitempty"`
 	Slug        string                    `json:"slug,omitempty"`
 	Version     string                    `json:"version,omitempty"`
+	Status      string                    `json:"status,omitempty"`
+	WebURL      string                    `json:"web_url,omitempty"`
 	Features    *[]map[string]interface{} `json:"features,omitempty"`
 	Parameters  *[]map[string]interface{} `json:"parameters,omitempty"`
 	Rules       *map[string]interface{}   `json:"rules,omitempty"`
@@ -36,6 +38,8 @@ func NewRulesheet(dto *dtos.Rulesheet) Rulesheet {
 		Description: dto.Description,
 		Slug:        dto.Slug,
 		Version:     dto.Version,
+		Status:      dto.Status,
+		WebURL:      dto.WebURL,
 		Features:    dto.Features,
 		Parameters:  dto.Parameters,
 		Rules:       dto.Rules,
