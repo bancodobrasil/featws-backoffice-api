@@ -40,3 +40,6 @@ godoc -http=:6060
 ````
 
 GoDoc will run on `localhost:6060`. To access the GoDoc documentation, just [click here](http://localhost:6060/pkg/).
+
+## MacOS config
+
