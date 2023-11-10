@@ -43,3 +43,35 @@ GoDoc will run on `localhost:6060`. To access the GoDoc documentation, just [cli
 
 ## MacOS config
 
+The MySQL used in the Docker Compose file isn't compatible with Apple's M1 and M2 chips. To make it work, perform the following modifications:
+
+### Arquivo .env
+
+Create the variable FEATWS_API_MYSQL_URI and set the path as follows:
+
+``````
+FEATWS_API_MYSQL_URI=api:api@tcp(localhost:3307)/api
+``````
+
+### Docker Compose
+
+In the Docker Compose file, it is necessary to change MySQL to MariaDB. Only the "db" section in the docker-compose file needs to be modified.
+
+``````
+  db:
+    image: mariadb
+    restart: always
+    ports:
+      - 3307:3306
+    volumes:
+      - ./data/mysql:/var/lib/mysql:rw
+    user: mysql
+    environment:
+      MARIADB_ROOT_PASSWORD: "root"
+      MARIADB_DATABASE: "api"
+      MARIADB_USER: "api"
+      MARIADB_PASSWORD: "api"
+      TELEMETRY_HTTPCLIENT_TLS: "false"
+      TELEMETRY_EXPORTER_JAEGER_AGENT_HOST: "localhost"
+      TELEMETRY_ENVIRONMENT: local
+``````

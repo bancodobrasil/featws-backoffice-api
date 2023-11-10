@@ -46,9 +46,9 @@ O GoDoc será executado em `localhost:6060`. Para acessar a documentação do Go
 
 ## MacOS config
 
-O MySQL usado no Docker compose não é compatível aos chips da Apple (M1 e M2). Para que funcione faça as seguintes alterações:
+O MySQL usado no arquivo Docker compose não é compatível aos chips da Apple (M1 e M2). Para que funcione faça as seguintes alterações:
 
-### .env:
+### Arquivo .env
 
 Crie a variável `FEATWS_API_MYSQL_URI` e adicione o caminho como a seguir:
 
@@ -56,9 +56,9 @@ Crie a variável `FEATWS_API_MYSQL_URI` e adicione o caminho como a seguir:
 FEATWS_API_MYSQL_URI=api:api@tcp(localhost:3307)/api
 ``````
 
-### Docker-compose
+### Docker Compose
 
-No docker compose será necessário que seja alterado o MySQL para o MariaDB. Apenas é necessário alterar o db do docker-compose.
+No docker compose será necessário que seja alterado o MySQL para o MariaDB. Apenas é necessário alterar o **db** do docker-compose.
 
 ``````
   db:
