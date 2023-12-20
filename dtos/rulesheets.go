@@ -16,6 +16,7 @@ import (
 type Rule struct {
 	Condition string      `json:"condition,omitempty"`
 	Value     interface{} `json:"value,omitempty"`
+	Dynamic   string      `json:"dynamic,omitempty"`
 	Type      string      `json:"type,omitempty"`
 }
 

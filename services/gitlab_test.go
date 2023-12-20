@@ -321,6 +321,7 @@ func TestSaveTestFilesCreationWithRuleInterface(t *testing.T) {
 	rules := []interface{}{
 		&dtos.Rule{
 			Condition: "test",
+			Dynamic:   "false",
 			Value: map[string]string{
 				"nomeAplicativo": "testAplicativo",
 				"textoUrlPadrao": "testURLpadrao",
@@ -363,7 +364,7 @@ func TestSaveTestFilesCreationWithRuleInterface(t *testing.T) {
 			parameters := c["actions"].([]interface{})[3].(map[string]interface{})["content"].(string)
 			assert.Equal(t, "[]", parameters)
 			rulesFeatws := c["actions"].([]interface{})[4].(map[string]interface{})["content"].(string)
-			assert.Equal(t, "{\n  \"tags\": [\n    {\n      \"condition\": \"test\",\n      \"value\": {\n        \"nomeAplicativo\": \"testAplicativo\",\n        \"textoUrlDesvio\": \"testURLdesvio\",\n        \"textoUrlPadrao\": \"testURLpadrao\"\n      },\n      \"type\": \"testType\"\n    }\n  ]\n}", rulesFeatws)
+			assert.Equal(t, "{\n  \"tags\": [\n    {\n      \"condition\": \"test\",\n      \"value\": {\n        \"nomeAplicativo\": \"testAplicativo\",\n        \"textoUrlDesvio\": \"testURLdesvio\",\n        \"textoUrlPadrao\": \"testURLpadrao\"\n      },\n      \"dynamic\": \"false\",\n      \"type\": \"testType\"\n    }\n  ]\n}", rulesFeatws)
 
 			w.Write(data)
 			return
