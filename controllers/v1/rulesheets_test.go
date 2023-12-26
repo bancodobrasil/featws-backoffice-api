@@ -14,6 +14,7 @@ import (
 	"github.com/bancodobrasil/featws-api/dtos"
 	mock_services "github.com/bancodobrasil/featws-api/mocks/services"
 	payloads "github.com/bancodobrasil/featws-api/payloads/v1"
+	responses "github.com/bancodobrasil/featws-api/responses/v1"
 	"github.com/bancodobrasil/featws-api/services"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
@@ -372,6 +373,35 @@ func TestRulesheet_CreateRulesheet(t *testing.T) {
 		srv.On("Create", mock.Anything, createdRulesheet).Return(nil)
 		v1.NewRulesheets(srv).CreateRulesheet()(c)
 		assert.Equal(t, http.StatusBadRequest, w.Code)
+	})
+
+	t.Run("Error on missing required Name field", func(t *testing.T) {
+		gin.SetMode(gin.TestMode)
+
+		w := httptest.NewRecorder()
+		c, _ := gin.CreateTestContext(w)
+
+		c.Request = &http.Request{
+			Header: make(http.Header),
+		}
+
+		payload := &payloads.Rulesheet{}
+
+		bytedPayload, _ := json.Marshal(payload)
+
+		c.Request.Body = ioutil.NopCloser(bytes.NewReader(bytedPayload))
+
+		srv := new(mock_services.Rulesheets)
+
+		createdRulesheet := &dtos.Rulesheet{}
+
+		srv.On("Create", mock.Anything, createdRulesheet).Return(nil)
+		v1.NewRulesheets(srv).CreateRulesheet()(c)
+		assert.Equal(t, http.StatusBadRequest, w.Code)
+		response := &responses.Error{}
+		json.Unmarshal(w.Body.Bytes(), response)
+		assert.Equal(t, "Name", response.ValidationErrors[0].Field)
+		assert.Equal(t, "required", response.ValidationErrors[0].Tag)
 	})
 
 	// t.Run("Error on define rulesheet entity", func(t *testing.T) {
