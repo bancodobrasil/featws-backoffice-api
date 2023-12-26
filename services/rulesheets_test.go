@@ -70,6 +70,30 @@ func TestGetSucess(t *testing.T) {
 	}
 }
 
+// This test function tests the successful retrieval (by slug) of a rulesheet entity from a
+// repository and its filling with data from a Gitlab service.
+func TestGetBySlugSucess(t *testing.T) {
+
+	ctx := context.Background()
+	dto := &dtos.Rulesheet{
+		Slug: "test",
+	}
+	entity, err := models.NewRulesheetV1(*dto)
+	if err != nil {
+		t.Error("unexpected error on model creation")
+	}
+	var opts *repository.FindOptions = nil
+	repository := new(mocks_repository.Rulesheets)
+	repository.On("Find", ctx, map[string]interface{}{"slug": "test"}, opts).Return([]*models.Rulesheet{&entity}, nil)
+	gitlabService := new(mocks_services.Gitlab)
+	gitlabService.On("Fill", dto).Return(nil)
+	service := services.NewRulesheets(repository, gitlabService)
+	_, err = service.Get(ctx, "test")
+	if err != nil {
+		t.Error("unexpected error on get")
+	}
+}
+
 // This's a Get function of a Rulesheets service, which tests for an error on
 // model creation.
 func TestGetWithErrorOnCreateModel(t *testing.T) {

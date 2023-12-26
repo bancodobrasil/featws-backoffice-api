@@ -151,6 +151,7 @@ func main() {
 	routes.SetupRoutes(router)
 	configCors := cors.DefaultConfig()
 	configCors.AllowOrigins = strings.Split(cfg.AllowOrigins, ",")
+	configCors.AllowHeaders = append(configCors.AllowHeaders, "X-API-Key")
 	router.Use(cors.New(configCors))
 
 	// Setup API routers

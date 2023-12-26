@@ -253,7 +253,7 @@ func (rc *rulesheets) GetRulesheets() gin.HandlerFunc {
 }
 
 // GetRulesheet 		godoc
-// @Summary 			Obter Folha de Regra por ID
+// @Summary 			Obter Folha de Regra por ID ou Slug
 // @Description 		Para se obter a folha de regra por ID, basta clicar em **Try it out** e colocar o ID desejado em *id*. Em seguida, clique em **Execute** e caso o ID exista retornará a folha de regra com o número de ID desejado.
 // @Tags 				Rulesheet
 // @Accept  			json
