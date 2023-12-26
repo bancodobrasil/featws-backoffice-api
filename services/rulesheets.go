@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"fmt"
+	"unicode"
 
 	"github.com/bancodobrasil/featws-api/dtos"
 	"github.com/bancodobrasil/featws-api/models"
@@ -152,12 +153,30 @@ func (rs rulesheets) Count(ctx context.Context, entity interface{}) (count int64
 // returns it.
 func (rs rulesheets) Get(ctx context.Context, id string) (result *dtos.Rulesheet, err error) {
 
-	entity, err := rs.repository.Get(ctx, id)
-	if err != nil {
-		log.Errorf("Error on fetch rulesheet(get): %v", err)
-		return
+	isSlug := true
+	if unicode.IsDigit(rune(id[0])) {
+		isSlug = false
 	}
 
+	var entity *models.Rulesheet
+
+	if isSlug {
+		findResult, err2 := rs.repository.Find(ctx, map[string]interface{}{"slug": id}, nil)
+		if err2 != nil {
+			log.Errorf("Error on fetch rulesheet(get): %v", err)
+			return
+		}
+		if len(findResult) == 0 {
+			return nil, nil
+		}
+		entity = findResult[0]
+	} else {
+		entity, err = rs.repository.Get(ctx, id)
+		if err != nil {
+			log.Errorf("Error on fetch rulesheet(get): %v", err)
+			return
+		}
+	}
 	result = newRulesheetDTO(entity)
 
 	if result != nil {
