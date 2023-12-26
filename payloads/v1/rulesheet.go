@@ -20,7 +20,7 @@ package v1
 //   - Rules: a pointer to a map of string keys and interface values. This is likely where the actual rules for the rulesheet are stored. The keys in the map would likely correspond to some sort of rule identifier or name, and the values would contain the logic or conditions for.
 type Rulesheet struct {
 	ID            uint                      `json:"id,omitempty"`
-	Name          string                    `json:"name,omitempty" validate:"required,doesNotStartWithDigit"`
+	Name          string                    `json:"name,omitempty" validate:"required,doesNotStartWithDigit,mustContainLetter"`
 	Description   string                    `json:"description,omitempty"`
 	Slug          string                    `json:"slug,omitempty"`
 	Version       string                    `json:"version,omitempty"`

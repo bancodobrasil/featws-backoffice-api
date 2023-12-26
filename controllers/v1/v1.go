@@ -12,6 +12,7 @@ import (
 func validatePayload(payload interface{}) *responses.Error {
 	validate := validator.New()
 	validate.RegisterValidation("doesNotStartWithDigit", validateDoesNotStartWithDigit)
+	validate.RegisterValidation("mustContainLetter", validateMustContainLetter)
 	if validationErr := validate.Struct(payload); validationErr != nil {
 		err2, ok := validationErr.(validator.ValidationErrors)
 
@@ -43,4 +44,13 @@ func validateDoesNotStartWithDigit(fl validator.FieldLevel) bool {
 		return false
 	}
 	return true
+}
+
+func validateMustContainLetter(fl validator.FieldLevel) bool {
+	for _, r := range fl.Field().String() {
+		if unicode.IsLetter(r) {
+			return true
+		}
+	}
+	return false
 }
