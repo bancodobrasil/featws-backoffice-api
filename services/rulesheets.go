@@ -163,7 +163,7 @@ func (rs rulesheets) Get(ctx context.Context, id string) (result *dtos.Rulesheet
 	if isSlug {
 		findResult, err2 := rs.repository.Find(ctx, map[string]interface{}{"slug": id}, nil)
 		if err2 != nil {
-			log.Errorf("Error on fetch rulesheet(get): %v", err)
+			log.Errorf("Error on fetch rulesheet(get): %v", err2)
 			return
 		}
 		if len(findResult) == 0 {
