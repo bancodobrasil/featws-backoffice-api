@@ -1,15 +1,17 @@
 package v1
 
 import (
+	"unicode"
+
 	responses "github.com/bancodobrasil/featws-api/responses/v1"
 	"github.com/go-playground/validator/v10"
 )
 
-var validate = validator.New()
-
 // validatePayload validates a payload using a validator library and returns any validation errors as a
 // custom error response.
 func validatePayload(payload interface{}) *responses.Error {
+	validate := validator.New()
+	validate.RegisterValidation("doesNotStartWithDigit", validateDoesNotStartWithDigit)
 	if validationErr := validate.Struct(payload); validationErr != nil {
 		err2, ok := validationErr.(validator.ValidationErrors)
 
@@ -34,4 +36,11 @@ func validatePayload(payload interface{}) *responses.Error {
 	}
 
 	return nil
+}
+
+func validateDoesNotStartWithDigit(fl validator.FieldLevel) bool {
+	if unicode.IsDigit(rune(fl.Field().String()[0])) {
+		return false
+	}
+	return true
 }

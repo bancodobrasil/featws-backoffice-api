@@ -375,7 +375,7 @@ func TestRulesheet_CreateRulesheet(t *testing.T) {
 		assert.Equal(t, http.StatusBadRequest, w.Code)
 	})
 
-	t.Run("Error on missing required Name field", func(t *testing.T) {
+	t.Run("Error on validate required Name field", func(t *testing.T) {
 		gin.SetMode(gin.TestMode)
 
 		w := httptest.NewRecorder()
@@ -402,6 +402,37 @@ func TestRulesheet_CreateRulesheet(t *testing.T) {
 		json.Unmarshal(w.Body.Bytes(), response)
 		assert.Equal(t, "Name", response.ValidationErrors[0].Field)
 		assert.Equal(t, "required", response.ValidationErrors[0].Tag)
+	})
+
+	t.Run("Error on validate Name field does not start with digit", func(t *testing.T) {
+		gin.SetMode(gin.TestMode)
+
+		w := httptest.NewRecorder()
+		c, _ := gin.CreateTestContext(w)
+
+		c.Request = &http.Request{
+			Header: make(http.Header),
+		}
+
+		payload := &payloads.Rulesheet{
+			Name: "123Test",
+		}
+
+		bytedPayload, _ := json.Marshal(payload)
+
+		c.Request.Body = ioutil.NopCloser(bytes.NewReader(bytedPayload))
+
+		srv := new(mock_services.Rulesheets)
+
+		createdRulesheet := &dtos.Rulesheet{}
+
+		srv.On("Create", mock.Anything, createdRulesheet).Return(nil)
+		v1.NewRulesheets(srv).CreateRulesheet()(c)
+		assert.Equal(t, http.StatusBadRequest, w.Code)
+		response := &responses.Error{}
+		json.Unmarshal(w.Body.Bytes(), response)
+		assert.Equal(t, "Name", response.ValidationErrors[0].Field)
+		assert.Equal(t, "doesNotStartWithDigit", response.ValidationErrors[0].Tag)
 	})
 
 	// t.Run("Error on define rulesheet entity", func(t *testing.T) {
