@@ -654,6 +654,10 @@ func TestFill(t *testing.T) {
 			w.Write([]byte(`{"id":1,"name":"teste", "full_path":"testpath"}`))
 			return
 		}
+		if r.URL.Path == "/api/v4/projects/1/pipelines/latest" {
+			w.Write([]byte(`{ "PippelineStatus": "success", "webURL": "testURL"}`))
+
+		}
 
 		if r.Method == "GET" && r.URL.Path == "/api/v4/projects/testpath/prefix-test" {
 			w.Write([]byte(`{"id":1,"description":"testeDesc","name":"teste"}`))
@@ -774,6 +778,10 @@ func TestFillJSON(t *testing.T) {
 		if r.URL.Path == "/api/v4/namespaces/"+namespace {
 			w.Write([]byte(`{"id":1,"name":"teste", "full_path":"testpath"}`))
 			return
+		}
+		if r.URL.Path == "/api/v4/projects/1/pipelines/latest" {
+			w.Write([]byte(`{ "PippelineStatus": "success", "webURL": "testURL"}`))
+
 		}
 
 		if r.Method == "GET" && r.URL.Path == "/api/v4/projects/testpath/prefix-test" {
@@ -898,7 +906,10 @@ func TestFillRulesSlices(t *testing.T) {
 			w.Write([]byte(`{"id":1,"name":"teste", "full_path":"testpath"}`))
 			return
 		}
+		if r.URL.Path == "/api/v4/projects/1/pipelines/latest" {
+			w.Write([]byte(`{ "PippelineStatus": "success", "webURL": "testURL"}`))
 
+		}
 		if r.Method == "GET" && r.URL.Path == "/api/v4/projects/testpath/prefix-test" {
 			w.Write([]byte(`{"id":1,"description":"testeDesc","name":"teste"}`))
 			return

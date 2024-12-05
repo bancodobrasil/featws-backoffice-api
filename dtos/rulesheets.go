@@ -33,15 +33,17 @@ type Rule struct {
 //   - Parameters: a pointer to a slice of maps, where each map represents a parameter that can be used in the rules defined in the `Rules` property. Each mapcontains key-value pairs where the key is a string representing the name of the parameter and the value is an interface{}
 //   - Rules: property is a pointer to a map of string keys and interface values. This map represents the set of rules that are associated with the rulesheet. Each key in the map represents a unique rule identifier, and the corresponding value is an interface that can be usedto store any type of data. The use of `interface` allows for flexibility in the type of data that can be stored in the map.
 type Rulesheet struct {
-	ID            uint
-	Name          string
-	Description   string
-	Slug          string
-	HasStringRule bool
-	Version       string
-	Features      *[]map[string]interface{}
-	Parameters    *[]map[string]interface{}
-	Rules         *map[string]interface{}
+	ID             uint
+	Name           string
+	Description    string
+	Slug           string
+	HasStringRule  bool
+	Version        string
+	PipelineStatus string
+	WebURL         string
+	Features       *[]map[string]interface{}
+	Parameters     *[]map[string]interface{}
+	Rules          *map[string]interface{}
 }
 
 // NewRulesheetV1 takes in a payload of rulesheet and returns a DTO with the rules converted to a

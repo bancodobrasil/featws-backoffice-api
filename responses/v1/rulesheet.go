@@ -18,26 +18,30 @@ import "github.com/bancodobrasil/featws-api/dtos"
 //   - Rules: a pointer to a map of string keys and interface values. This is likely where the actual rules for the rulesheet are stored. The keys in the map would likely correspond to some sort of rule identifier or name, and the values would contain the logic or conditions for.
 type Rulesheet struct {
 	FindResult
-	ID          uint                      `json:"id,omitempty"`
-	Name        string                    `json:"name,omitempty"`
-	Description string                    `json:"description,omitempty"`
-	Slug        string                    `json:"slug,omitempty"`
-	Version     string                    `json:"version,omitempty"`
-	Features    *[]map[string]interface{} `json:"features,omitempty"`
-	Parameters  *[]map[string]interface{} `json:"parameters,omitempty"`
-	Rules       *map[string]interface{}   `json:"rules,omitempty"`
+	ID             uint                      `json:"id,omitempty"`
+	Name           string                    `json:"name,omitempty"`
+	Description    string                    `json:"description,omitempty"`
+	Slug           string                    `json:"slug,omitempty"`
+	Version        string                    `json:"version,omitempty"`
+	PipelineStatus string                    `json:"status,omitempty"`
+	WebURL         string                    `json:"web_url,omitempty"`
+	Features       *[]map[string]interface{} `json:"features,omitempty"`
+	Parameters     *[]map[string]interface{} `json:"parameters,omitempty"`
+	Rules          *map[string]interface{}   `json:"rules,omitempty"`
 }
 
 // NewRulesheet creates a new Rulesheet object by copying data from a DTO object.
 func NewRulesheet(dto *dtos.Rulesheet) Rulesheet {
 	return Rulesheet{
-		ID:          dto.ID,
-		Name:        dto.Name,
-		Description: dto.Description,
-		Slug:        dto.Slug,
-		Version:     dto.Version,
-		Features:    dto.Features,
-		Parameters:  dto.Parameters,
-		Rules:       dto.Rules,
+		ID:             dto.ID,
+		Name:           dto.Name,
+		Description:    dto.Description,
+		Slug:           dto.Slug,
+		Version:        dto.Version,
+		PipelineStatus: dto.PipelineStatus,
+		WebURL:         dto.WebURL,
+		Features:       dto.Features,
+		Parameters:     dto.Parameters,
+		Rules:          dto.Rules,
 	}
 }
